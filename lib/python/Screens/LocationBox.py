@@ -88,6 +88,7 @@ class LocationBox(Screen, NumericalTextInput, HelpableScreen):
 
 		# Initialize Target
 		self["target"] = Label()
+		self["targetfreespace"] = Label()
 
 		if self.userMode:
 			self.usermodeOn()
@@ -167,13 +168,7 @@ class LocationBox(Screen, NumericalTextInput, HelpableScreen):
 		self.onClose.append(self.disableTimer)
 
 	def switchToFileListOnStart(self):
-		if self.realBookmarks and self.realBookmarks.value:
-			self.currList = "booklist"
-			currDir = self["filelist"].current_directory
-			if currDir in self.bookmarks:
-				self["booklist"].moveToIndex(self.bookmarks.index(currDir))
-		else:
-			self.switchToFileList()
+		self.switchToFileList()
 
 	def disableTimer(self):
 		self.qs_timer.callback.remove(self.timeout)
@@ -387,6 +382,13 @@ class LocationBox(Screen, NumericalTextInput, HelpableScreen):
 		# Write Combination of Folder & Filename when Folder is valid
 		currFolder = self.getPreferredFolder()
 		if currFolder is not None:
+			free = ""
+			try:
+				stat = os.statvfs(currFolder)
+				free = ("%0.f GB " + _("free")) % (float(stat.f_bavail) * stat.f_bsize / 1024 / 1024 /1024)
+			except:
+				pass
+			self["targetfreespace"].setText(free)
 			self["target"].setText(''.join((currFolder, self.filename)))
 		# Display a Warning otherwise
 		else:
@@ -527,3 +529,27 @@ class TimeshiftLocationBox(LocationBox):
 			config.usage.timeshift_path.save()
 			LocationBox.selectConfirmed(self, ret)
 
+class AutorecordLocationBox(LocationBox):
+	def __init__(self, session):
+		LocationBox.__init__(
+				self,
+				session,
+				text = _("Where to save temporary timeshift recordings?"),
+				currDir = config.usage.autorecord_path.value,
+				bookmarks = config.usage.allowed_autorecord_paths,
+				autoAdd = True,
+				editDir = True,
+				inhibitDirs = defaultInhibitDirs,
+				minFree = 1024 # the same requirement is hardcoded in servicedvb.cpp
+		)
+		self.skinName = "LocationBox"
+
+	def cancel(self):
+		config.usage.autorecord_path.cancel()
+		LocationBox.cancel(self)
+
+	def selectConfirmed(self, ret):
+		if ret:
+			config.usage.autorecord_path.setValue(self.getPreferredFolder())
+			config.usage.autorecord_path.save()
+			LocationBox.selectConfirmed(self, ret)

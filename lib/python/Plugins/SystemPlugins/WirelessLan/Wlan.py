@@ -187,13 +187,13 @@ class wpaSupplicant:
 				split = s.strip().split('=',1)
 				if split[0] == 'scan_ssid':
 					if split[1] == '1':
-						config.plugins.wlan.hiddenessid.value = True
+						config.plugins.wlan.hiddenessid.setValue(True)
 					else:
-						config.plugins.wlan.hiddenessid.value = False
+						config.plugins.wlan.hiddenessid.setValue(False)
 
 				elif split[0] == 'ssid':
 					essid = split[1][1:-1]
-					config.plugins.wlan.essid.value = essid
+					config.plugins.wlan.essid.setValue(essid)
 
 				elif split[0] == 'proto':
 					if split[1] == 'WPA' :
@@ -207,18 +207,18 @@ class wpaSupplicant:
 				elif split[0] == 'wep_key0':
 					encryption = 'WEP'
 					if split[1].startswith('"') and split[1].endswith('"'):
-						config.plugins.wlan.wepkeytype.value = 'ASCII'
-						config.plugins.wlan.psk.value = split[1][1:-1]
+						config.plugins.wlan.wepkeytype.setValue('ASCII')
+						config.plugins.wlan.psk.setValue(split[1][1:-1])
 					else:
-						config.plugins.wlan.wepkeytype.value = 'HEX'
-						config.plugins.wlan.psk.value = split[1]
+						config.plugins.wlan.wepkeytype.setValue('HEX')
+						config.plugins.wlan.psk.setValue(split[1])
 
 				elif split[0] == 'psk':
-					config.plugins.wlan.psk.value = split[1][1:-1]
+					config.plugins.wlan.psk.setValue(split[1][1:-1])
 				else:
 					pass
 
-			config.plugins.wlan.encryption.value = encryption
+			config.plugins.wlan.encryption.setValue(encryption)
 
 			wsconfig = {
 					'hiddenessid': config.plugins.wlan.hiddenessid.value,
