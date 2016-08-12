@@ -1,0 +1,28 @@
+<!-- Radiode -->
+<screen name="Radio.de" position="0,0" size="1280,720" flags="wfNoBorder">
+	<widget source="session.VideoPicture" render="Pig" position="937,15" size="320,180" zPosition="3" backgroundColor="transparent" />
+	<widget source="hidePig" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/video_bg_logo.png" position="937,15" size="320,180" zPosition="4">
+		<convert type="ConditionalShowHide" />
+	</widget>
+	<ePixmap position="14,31" size="508,48" zPosition="0" pixmap="~/liquidblue/images/mplogo.png" transparent="1" alphatest="blend" />
+	<ePixmap position="928,7" size="342,201" zPosition="5" pixmap="~/liquidblue/images/video_bg.png" backgroundColor="transparent" alphatest="blend" />
+	<!-- select screen -->
+	<widget name="leftContentTitle" position="25,230" size="440,26" backgroundColor="#26181d20" zPosition="0" foregroundColor="#00ffffff" font="mediaportal;22" halign="center" transparent="1" />
+	<widget name="liste" position="25,270" size="440,350" backgroundColor="#26181d20" scrollbarMode="showOnDemand" transparent="1" selectionPixmap="~/liquidblue/images/sel.png" foregroundColorSelected="#ffffff" itemHeight="25" />
+	<widget name="rightContentTitle" position="465,230" size="440,26" backgroundColor="#26181d20" zPosition="0" foregroundColor="#00ffffff" font="mediaportal;22" halign="center" transparent="1" />
+	<widget name="playlist" position="465,270" size="440,350" backgroundColor="#26181d20" scrollbarMode="showOnDemand" transparent="1" selectionPixmap="~/liquidblue/images/sel.png" foregroundColorSelected="#ffffff" itemHeight="25" />
+	<widget name="stationIcon" pixmap="~/liquidblue/images/no_coverArt.png" position="935,424" size="320,200" transparent="1" alphatest="blend" />
+	<eLabel text="Play" position="25,115" size="120,25" backgroundColor="#26181d20" transparent="1" foregroundColor="#00ffffff" font="mediaportal;20" valign="top" />
+	<widget name="stationInfo" position="145,115" size="650,25" backgroundColor="#26181d20" foregroundColor="#00ffffff" transparent="1" font="mediaportal;20" valign="top" />
+	<widget source="session.CurrentService" render="Label" position="780,115" size="120,25" font="mediaportal;20" foregroundColor="#00ffffff" backgroundColor="#26181d20" halign="right" valign="top" transparent="1">
+		<convert type="MPServicePosition">Position</convert>
+	</widget>
+	<eLabel text="Info" position="25,160" size="120,25" backgroundColor="#00ffffff" foregroundColor="#00ffffff" transparent="1" font="mediaportal;20" valign="top" />
+	<widget name="stationDesc" position="145,160" zPosition="1" size="765,50" backgroundColor="#26181d20" transparent="1" font="mediaportal;19" halign="left" valign="top" foregroundColor="#00ffffff" />
+	<widget name="F1" position="96,665" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<widget name="F2" position="392,665" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<widget name="F3" position="688,665" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<widget name="F4" position="984,665" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" /> 	
+	<ePixmap position="0,0" size="1280,640" zPosition="-2" pixmap="~/liquidblue/images/Radiode.png" />	
+	<ePixmap position="0,638" size="1280,82" zPosition="-1" pixmap="~/liquidblue/images/buttons200x40_rgyb.png" />
+</screen>	

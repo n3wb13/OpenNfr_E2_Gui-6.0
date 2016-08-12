@@ -1,0 +1,10 @@
+<!-- category_selector -->
+<screen name="CategorySelector" position="center,center" size="1280,720" flags="wfNoBorder" backgroundColor="#ffffffff">
+	<ePixmap position="490,165" size="300,390" zPosition="-1" pixmap="~/clean_uhd/images/category_selector_bg.png" />
+	<widget name="F1" position="531,195" size="218,45" transparent="1" font="Regular;35" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="2" />
+    <widget name="F2" position="531,240" size="218,45" transparent="1" font="Regular;35" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="2" />
+    <widget name="F3" position="531,290" size="218,45" transparent="1" font="Regular;35" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="2" />
+    <widget name="F4" position="531,338" size="218,45" transparent="1" font="Regular;35" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="2" />
+    <widget name="F5" position="531,385" size="218,45" transparent="1" font="Regular;35" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="2" />
+    <widget name="F6" position="531,435" size="218,45" transparent="1" font="Regular;35" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="2" />
+    <widget name="F7" position="531,480" size="218,45" transparent="1" font="Regular;35" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="2" />

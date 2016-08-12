@@ -1,0 +1,13 @@
+<screen position="center,center" size="450,240" title="" >
+	<widget source="label_filename" transparent="1" render="Label" zPosition="2" position="10,10" size="430,21" font="mediaportal;19" />
+	<widget source="label_speed" transparent="1" render="Label" zPosition="2" position="10,60" size="430,21" font="mediaportal;19" />
+	<widget source="label_timeleft" transparent="1" render="Label" zPosition="2" position="10,85" size="430,21" font="mediaportal;19" />
+	<widget source="label_progress" transparent="1" render="Label" zPosition="2" position="10,110" size="430,21" font="mediaportal;19" />
+	<widget name="activityslider" position="10,150" size="430,30" zPosition="3" transparent="0" />
+	<widget name="key_red" position="10,200" zPosition="1" size="140,40" font="mediaportal;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+	<widget name="key_green" position="155,200" zPosition="1" size="140,40" font="mediaportal;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+	<widget name="key_blue" position="300,200" zPosition="1" size="140,40" font="mediaportal;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+	<ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/red.png" position="10,200" size="140,40" alphatest="on" />
+	<ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/green.png" position="155,200" size="140,40" alphatest="on" />
+	<ePixmap pixmap="/usr/share/enigma2/skin_default/buttons/blue.png" position="300,200" size="140,40" alphatest="on" />
+</screen>

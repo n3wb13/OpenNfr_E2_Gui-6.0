@@ -1,0 +1,8 @@
+﻿Tipp: Mit "0" kommt man aus jeder Ebene direkt wieder zum Wallscreen.
+Tipp: Im Wallscreen kommt man mit "PVR/Video" zur SimpleList.
+Tipp: Im Wallscreen die Taste "EPG/INFO" (Panik-Button) drücken um die Porn Section ein-/auszuschalten.
+Tipp: Während der Film-Wiedergabe "MENU" drücken um die Coveranzeige im Simpleplayer ein-/auszuschalten.
+Tipp: Während der Film-Wiedergabe "MENU" drücken um den Screensaver im Simpleplayer ein-/auszuschalten.
+Tipp: Die Grauzone fehlt?! - Drücke "MENU" im Wallscreen und aktiviere die Grauzone und beim erneuten betreten der Einstellungen können die einzelnen Plugins aktiviert werden.
+Tipp: Die Streams ruckeln?! - Mit dem PROXY (premiumize.me) nicht.
+Tipp: Lege deine eigene Reihenfolge der Plugins im Wallscreen fest, drücke dazu die Taste "GELB" (Sort).

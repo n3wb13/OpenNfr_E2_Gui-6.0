@@ -1,0 +1,31 @@
+﻿#EXTM3U,$MODE=IPTV
+#EXTINF:-1,Invest TV
+http://vtv.live.cdn.fptplay.net/vtvlive/smil:investtv_hls.smil/master.m3u8
+#EXTINF:-1,Thé Thao TV
+http://vtv.live.cdn.fptplay.net/vtvlive/smil:thethaotvsd_hls.smil/master.m3u8
+#EXTINF:-1,Bongda TV
+http://vtv.live.cdn.fptplay.net/vtvlive/smil:bongdatvsd_hls.smil/master.m3u8
+#EXTINF:-1,Giai Tri TV
+http://vtv.live.cdn.fptplay.net/vtvlive/smil:giaitritv_hls.smil/master.m3u8
+#EXTINF:-1,Phim Viet
+http://vtv.live.cdn.fptplay.net/vtvlive/smil:phimviet_hls.smil/master.m3u8
+#EXTINF:-1,Hay TV
+http://vtv.live.cdn.fptplay.net/vtvlive/smil:haytv_hls.smil/master.m3u8
+#EXTINF:-1,D Dramas
+http://vtv.live.cdn.fptplay.net/vtvlive/smil:ddramas_hls.smil/master.m3u8
+#EXTINF:-1,Bibi
+http://vtv.live.cdn.fptplay.net/vtvlive/smil:bibi_hls.smil/master.m3u8
+#EXTINF:-1,O2 TV
+http://vtv.live.cdn.fptplay.net/vtvlive/smil:o2tv_hls.smil/master.m3u8
+#EXTINF:-1,Style TV
+http://vtv.live.cdn.fptplay.net/vtvlive/smil:styletv_hls.smil/master.m3u8
+#EXTINF:-1,Yeah 1 TV
+http://vtv.live.cdn.fptplay.net/vtvlive/smil:yeah1tv_hls.smil/master.m3u8
+#EXTINF:-1,Kênh 17
+http://vtv.live.cdn.fptplay.net/vtvlive/smil:kenh17_hls.smil/master.m3u8
+#EXTINF:-1,E-Channel
+http://vtv.live.cdn.fptplay.net/vtvlive/smil:echanel_hls.smil/master.m3u8
+#EXTINF:-1,Info TV
+http://vtv.live.cdn.fptplay.net/vtvlive/smil:infotv_hls.smil/master.m3u8
+#EXTINF:-1,VNBC
+http://uni6rtmp.tulix.tv/vbstv/vbsabr.smil/master.m3u8

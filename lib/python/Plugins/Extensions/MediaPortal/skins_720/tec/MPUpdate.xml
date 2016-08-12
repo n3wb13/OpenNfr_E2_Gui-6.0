@@ -1,0 +1,4 @@
+<screen name="MPUpdateScreen" position="center,center" size="1280,720" title="" backgroundColor="transparent" flags="wfNoBorder">
+	<ePixmap position="215,110" size="850,500" zPosition="0" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/MP_update.png" alphatest="on" />
+	<widget name="mplog" position="287,240" size="720,320" font="mediaportal;22" valign="top" halign="left" backgroundColor="#00000000" transparent="1" zPosition="1" />
+</screen>

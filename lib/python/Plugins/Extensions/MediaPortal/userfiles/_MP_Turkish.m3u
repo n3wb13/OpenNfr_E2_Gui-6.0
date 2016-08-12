@@ -1,0 +1,85 @@
+﻿#EXTM3U,$MODE=IPTV
+#EXTINF:-1,TRT 1 HD
+http://trtcanlitv-lh.akamaihd.net/i/TRT1HD_1@181842/master.m3u8
+#EXTINF:-1,TRT HABER HD
+http://trtcanlitv-lh.akamaihd.net/i/TRTHABERHD_1@181942/master.m3u8
+#EXTINF:-1,TRT MÜZIK
+http://trtcanlitv-lh.akamaihd.net/i/TRTMUZIK_1@181845/master.m3u8
+#EXTINF:-1,TRT COCUK
+http://trtcanlitv-lh.akamaihd.net/i/TRTCOCUK_1@181844/master.m3u8
+#EXTINF:-1,TRT TÜRK
+http://trtcanlitv-lh.akamaihd.net/i/TRTTURK_1@182144/master.m3u8
+#EXTINF:-1,TRT DİYANET
+http://trtcanlitv-lh.akamaihd.net/i/TRTDIYANET_1@182344/master.m3u8
+#EXTINF:-1,TRT AVAZ
+http://trtcanlitv-lh.akamaihd.net/i/TRTAVAZ_1@182244/master.m3u8
+#EXTINF:-1,TRT KURDÎ
+http://trtcanlitv-lh.akamaihd.net/i/TRT6_1@181944/master.m3u8
+#EXTINF:-1,TRT OKUL
+http://trtcanlitv-lh.akamaihd.net/i/TRTOKUL_1@182245/master.m3u8
+#EXTINF:-1,TRT ARAPÇA
+http://trtcanlitv-lh.akamaihd.net/i/TRTARAPCA_1@181945/master.m3u8
+#EXTINF:-1,TRT BELGESEL HD
+http://trtcanlitv-lh.akamaihd.net/i/TRTBELGESEL_1@182145/master.m3u8
+#EXTINF:-1,TRT 3 - TBMM
+http://mecliscanlitv-lh.akamaihd.net/i/MECLISTV_1@127503/master.m3u8
+#EXTINF:-1,Kanal D
+http://live.netd.com.tr/S1/HLS_LIVE/kanald/index.m3u8
+#EXTINF:-1,TV 2
+http://media.netd.com.tr/S2/HLS_LIVE/tv2/playlist.m3u8
+#EXTINF:-1,CNN Türk
+http://live.netd.com.tr/S1/HLS_LIVE/cnn_turk/index.m3u8
+#EXTINF:-1,Dream TV
+http://live.netd.com.tr/S1/HLS_LIVE/dreamtv/index.m3u8
+#EXTINF:-1,Dream Türk
+http://live.netd.com.tr/S1/HLS_LIVE/dreamturktv/index.m3u8
+#EXTINF:-1,tvem
+http://mn-i.mncdn.com:1935/tvem_live/smil:tvem.smil/master.m3u8
+#EXTINF:-1,Kanal 7
+http://livetr.gostream.nl/kanal7hq/kanal7hq/master.m3u8
+#EXTINF:-1,Kanal 7 Avrupa
+http://stream.gostream.nl/kanal7int/kanal7int.m3u8
+#EXTINF:-1,Ülke TV
+http://livetr.gostream.nl/ulketvhq/ulketvhq/master.m3u8
+#EXTINF:-1,SEMERKAND
+http://semerkandglb.mediatriple.net:1935/semerkandliveedge/semerkand1/master.m3u8
+#EXTINF:-1,Bloomberg HT
+http://mn-i.mncdn.com:1935/bloomberght_ios/smil:bloomberght.smil/master.m3u8
+#EXTINF:-1,Haber Turk
+http://strm-i.glb.pr.medianova.tv:1935/haberturk/smil:ihaberturk.smil/playlist.m3u8
+#EXTINF:-1,Kanal 24
+http://strm-i.glb.pr.medianova.tv:1935/kanal24/kanal243/playlist.m3u8
+#EXTINF:-1,TV 4
+http://mn-l.mncdn.com:1935/r_karamel/karamel/master.m3u8
+#EXTINF:-1,Show TV
+http://mn-l.mncdn.com:1935/showtv/showtv2/master.m3u8
+#EXTINF:-1,Show Türk
+http://mn-l.mncdn.com:1935/showturktv/showturktv1/master.m3u8
+#EXTINF:-1,atv
+atv-stream-tr.m3u8
+#EXTINF:-1,atv Avrupa
+atvavrupa-stream-tr.m3u8
+#EXTINF:-1,a Spor
+aspor-stream-tr.m3u8
+#EXTINF:-1,a Haber
+ahaber-stream-tr.m3u8
+#EXTINF:-1,minika COCUK
+minikacocuk-stream-tr.m3u8
+#EXTINF:-1,minika GO
+minikago-stream-tr.m3u8
+#EXTINF:-1,Bugün TV
+http://buguntv-live.ercdn.com/buguntv.m3u8
+#EXTINF:-1,KOZA
+http://kozatv.garantisistem.com:1935/kozatv/smil:kozatv.smil/playlist.m3u8
+#EXTINF:-1,ANS TV Azerbaycan
+http://ans-ng.ercdn.com/ans/live/anstv.m3u8
+#EXTINF:-1,NRT HD
+http://nrttv.iptv-playoutcenter.de:1935/nrt1/nrt1.stream_1/master.m3u8
+#EXTINF:-1,Kurdmax
+http://live.kurdstream.net:1935/liveTrans/_definst_/mp4:myStream_720p/master.m3u8
+#EXTINF:-1,Rudaw TV
+http://livestreaming.itworkscdn.net/rudawlive/rudawtv/master.m3u8
+#EXTINF:-1,Kurdsat News
+http://68.168.105.117/live/autoHLS/livestream/livestream.m3u8
+#EXTINF:-1,Geli Kurdistan TV
+http://64.150.177.45:1935/live/mp4:myStream/master.m3u8

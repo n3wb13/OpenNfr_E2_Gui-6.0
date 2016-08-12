@@ -1,0 +1,40 @@
+<!-- tmdbinfo -->
+<screen position="0,0" size="1280,720" title="TMDb - The Movie Database" name="TMDb" flags="wfNoBorder" backgroundColor="transparent">
+   <widget source="session.VideoPicture" render="Pig" position="937,15" size="320,180" zPosition="3" backgroundColor="transparent" />
+	<widget source="hidePig" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/video_bg_logo.png" position="937,15" size="320,180" zPosition="4">
+		<convert type="ConditionalShowHide" />
+	</widget>
+    <ePixmap position="14,31" size="508,48" zPosition="0" pixmap="~/liquidblue/images/mplogo.png" transparent="1" alphatest="blend" />
+	<ePixmap position="928,7" size="342,201" zPosition="5" pixmap="~/liquidblue/images/video_bg.png" backgroundColor="transparent" alphatest="blend" />
+    <ePixmap position="928,7" size="342,201" zPosition="5" pixmap="~/liquidblue/images/video_bg.png" backgroundColor="transparent" alphatest="blend" />
+    <widget name="searchinfo" zPosition="1" transparent="1" position="20,115" size="900,40" font="mediaportal;24" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="subtitle" position="20,220" size="700,25" zPosition="2" transparent="1" font="mediaportal;22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="fulldescription" zPosition="1" transparent="1" position="20,260" size="705,370" font="mediaportal;22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="coverArt" position="1035,260" size="220,305" alphatest="blend" />
+    <widget name="fsk_txt" position="730,360" size="400,25" zPosition="2" transparent="1" font="mediaportal;22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="fsk" position="860,360" size="150,25" zPosition="2" transparent="1" font="mediaportal;22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="year_txt" position="730,390" size="400,25" zPosition="2" transparent="1" font="mediaportal;22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="year" position="860,390" size="400,25" zPosition="2" transparent="1" font="mediaportal;22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="country_txt" position="730,420" size="400,25" zPosition="2" transparent="1" font="mediaportal;22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="country" position="860,420" size="400,25" zPosition="2" transparent="1" font="mediaportal;22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="runtime_txt" position="730,450" size="400,25" zPosition="2" transparent="1" font="mediaportal;22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="runtime" position="860,450" size="400,25" zPosition="2" transparent="1" font="mediaportal;22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="votes_txt" position="730,480" size="400,25" zPosition="2" transparent="1" font="mediaportal;22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="votes" position="860,480" size="400,25" zPosition="2" transparent="1" font="mediaportal;22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="director_txt" position="730,510" size="400,25" zPosition="2" transparent="1" font="mediaportal;22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="director" position="860,510" size="400,25" zPosition="2" transparent="1" font="mediaportal;22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="author_txt" position="730,540" size="400,25" zPosition="2" transparent="1" font="mediaportal;22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="author" position="860,540" size="400,25" zPosition="2" transparent="1" font="mediaportal;22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="genre_txt" position="730,570" size="100,30" zPosition="2" transparent="1" font="mediaportal; 22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="genre" position="860,570" size="400,25" zPosition="2" transparent="1" font="mediaportal;22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="studio_txt" position="730,600" size="100,30" zPosition="2" transparent="1" font="mediaportal; 22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="studio" position="860,600" size="400,25" zPosition="2" transparent="1" font="mediaportal;22" backgroundColor="#26181d20" foregroundColor="#00ffffff" />
+    <widget name="F1" position="96,661" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+    <widget name="F2" position="392,661" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+    <widget name="F3" position="688,661" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+    <widget name="F4" position="984,661" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+    <ePixmap position="0,0" size="1280,640" zPosition="-2" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins_720/liquidblue/images/haupt_Screen.png" />
+    <ePixmap position="0,638" size="1280,82" zPosition="-1" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins_720/liquidblue/images/buttons200x40_rgyb.png" />
+    <widget name="rating10" position="730,260" size="140,20" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins_720/liquidblue/images/stars-full10.png" zPosition="4" transparent="1" backgroundColor="#26181d20" />
+    <widget name="rating0" position="730,260" size="140,20" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins_720/liquidblue/images/stars-empty10.png" zPosition="3" transparent="1" backgroundColor="#26181d20" />
+</screen>

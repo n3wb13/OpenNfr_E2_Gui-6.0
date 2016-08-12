@@ -1,0 +1,3 @@
+<screen position="center,center" size="500,200" title="">
+	<widget name="menu" position="10,10" size="480,190" scrollbarMode="showOnDemand" />
+</screen>

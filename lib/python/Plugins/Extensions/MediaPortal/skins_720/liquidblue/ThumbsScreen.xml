@@ -1,0 +1,14 @@
+<!-- bottomScreen -->
+<screen name="MediaPortal_Thumbs" position="0,0" size="1280,720" flags="wfNoBorder">
+	<ePixmap position="14,31" size="508,48" zPosition="0" pixmap="~/liquidblue/images/mplogo.png" transparent="1" alphatest="blend" />
+	<widget name="Page" position="552,663" size="80,36" backgroundColor="#26181d20" transparent="1" foregroundColor="#00ffffff" font="mediaportal;18" valign="center" zPosition="1" />
+	<widget name="page" position="579,663" size="461,36" backgroundColor="#26181d20" transparent="1" font="mediaportal;18" valign="center" foregroundColor="#00ffffff" zPosition="1" />
+	<widget name="Thumb" position="986,663" size="100,36" backgroundColor="#26181d20" transparent="1" font="mediaportal;18" valign="center" foregroundColor="#00ffffff" zPosition="1" />
+	<widget name="thumb" position="1064,663" size="100,36" backgroundColor="#26181d20" transparent="1" font="mediaportal;18" valign="center" foregroundColor="#00ffffff" zPosition="1" />
+	<widget name="F1" position="10,660" size="125,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<widget name="F2" position="145,660" size="125,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<widget name="F3" position="280,660" size="125,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<widget name="F4" position="415,660" size="125,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<eLabel text="INFO" position="1145,660" size="125,40" transparent="1" font="mediaportal; 18" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<widget source="session.VideoPicture" render="Pig" position="937,15" size="320,180" zPosition="-10" backgroundColor="transparent" />
+	<ePixmap position="0,0" size="1280,720" zPosition="-1" pixmap="~/liquidblue/images/ThumbsScreen.png" />

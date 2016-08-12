@@ -1,0 +1,46 @@
+<!-- defaultPlaylistScreen -->
+<screen name="defaultPlaylist" position="center,center" size="900,650" backgroundColor="#00060606" flags="wfNoBorder">
+	<eLabel position="0,0" size="900,60" backgroundColor="#00242424" />
+	<widget name="title" position="20,4" size="645,52" backgroundColor="#18101214" transparent="1" zPosition="1" font="mediaportal;24" valign="center" halign="left" />
+	<widget source="global.CurrentTime" render="Label" position="730,8" size="150,30" backgroundColor="#18101214" transparent="1" zPosition="1" font="mediaportal;24" valign="center" halign="right">
+		<convert type="ClockToText">Format:%-H:%M</convert>
+	</widget>
+	<widget source="global.CurrentTime" render="Label" position="680,38" size="200,20" backgroundColor="#18101214" transparent="1" zPosition="1" font="mediaportal;18" valign="center" halign="right">
+		<convert type="ClockToText">Format:%A, %d.%m.%Y</convert>
+	</widget>
+	<widget name="liste" position="0,60" size="900,350" backgroundColor="#00101214" scrollbarMode="showOnDemand" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins_720/original/images/sel.png" foregroundColorSelected="#00e5b243" transparent="0" itemHeight="25" />
+	<widget name="songtitle" position="220,420" size="520,30" foregroundColor="#00e5b243" backgroundColor="#00101214" transparent="1" font="mediaportal;24" valign="top" />
+	<widget source="session.CurrentService" render="Label" position="760,420" size="120,40" font="mediaportal;24" foregroundColor="#00e5b243" backgroundColor="#00101214" halign="right" transparent="1">
+		<convert type="MPServicePosition">Length</convert>
+	</widget>
+	<eLabel position="215,460" size="665,2" backgroundColor="#00555556" />
+	<widget name="coverArt" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins_720/original/images/no_coverArt100.png" position="20,420" size="180,180" transparent="1" alphatest="blend" />
+	<eLabel text="Artist" position="230,470" size="100,25" backgroundColor="#00101214" transparent="1" foregroundColor="#00555556" font="mediaportal;20" valign="top" />
+	<widget name="artist" position="330,470" size="550,25" backgroundColor="#00101214" transparent="1" font="mediaportal;20" valign="top" />
+	<eLabel text="Album" position="230,500" size="100,25" backgroundColor="#00101214" transparent="1" foregroundColor="#00555556" font="mediaportal;20" valign="top" />
+	<widget name="album" position="330,500" size="550,25" backgroundColor="#00101214" transparent="1" font="mediaportal;20" valign="top" />
+	<eLabel text="Info" position="230,530" size="100,25" backgroundColor="#00101214" transparent="1" foregroundColor="#00555556" font="mediaportal;20" valign="top" />
+	<widget source="session.CurrentService" render="Progress" position="420,540" size="230,10" backgroundColor="#00101214" borderWidth="1" borderColor="#00555556" transparent="1">
+		<convert type="MPServicePosition">Position</convert>
+	</widget>
+	<widget source="session.CurrentService" render="Label" position="330,530" size="90,25" backgroundColor="#00101214" transparent="1" font="mediaportal;22" valign="center" halign="left">
+		<convert type="MPServicePosition">Position</convert>
+	</widget>
+	<widget source="session.CurrentService" render="Label" position="670,530" size="90,25" backgroundColor="#00101214" transparent="1" font="mediaportal;22" valign="center" halign="right">
+		<convert type="MPServicePosition">Remaining</convert>
+	</widget>
+	<eLabel text="Playmode" position="230,560" size="100,25" backgroundColor="#00101214" transparent="1" foregroundColor="#00555556" font="mediaportal;20" valign="top" />
+	<widget name="playmode" position="330,560" size="460,25" backgroundColor="#00101214" transparent="1" font="mediaportal;20" valign="top" />
+	<ePixmap pixmap="~/original/images/buttonred.png" position="20,635" size="100,2" alphatest="blend" />
+	<ePixmap pixmap="~/original/images/buttongreen.png" position="225,635" size="100,2" alphatest="blend" />
+	<ePixmap pixmap="~/original/images/buttonyellow.png" position="430,635" size="100,2" alphatest="blend" />
+	<ePixmap pixmap="~/original/images/buttonblue.png" position="635,635" size="100,2" alphatest="blend" />
+	<ePixmap pixmap="~/original/images/buttonred.png" position="120,635" size="100,2" alphatest="blend" />
+	<ePixmap pixmap="~/original/images/buttongreen.png" position="325,635" size="100,2" alphatest="blend" />
+	<ePixmap pixmap="~/original/images/buttonyellow.png" position="530,635" size="100,2" alphatest="blend" />
+	<ePixmap pixmap="~/original/images/buttonblue.png" position="735,635" size="100,2" alphatest="blend" />
+	<widget name="F1" position="20,610" size="200,30" transparent="1" font="mediaportal; 17" backgroundColor="#00101214" valign="center" halign="center" zPosition="1" />
+	<widget name="F2" position="225,610" size="200,30" transparent="1" font="mediaportal; 17" backgroundColor="#00101214" valign="center" halign="center" zPosition="1" />
+	<widget name="F3" position="430,610" size="200,30" transparent="1" font="mediaportal; 17" backgroundColor="#00101214" valign="center" halign="center" zPosition="1" />
+	<widget name="F4" position="635,610" size="200,30" transparent="1" font="mediaportal; 17" backgroundColor="#00101214" valign="center" halign="center" zPosition="1" />
+</screen>

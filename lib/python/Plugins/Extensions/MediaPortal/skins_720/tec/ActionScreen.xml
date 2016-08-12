@@ -1,0 +1,5 @@
+<screen position="center,center" size="1000,330" title="">
+	<widget name="name" position="0,0" size="1000,30" backgroundColor="#26181d20" transparent="1" zPosition="1" font="mediaportal;24" valign="bottom" halign="center" foregroundColor="#00ffffff" />
+	<widget name="interspace" position="0,30" size="1000,20" backgroundColor="#26181d20" transparent="1" zPosition="1" font="mediaportal;24" valign="bottom" halign="center" foregroundColor="#00ffffff" />
+	<widget name="liste" position="0,50" size="980,275" scrollbarMode="showOnDemand" itemHeight="25" />
+</screen>

@@ -1,0 +1,14 @@
+<!-- pluginSort_Screen -->
+<screen name="pluginSort" position="0,0" size="1280,720" flags="wfNoBorder">
+	<widget source="session.VideoPicture" render="Pig" position="929,13" size="336,188" zPosition="3" backgroundColor="transparent" />
+	<widget source="hidePig" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/video_bg_logo.png" position="929,13" size="336,188" zPosition="4">
+		<convert type="ConditionalShowHide" />
+	</widget>
+	<ePixmap position="928,7" size="342,201" zPosition="5" pixmap="~/tec/images/video_bg.png" backgroundColor="transparent" alphatest="blend" />
+	<eLabel text="User Plugin Sortierung" position="10,104" size="900,50" transparent="1" font="mediaportal; 26" backgroundColor="#26181d20" foregroundColor="#00999999" valign="center" halign="center" zPosition="0" />
+	<widget name="config2" position="12,220" size="898,400" scrollbarMode="showOnDemand" transparent="1" selectionPixmap="~/tec/images/sel.png" foregroundColorSelected="#ffffff" />
+	<eLabel text="OK " position="1010,661" size="125,40" transparent="1" font="mediaportal; 18" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<eLabel text="Exit " position="1145,661" size="125,40" transparent="1" font="mediaportal; 18" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<ePixmap position="0,0" size="1280,720" zPosition="-2" pixmap="~/tec/images/pluginSortScreen.png" />	
+	<ePixmap position="1010,638" size="270,82" zPosition="-1" pixmap="~/tec/images/buttons_sort.png" />
+</screen>

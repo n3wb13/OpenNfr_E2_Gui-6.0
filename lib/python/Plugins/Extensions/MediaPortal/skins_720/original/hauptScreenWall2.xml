@@ -1,0 +1,23 @@
+<!-- Hauptscreen_Wall -->
+<screen name="MediaPortal" position="center,center" size="1280,680" backgroundColor="#00060606" flags="wfNoBorder">
+	<widget name="name" position="320,50" size="650,50" foregroundColor="#00aaaaaa" backgroundColor="#00101214" transparent="1" font="mediaportal; 30" valign="center" halign="center" />
+	<widget name="tipps" position="10,140" size="900,50" foregroundColor="#00aaaaaa" backgroundColor="#26181d20" transparent="1" font="mediaportal;22" valign="center" halign="left" zPosition="0" />
+	<widget name="page" position="570,645" size="140,30" foregroundColor="#00aaaaaa" backgroundColor="#00101214" transparent="1" font="mediaportal;24" valign="center" halign="center" />"
+	<ePixmap position="750,670" size="100,2" zPosition="1" pixmap="~/original/images/buttongrey.png" alphatest="blend" backgroundColor="#00101214" />
+	<widget name="CH+" position="750,645" size="100,25" transparent="1" font="mediaportal; 16" backgroundColor="#00101214" foregroundColor="#00aaaaaa" valign="center" halign="center" zPosition="1" />
+	<ePixmap position="860,670" size="100,2" zPosition="1" pixmap="~/original/images/buttongrey.png" alphatest="blend" backgroundColor="#00101214" />
+	<widget name="CH-" position="860,645" size="100,25" transparent="1" font="mediaportal; 16" backgroundColor="#00101214" foregroundColor="#00aaaaaa" valign="center" halign="center" zPosition="1" />
+	<ePixmap position="970,670" size="100,2" zPosition="1" pixmap="~/original/images/buttongrey.png" alphatest="blend" backgroundColor="#00101214" />
+	<widget name="PVR" position="970,645" size="100,25" transparent="1" font="mediaportal; 16" backgroundColor="#00101214" foregroundColor="#00aaaaaa" valign="center" halign="center" zPosition="1" />
+	<ePixmap position="1080,670" size="100,2" zPosition="1" pixmap="~/original/images/buttongrey.png" alphatest="blend" backgroundColor="#00101214" />
+	<widget name="Menu" position="1080,645" size="100,25" transparent="1" font="mediaportal; 16" backgroundColor="#00101214" foregroundColor="#00aaaaaa" valign="center" halign="center" zPosition="1" />
+	<ePixmap position="100,670" size="100,2" zPosition="1" pixmap="~/original/images/buttonred.png" alphatest="blend" backgroundColor="#00101214" />
+	<widget name="red" position="100,645" size="100,25" transparent="1" font="mediaportal; 16" backgroundColor="#00101214" foregroundColor="#00aaaaaa" valign="center" halign="center" zPosition="1" />
+	<ePixmap position="320,670" size="100,2" zPosition="1" pixmap="~/original/images/buttongreen.png" alphatest="blend" backgroundColor="#00101214" />
+	<widget name="green" position="320,645" size="100,25" transparent="1" font="mediaportal; 16" backgroundColor="#00101214" foregroundColor="#00aaaaaa" valign="center" halign="center" zPosition="1" />
+	<ePixmap position="210,670" size="100,2" zPosition="1" pixmap="~/original/images/buttonyellow.png" alphatest="blend" backgroundColor="#00101214" />
+	<widget name="yellow" position="210,645" size="100,25" transparent="1" font="mediaportal; 16" backgroundColor="#00101214" foregroundColor="#00aaaaaa" valign="center" halign="center" zPosition="1" />
+	<ePixmap position="430,670" size="100,2" zPosition="1" pixmap="~/original/images/buttonblue.png" alphatest="blend" backgroundColor="#00101214" />
+	<widget name="blue" position="430,645" size="100,25" transparent="1" font="mediaportal; 16" backgroundColor="#00101214" foregroundColor="#00aaaaaa" valign="center" halign="center" zPosition="1" />
+	<widget name="covercollection" position="0,200" size="1280,445" transparent="1" zPosition="10" backgroundColor="#ff000000" coverSize="150,80" selectedCoverScale="1.3" unselectedCoverDimm="0.8" coverBeginPosition="98,50" coverDistance="5,5" style="0" noCoverAvailablePic="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/icons/no_icon.png" />
+	</screen>	

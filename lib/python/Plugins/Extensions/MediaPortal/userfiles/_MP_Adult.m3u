@@ -1,0 +1,53 @@
+﻿#EXTM3U,$MODE=IPTV
+#EXTINF:-1,Babestation24 Germany
+http://sdn-global-live-http-cache.3qsdn.com/2346/_definst_/smil:2346-mbr.smil/playlist.m3u8
+#EXTINF:-1,Babestation
+http://publish.thewebstream.co:1935/cellcast/_definst_/encoder21/playlist.m3u8
+#EXTINF:-1,Babestation Blue
+http://publish.thewebstream.co:1935/cellcast/_definst_/encoder31/playlist.m3u8
+#EXTINF:-1,Babestation Xtra
+http://publish.thewebstream.co:1935/cellcast/_definst_/encoder71/playlist.m3u8
+#EXTINF:-1,Babestation Unleashed 1
+http://publish.thewebstream.co:1935/iptv_cellcast_24/_definst_/livestream1/playlist.m3u8
+#EXTINF:-1,Babestation Unleashed 2
+http://publish.thewebstream.co:1935/iptv_cellcast_24/_definst_/livestream_two1/playlist.m3u8
+#EXTINF:-1,Babestation Xtreme/Sexstation
+http://publish.thewebstream.co:1935/bsx24/_definst_/mpegts1.stream/playlist.m3u8
+#EXTINF:-1,Babestation Enc5
+http://publish.thewebstream.co:1935/cellcast/_definst_/encoder5/playlist.m3u8
+#EXTINF:-1,Babestation Enc41
+http://publish.thewebstream.co:1935/cellcast/_definst_/encoder41/playlist.m3u8
+#EXTINF:-1,Studio 66 Channel 1
+http://publish.thewebstream.co:1935/leved/_definst_/studio66tv_channel1/playlist.m3u8
+#EXTINF:-1,Studio 66 Channel 2
+http://publish.thewebstream.co:1935/leved/_definst_/studio66tv_channel2/playlist.m3u8
+#EXTINF:-1,Studio 66 Channel 3
+http://publish.thewebstream.co:1935/leved/_definst_/studio66tv_channel3/playlist.m3u8
+#EXTINF:-1,Studio 66 Channel 4
+http://publish.thewebstream.co:1935/leved/_definst_/studio66tv_channel4/playlist.m3u8
+#EXTINF:-1,Thai Chat
+http://publish.thewebstream.co:1935/thaichat/_definst_/mpegts3.stream/playlist.m3u8
+#EXTINF:-1,Hot and Wet
+http://publish.thewebstream.co:1935/leved/_definst_/hotandwet1/playlist.m3u8
+#EXTINF:-1,Live Sex Latinas
+http://publish.thewebstream.co:1935/leved/_definst_/livesexlatinas/playlist.m3u8
+#EXTINF:-1,Red Light Central 1
+http://playback.d2see.com:1935/wavemachine-live01/_definst_/mp4:playboytv_channel1/playlist.m3u8
+#EXTINF:-1,Red Light Central 2
+http://playback.d2see.com:1935/wavemachine-live01/_definst_/mp4:playboytv_channel2/playlist.m3u8
+#EXTINF:-1,Private.com
+http://publish.thewebstream.co:1935/leved/_definst_/privateCom/playlist.m3u8
+#EXTINF:-1,Passion XXX
+http://publish.thewebstream.co:1935/leved/_definst_/passielivestream/playlist.m3u8
+#EXTINF:-1,Brazzers TV Europe
+http://serv20.vintera.tv:8081/cdn/brozzS00650029/playlist.m3u8
+#EXTINF:-1,Jasmin TV HD
+http://109.71.162.112:1935/live/hd.jasminchannel.stream/playlist.m3u8
+#EXTINF:-1,TV Mia 1
+http://cdn5.iviplanet.com:1935/TVMIA-ARG-VODLive1/smil:tvmia-arg-vodlive1.smil/playlist.m3u8
+#EXTINF:-1,TV Mia 4
+http://cdn5.iviplanet.com:1935/TVMIA-ARG-VODLive4/smil:tvmia-arg-vodlive4.smil/playlist.m3u8
+#EXTINF:-1,Sexysat
+http://81.89.48.215:1935/xyz111wkz/xy111_360p/i.m3u8
+#EXTINF:-1,Sexysat XXX
+http://81.89.48.215:1935/xyz112wkz/xy112_360p/i.m3u8

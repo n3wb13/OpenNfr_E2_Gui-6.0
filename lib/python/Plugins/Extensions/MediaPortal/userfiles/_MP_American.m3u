@@ -1,0 +1,33 @@
+﻿#EXTM3U,$MODE=IPTV
+#EXTINF:-1,Adult Swim
+http://adultswim-lh.akamaihd.net/i/timanderic_1@318521/master.m3u8
+#EXTINF:-1,BYUtv
+http://byuhd2-lh.akamaihd.net/i/byutvhd2_live@103136/master.m3u8
+#EXTINF:-1,Canal Orbe 21 (Argentina)
+http://urtmpkal-f.akamaihd.net/i/1b6mj17sk_1@308700/master.m3u8
+#EXTINF:-1,Canal 4 HD (Argentina)
+http://streaming.wirenetserver.com.ar:1935/canal4/live_1/master.m3u8
+#EXTINF:-1,Telpin Canal 2 HD (Argentina)
+http://201.219.100.30:1935/telpintv/ttv.stream_720p/master.m3u8
+#EXTINF:-1,La Red Televisión (Chile)
+http://wow1.lax.digitalproserver.com/redtv/redtvvivo/livestream1/master.m3u8
+#EXTINF:-1,TV Chile (Chile)
+http://edge-61-cl.edge.mdstrm.com/tvn-live/smil:285a5c6dade574d5f111419c85c6cf17/playlist.m3u8
+#EXTINF:-1,TVN (Chile)
+http://edge-51-cl.edge.mdstrm.com/tvn-live/_definst_/smil:7cb6048ff45cb5cdf7f5fed828597fd1/playlist.m3u8
+#EXTINF:-1,TVE HD (Brazil)
+rtmp://stream2.ba.gov.br/livepkgr/pgm-1
+#EXTINF:-1,TV Brasil (Brazil)
+http://ebcremuxlive-live.hls.adaptive.level3.net/manifests/ebcremuxlive-ebctvbrasil/live.m3u8
+#EXTINF:-1,TV Vitória (Brazil)
+http://flash.midiaip.com.br:1935/tvvitoria/Sample1/playlist.m3u8
+#EXTINF:-1,RedeTV (Brazil)
+http://evp.mm.uol.com.br/redetv1/_definst_/redetv1/master.m3u8
+#EXTINF:-1,XEW-TV (Mexico)
+http://tvsawpdvr-lh.akamaihd.net/i/stch02wp_1@119660/master.m3u8
+#EXTINF:-1,Azteca Trece (Mexico)
+http://aztecalive-lh.akamaihd.net/i/0oxnvzh8a_1@175671/master.m3u8
+#EXTINF:-1,Azteca Noticias (Mexico)
+http://urtmpkal-f.akamaihd.net/i/077zoqxzy_1@130091/master.m3u8
+#EXTINF:-1,Anime TV (Mexico)
+http://video7.stream.mx:1935/raxatv/raxatv/master.m3u8

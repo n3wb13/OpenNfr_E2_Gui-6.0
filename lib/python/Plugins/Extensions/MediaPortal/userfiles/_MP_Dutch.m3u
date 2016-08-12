@@ -1,0 +1,7 @@
+﻿#EXTM3U,$MODE=IPTV
+#EXTINF:-1,ATV Antwerpse televisie
+http://urtmpkal-f.akamaihd.net/i/1ut1nl3fq_1@316656/master.m3u8
+#EXTINF:-1,TV Limburg
+http://urtmpkal-f.akamaihd.net/i/1ef9833b4_1@128347/master.m3u8
+#EXTINF:-1,TV Oost
+http://urtmpkal-f.akamaihd.net/i/1uaalhcyz_1@309863/master.m3u8

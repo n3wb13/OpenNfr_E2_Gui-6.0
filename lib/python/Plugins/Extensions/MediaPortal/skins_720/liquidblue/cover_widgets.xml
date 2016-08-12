@@ -1,0 +1,4 @@
+﻿<widget name="hdpic" position="23,399" size="36,24" pixmap="~/tec/images/coverpic_hd.png" zPosition="0" transparent="1" alphatest="blend" />
+<widget name="rating10" position="25,582" size="125,12" pixmap="~/tec/images/stars-full10.png" zPosition="4" transparent="1" />
+<widget name="rating0" position="25,582" size="125,12" pixmap="~/tec/images/stars-empty10.png" zPosition="3" transparent="1" alphatest="blend" />
+<ePixmap pixmap="~/tec/images/coverbar135.png" position="20,580" size="135,16" zPosition="2"  alphatest="blend" />

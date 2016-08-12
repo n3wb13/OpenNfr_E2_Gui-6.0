@@ -1,0 +1,19 @@
+<!--Setup-->
+<screen name="hauptScreenSetup" position="0,0" size="1280,720" flags="wfNoBorder">
+	<widget source="session.VideoPicture" render="Pig" position="929,13" size="336,188" zPosition="3" backgroundColor="transparent" />
+	<widget source="hidePig" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/video_bg_logo.png" position="929,13" size="336,188" zPosition="4">
+		<convert type="ConditionalShowHide" />
+	</widget>
+	<ePixmap position="928,7" size="342,201" zPosition="5" pixmap="~/tec/images/video_bg.png" backgroundColor="transparent" alphatest="blend" />
+	<!-- select screen -->
+	<widget name="title" position="10,106" size="550,50" backgroundColor="#26181d20" transparent="1" zPosition="0" font="mediaportal; 26" valign="center" halign="center" foregroundColor="#00999999" />
+	<widget name="config" position="15,173" size="895,450" backgroundColor="#26181d20" scrollbarMode="showOnDemand" transparent="1" selectionPixmap="~/tec/images/sel25.png" backgroundPixmap="~/tec/images/sep850.png" foregroundColorSelected="#ffffff" zPosition="1" foregroundColor="#00999999" />
+	<widget name="name" position="914,368" size="330,30" foregroundColor="#00ffffff" backgroundColor="#26181d20" transparent="1" font="mediaportal;28" valign="top" halign="center" zPosition="-3" />
+	<ePixmap position="0,0" size="1280,720" zPosition="-2" pixmap="~/tec/images/hauptScreenSetup.png" />	
+	<!--	<widget source="session.CurrentService" render="AnimatedPictures" pixdelay="300" polltime="3000" control="1" position="958,385" size="300,300" zPosition="10" pixmaps="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/setup1.png,/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/setup2.png,/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/setup3.png,/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/setup4.png,/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/setup5.png,/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/setup6.png,/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/setup5.png,/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/setup4.png,/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/setup3.png,/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/setup2.png" transparent="1" alphatest="blend" />-->
+    <widget name="F1" position="96,661" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="3" />
+    <widget name="F2" position="392,661" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="3" />
+    <widget name="F3" position="688,661" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="3" />
+    <widget name="F4" position="984,661" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="3" />
+    <ePixmap position="0,638" size="1280,82" zPosition="2" pixmap="~/tec/images/buttons200x40_rgyb.png" />
+</screen>

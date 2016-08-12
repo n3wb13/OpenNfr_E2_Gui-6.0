@@ -1,0 +1,133 @@
+﻿#EXTM3U,$MODE=IPTV
+#EXTINF:-1,Pervyj
+http://hls.peers.tv/streaming/1kanal/126/tvrecw/playlist.m3u8
+#EXTINF:-1,Rossija 1
+http://hls.peers.tv/streaming/rossija/126/tvrec/playlist.m3u8
+#EXTINF:-1,Rossija 2
+http://hls.peers.tv/streaming/sport/126/tvrec/playlist.m3u8
+#EXTINF:-1,NTV
+http://hls.peers.tv/streaming/ntv/126/tvrec/playlist.m3u8
+#EXTINF:-1,Pjatyj
+http://hls.peers.tv/streaming/5kanal/126/tvrec/playlist.m3u8
+#EXTINF:-1,Rossija K
+http://hls.peers.tv/streaming/kultura/126/tvrec/playlist.m3u8
+#EXTINF:-1,Rossija 24
+http://hls.peers.tv/streaming/vesti/126/tvrec/playlist.m3u8
+#EXTINF:-1,Karusel'
+http://hls.peers.tv/streaming/karusel/16/tvrec/playlist.m3u8
+#EXTINF:-1,OTR
+http://hls.peers.tv/streaming/otvrus/16/tvrecw/playlist.m3u8
+#EXTINF:-1,TVC
+http://hls.peers.tv/streaming/tvc/16/tvrec/playlist.m3u8
+#EXTINF:-1,STS
+http://hls.peers.tv/streaming/sts/16/tvrec/playlist.m3u8
+#EXTINF:-1,Domashnij
+http://hls.peers.tv/streaming/domashny/126/tvrec/playlist.m3u8
+#EXTINF:-1,TV-3
+http://hls.peers.tv/streaming/tv3/126/tvrec/playlist.m3u8
+#EXTINF:-1,Zvezda
+http://hls.peers.tv/streaming/zvezda/126/tvrec/playlist.m3u8
+#EXTINF:-1,TNT
+http://hls.peers.tv/streaming/tnt/126/tvrec/playlist.m3u8
+#EXTINF:-1,Nickelodeon
+http://hls.peers.tv/streaming/nickelodeon/126/tvrec/playlist.m3u8
+#EXTINF:-1,2h2
+http://hls.peers.tv/streaming/2x2tv/126/tvrec/playlist.m3u8
+#EXTINF:-1,OTS
+http://hls.peers.tv/streaming/ots/16/tvrec/playlist.m3u8
+#EXTINF:-1,Lifenews
+http://hls.peers.tv/streaming/lifenews/126/tvrec/playlist.m3u8
+#EXTINF:-1,Muzhskoj
+http://hls.peers.tv/streaming/muzhskoj/126/tvrec/playlist.m3u8
+#EXTINF:-1,Pjatnica
+http://hls.peers.tv/streaming/friday/126/tvrec/playlist.m3u8
+#EXTINF:-1,Perec
+http://hls.peers.tv/streaming/perec/126/tvrec/playlist.m3u8
+#EXTINF:-1,Zagorodnaja zhizn'
+http://hls.peers.tv/streaming/zagorod_zh/16/tvrec/playlist.m3u8
+#EXTINF:-1,49 KANAL
+http://hls.peers.tv/streaming/49kanal/16/tvrec/playlist.m3u8
+#EXTINF:-1,RBK
+http://hls.peers.tv/streaming/rbk/126/tvrec/playlist.m3u8
+#EXTINF:-1,Jumor TV
+http://hls.peers.tv/streaming/yumor_tv/16/tvrec/playlist.m3u8
+#EXTINF:-1,Mir 24
+http://hls.peers.tv/streaming/mir24/16/tvrec/playlist.m3u8
+#EXTINF:-1,EuroNews
+http://hls.peers.tv/streaming/euronews/126/tvrec/playlist.m3u8
+#EXTINF:-1,TVXXI
+http://hls.peers.tv/streaming/tv21/16/tvrec/playlist.m3u8
+#EXTINF:-1,Music Box RU
+http://hls.peers.tv/streaming/musboxru/126/tvrec/playlist.m3u8
+#EXTINF:-1,Pervyj muzykal'nyj HD
+http://hls.peers.tv/streaming/firstmuz/16/hd/playlist.m3u8
+#EXTINF:-1,Mul'timanija
+http://hls.peers.tv/streaming/multimania/16/tvrec/playlist.m3u8
+#EXTINF:-1,Cartoon Network
+http://hls.peers.tv/streaming/cartoonnetwork/16/tvrec/playlist.m3u8
+#EXTINF:-1,A-One
+http://hls.peers.tv/streaming/aone/126/tvrec/playlist.m3u8
+#EXTINF:-1,TV-TREJLER
+http://hls.peers.tv/streaming/tvtrailer/16/tvrec/playlist.m3u8
+#EXTINF:-1,Futbol
+http://hls.peers.tv/streaming/futbol/126/tvrec/playlist.m3u8
+#EXTINF:-1,Amedia 1
+http://hls.peers.tv/streaming/amedia1/16/tvrec/playlist.m3u8
+#EXTINF:-1,Evrokino
+http://hls.peers.tv/streaming/eurokino/16/tvrec/playlist.m3u8
+#EXTINF:-1,Illjuzion+
+http://hls.peers.tv/streaming/illyuzion/16/tvrec/playlist.m3u8
+#EXTINF:-1,Uspeh
+http://hls.peers.tv/streaming/uspex/16/tvrec/playlist.m3u8
+#EXTINF:-1,Detskij
+http://hls.peers.tv/streaming/forkids/16/tvrec/playlist.m3u8
+#EXTINF:-1,Ulybka Rebenka
+http://hls.peers.tv/streaming/smile/126/tvrec/playlist.m3u8
+#EXTINF:-1,Pervyj obrazovatel'nyj
+http://hls.peers.tv/streaming/1_obraz/126/tvrec/playlist.m3u8
+#EXTINF:-1,TBN-Rossija
+http://hls.peers.tv/streaming/tbn/126/tvrec/playlist.m3u8
+#EXTINF:-1,Zoopark
+http://hls.peers.tv/streaming/zoopark/126/tvrec/playlist.m3u8
+#EXTINF:-1,Russkij illjuzion
+http://hls.peers.tv/streaming/russian_illusion/16/tvrec/playlist.m3u8
+#EXTINF:-1,Russia Today
+http://hls.peers.tv/streaming/russiatoday/16/tvrec/playlist.m3u8
+#EXTINF:-1,Zhivi
+http://hls.peers.tv/streaming/jv/16/tvrec/playlist.m3u8
+#EXTINF:-1,Avto 24
+http://hls.peers.tv/streaming/avto_24/16/tvrec/playlist.m3u8
+#EXTINF:-1,Shopping Live
+http://hls.peers.tv/streaming/shopping_live/16/tvrec/playlist.m3u8
+#EXTINF:-1,Music Box TV
+http://hls.peers.tv/streaming/musboxtv/16/tvrec/playlist.m3u8
+#EXTINF:-1,JuCeTV
+http://hls.peers.tv/streaming/juce/126/tvrec/playlist.m3u8
+#EXTINF:-1,Boec
+http://hls.peers.tv/streaming/boets/16/tvrec/playlist.m3u8
+#EXTINF:-1,Pervyj Internet kanal HD
+http://hls.peers.tv/streaming/pik_hd/126/hd/playlist.m3u8
+#EXTINF:-1,VMESTE-RF
+http://hls.peers.tv/streaming/vmeste_rf/126/copy/playlist.m3u8
+#EXTINF:-1,Balans-TV
+http://hls.peers.tv/streaming/balance/126/copy/playlist.m3u8
+#EXTINF:-1,STRK
+http://hls.peers.tv/streaming/strk/126/copy/playlist.m3u8
+#EXTINF:-1,TVMChannel
+http://hls.peers.tv/streaming/tvmchannel/126/tvrec/playlist.m3u8
+#EXTINF:-1,Novoe televidenie
+http://hls.peers.tv/streaming/novoe_televidenie/318/tvrec/playlist.m3u8
+#EXTINF:-1,LDPR.TV
+http://hls.peers.tv/streaming/ldpr_tv/16/tvrec/playlist.m3u8
+#EXTINF:-1,8 kanal Krasnojarskij kraj
+http://hls.peers.tv/streaming/ya1pm/90/copy/playlist.m3u8
+#EXTINF:-1,Krasnaja linija
+http://hls.peers.tv/streaming/red_line/126/copy/playlist.m3u8
+#EXTINF:-1,Nadezhda
+http://hls.peers.tv/streaming/hopetv/126/copy/playlist.m3u8
+#EXTINF:-1,Vojna i Mir
+http://hls.peers.tv/streaming/wap/126/copy/playlist.m3u8
+#EXTINF:-1,Boks TV
+http://hls.peers.tv/streaming/boks_tv/16/tvrec/playlist.m3u8
+#EXTINF:-1,Kuban' 24 ORBITA
+http://hls.peers.tv/streaming/kuban24/126/copy/playlist.m3u8

@@ -1,0 +1,25 @@
+<!-- dokuListScreen -->
+<screen name="defaultList" position="center,center" size="1280,720" flags="wfNoBorder">
+	<widget source="session.VideoPicture" render="Pig" position="937,15" size="320,180" zPosition="3" backgroundColor="transparent" />
+	<widget source="hidePig" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/video_bg_logo.png" position="937,15" size="320,180" zPosition="4">
+		<convert type="ConditionalShowHide" />
+	</widget>
+	<ePixmap position="14,31" size="508,48" zPosition="0" pixmap="~/liquidblue/images/mplogo.png" transparent="1" alphatest="blend" />
+	<ePixmap position="928,7" size="342,201" zPosition="5" pixmap="~/liquidblue/images/video_bg.png" backgroundColor="transparent" alphatest="blend" />
+	<widget name="ContentTitle" position="10,171" size="900,25" backgroundColor="#26181d20" zPosition="5" foregroundColor="#00ffffff" font="mediaportal;22" halign="center" transparent="1" />
+	<widget name="name" position="935,266" size="320,150" backgroundColor="#26181d20" transparent="1" zPosition="1" font="mediaportal;24" valign="center" halign="center" foregroundColor="#00ffffff" />
+	<widget name="liste" position="12,220" size="898,250" backgroundColor="#26181d20" scrollbarMode="showOnDemand" transparent="1" selectionPixmap="~/liquidblue/images/sel.png" foregroundColorSelected="#ffffff" foregroundColor="#00999999" itemHeight="25" />
+	<widget name="coverArt" pixmap="~/liquidblue/images/no_coverArt.png" position="935,423" size="320,200" transparent="1" alphatest="blend" />
+	<widget name="title" position="10,100" size="900,60" foregroundColor="#00ffffff" backgroundColor="#26181d20" transparent="1" font="mediaportal;26" valign="center" halign="center" />
+	<widget name="handlung" position="15,497" size="895,126" backgroundColor="#26181d20" transparent="1" font="mediaportal;17" valign="top" foregroundColor="#00ffffff" />
+	<widget name="Page" position="1090,231" size="100,25" backgroundColor="#26181d20" transparent="1" foregroundColor="#00ffffff" font="mediaportal;22" zPosition="1" />
+	<widget name="page" position="1155,231" size="100,25" backgroundColor="#26181d20" transparent="1" font="mediaportal;22" foregroundColor="#00ffffff" zPosition="1" />
+	<widget name="VideoPrio" position="938,231" size="105,25" backgroundColor="#26181d20" transparent="1" foregroundColor="#00ffffff" font="mediaportal; 22" halign="right" zPosition="1" />
+	<widget name="vPrio" position="1043,231" size="25,25" backgroundColor="#26181d20" transparent="1" font="mediaportal;22" halign="center" zPosition="1" foregroundColor="#00ffffff" />
+	<widget name="F1" position="96,665" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<widget name="F2" position="392,665" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<widget name="F3" position="688,665" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<widget name="F4" position="984,665" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" /> 	
+	<ePixmap position="0,0" size="1280,640" zPosition="-2" pixmap="~/liquidblue/images/defaultListScreen.png" />
+	<ePixmap position="0,638" size="1280,82" zPosition="-1" pixmap="~/liquidblue/images/buttons200x40_rgyb.png" />
+</screen>

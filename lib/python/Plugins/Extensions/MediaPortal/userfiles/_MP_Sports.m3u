@@ -1,0 +1,31 @@
+﻿#EXTM3U,$MODE=IPTV
+#EXTINF:-1,NFL Now
+http://nflioslivesvg2-i.akamaihd.net/hls/live/221521/nflioslive/2015HackerNow_w99d9.m3u8|X-Forwarded-For=209.239.112.104
+#EXTINF:-1,Pac-12 National
+http://xrxs.net/video/live-p12netw-2328.m3u8
+#EXTINF:-1,Pac-12 Arizona
+http://pac12hd2-lh.akamaihd.net/i/p12ariz_delivery@132836/master.m3u8
+#EXTINF:-1,Pac-12 Bay Area
+http://pac12hd2-lh.akamaihd.net/i/p12baya_delivery@132837/master.m3u8
+#EXTINF:-1,Pac-12 Los Angeles
+http://pac12hd2-lh.akamaihd.net/i/p12losa_delivery@132838/master.m3u8
+#EXTINF:-1,Pac-12 Mountain
+http://pac12hd2-lh.akamaihd.net/i/p12moun_delivery@132839/master.m3u8
+#EXTINF:-1,Pac-12 Oregon
+http://pac12hd2-lh.akamaihd.net/i/p12oreg_delivery@132835/master.m3u8
+#EXTINF:-1,Pac-12 Washington
+http://pac12hd2-lh.akamaihd.net/i/p12wash_delivery@132841/master.m3u8
+#EXTINF:-1,NBC GOLF
+http://tvegolf-i.Akamaihd.net/hls/live/218225/golfx/2596k/prog.m3u8|X-Forwarded-For=209.239.112.104
+#EXTINF:-1,Rai Sport 1
+http://httpstream1.rai.it/Italy/raisport1.isml/QualityLevels(1896000)/manifest(format=m3u8-aapl).m3u8|X-Forwarded-For=77.238.31.240
+#EXTINF:-1,Rai Sport 2
+http://httpstream1.rai.it/Italy/raisport2.isml/QualityLevels(1896000)/manifest(format=m3u8-aapl).m3u8|X-Forwarded-For=77.238.31.240
+#EXTINF:-1,Sportitalia
+http://spi.hystream.com:1935/spilive/spistream/chunklist.m3u8|X-Forwarded-For=77.238.31.240
+#EXTINF:-1,Real Madrid TV
+http://rmtvlive-lh.akamaihd.net/i/rmtv_1@154306/master.m3u8
+#EXTINF:-1,Sevilla FC TV
+http://gstudio_hls04-lh.akamaihd.net/i/hls04stream001_0@348222/master.m3u8
+#EXTINF:-1,Sports TV Turkey
+http://stream.sportstv.com.tr:1935/sportstv/SportsTV3/playlist.m3u8

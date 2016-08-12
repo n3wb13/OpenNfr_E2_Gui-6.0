@@ -1,0 +1,13 @@
+﻿#EXTM3U,$MODE=IPTV
+#EXTINF:-1,ZDF
+http://zdf1314-lh.akamaihd.net/i/de14_v1@392878/master.m3u8
+#EXTINF:-1,ZDF.kultur
+http://zdf1112-lh.akamaihd.net/i/de11_v1@392881/master.m3u8
+#EXTINF:-1,ZDFinfo
+http://zdf1112-lh.akamaihd.net/i/de12_v1@392882/master.m3u8
+#EXTINF:-1,ZDFneo
+http://zdf1314-lh.akamaihd.net/i/de13_v1@392877/master.m3u8
+#EXTINF:-1,3sat
+http://zdf_hds_dach-f.akamaihd.net/i/dach10_v1@87031/master.m3u8
+#EXTINF:-1,phoenix
+http://zdf_hds_de-f.akamaihd.net/i/de09_v1@87012/master.m3u8

@@ -1,0 +1,10 @@
+<!-- Category_Selector -->
+	<screen name="CategorySelector" position="center,center" size="1280,720" flags="wfNoBorder" backgroundColor="#ffffffff">
+	<eLabel position="490,165" size="300,390" zPosition="-5" name="SelectBG" backgroundColor="#30000000"/>
+	<widget name="F1" position="531,197" size="218,38" transparent="1" font="mediaportal; 18" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="2" />
+    <widget name="F2" position="531,245" size="218,38" transparent="1" font="mediaportal; 18" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="2" />
+    <widget name="F3" position="531,293" size="218,38" transparent="1" font="mediaportal; 18" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="2" />
+    <widget name="F4" position="531,341" size="218,38" transparent="1" font="mediaportal; 18" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="2" />
+    <widget name="F5" position="531,389" size="218,38" transparent="1" font="mediaportal; 18" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="2" />
+    <widget name="F6" position="531,437" size="218,38" transparent="1" font="mediaportal; 18" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="2" />
+    <widget name="F7" position="531,485" size="218,38" transparent="1" font="mediaportal; 18" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="2" />

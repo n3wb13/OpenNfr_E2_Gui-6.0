@@ -1,0 +1,20 @@
+<!-- defaultGenreScreenCover -->
+<screen name="defaultGenre" position="center,center" size="1280,720" flags="wfNoBorder">
+	<widget source="session.VideoPicture" render="Pig" position="929,13" size="336,188" zPosition="3" backgroundColor="transparent" />
+	<widget source="hidePig" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/video_bg_logo.png" position="929,13" size="336,188" zPosition="4">
+		<convert type="ConditionalShowHide" />
+	</widget>
+	<ePixmap position="928,7" size="342,201" zPosition="5" pixmap="~/tec/images/video_bg.png" backgroundColor="transparent" alphatest="blend" />
+	<!-- select screen -->
+	<widget name="ContentTitle" position="10,171" size="900,25" backgroundColor="#26181d20" zPosition="5" foregroundColor="#00ffffff" font="mediaportal;22" halign="center" transparent="1" />
+	<widget name="name" position="935,250" size="320,150" backgroundColor="#26181d20" transparent="1" zPosition="1" font="mediaportal;24" valign="bottom" halign="center" foregroundColor="#00ffffff" />
+	<widget name="coverArt" pixmap="~/tec/images/no_coverArt.png" position="935,424" size="320,200" transparent="1" alphatest="blend" />
+	<widget name="liste" position="12,220" size="898,400" backgroundColor="#26181d20" scrollbarMode="showOnDemand" transparent="1" selectionPixmap="~/tec/images/sel.png" foregroundColorSelected="#ffffff" foregroundColor="#00999999" itemHeight="25" />
+	<widget name="title" position="10,100" size="900,60" foregroundColor="#00ffffff" backgroundColor="#26181d20" transparent="1" font="mediaportal;26" valign="center" halign="center" />
+	<widget name="F1" position="96,661" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<widget name="F2" position="392,661" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<widget name="F3" position="688,661" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<widget name="F4" position="984,661" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" /> 	
+	<ePixmap position="0,0" size="1280,640" zPosition="-2" pixmap="~/tec/images/defaultGenreScreen.png" />
+	<ePixmap position="0,638" size="1280,82" zPosition="-1" pixmap="~/tec/images/buttons200x40_rgyb.png" />
+</screen>

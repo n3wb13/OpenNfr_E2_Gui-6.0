@@ -1,0 +1,37 @@
+<!-- defaultPlaylistScreen -->
+<screen name="defaultPlaylist" position="0,0" size="1280,720" flags="wfNoBorder">
+	<widget source="session.VideoPicture" render="Pig" position="929,13" size="336,188" zPosition="3" backgroundColor="transparent" />
+	<widget source="hidePig" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/video_bg_logo.png" position="929,13" size="336,188" zPosition="4">
+		<convert type="ConditionalShowHide" />
+	</widget>
+	<ePixmap position="928,7" size="342,201" zPosition="5" pixmap="~/tec/images/video_bg.png" backgroundColor="transparent" alphatest="blend" />
+	<!-- select screen -->
+	<widget name="title" position="10,100" size="900,60" backgroundColor="#26181d20" transparent="1" zPosition="0" font="mediaportal;30" valign="center" halign="center" />
+	<widget name="liste" position="12,220" size="898,400" backgroundColor="#26181d20" scrollbarMode="showOnDemand" transparent="1" selectionPixmap="~/tec/images/sel.png" foregroundColorSelected="#ffffff" foregroundColor="#00999999" zPosition="0" itemHeight="25" />
+	<widget name="songtitle" position="934,230" size="322,40" foregroundColor="#00ffffff" backgroundColor="#26181d20" transparent="1" font="mediaportal;18" valign="center" halign="center" />
+	<widget source="session.CurrentService" render="Label" position="1050,594" size="90,25" font="mediaportal; 20" foregroundColor="#00ffffff" backgroundColor="#26181d20" halign="center" transparent="1">
+		<convert type="MPServicePosition">Length</convert>
+	</widget>
+	<widget name="coverArt" pixmap="~/tec/images/no_coverArt_150.png" position="934,414" size="320,150" transparent="1" alphatest="blend" />
+	<eLabel text="Artist" position="934,275" size="100,40" backgroundColor="#101214" transparent="1" foregroundColor="#555556" font="mediaportal;20" valign="center" halign="left" />
+	<widget name="artist" position="1040,275" size="215,40" backgroundColor="#26181d20" transparent="1" font="mediaportal;18" valign="center" foregroundColor="#00ffffff" halign="left" />
+	<eLabel text="Album" position="934,320" size="100,40" backgroundColor="#26181d20" transparent="1" foregroundColor="#555556" font="mediaportal;20" valign="center" halign="left" />
+	<widget name="album" position="1040,320" size="215,40" backgroundColor="#26181d20" transparent="1" font="mediaportal;18" valign="center" foregroundColor="#00ffffff" halign="left" />
+	<widget source="session.CurrentService" render="Progress" position="934,582" size="320,10" backgroundColor="#26181d20" borderWidth="1" borderColor="#00999999" transparent="1">
+		<convert type="MPServicePosition">Position</convert>
+	</widget>
+	<widget source="session.CurrentService" render="Label" position="934,595" size="90,25" backgroundColor="#26181d20" transparent="1" font="mediaportal; 20" valign="center" halign="left" foregroundColor="#00ffffff">
+		<convert type="MPServicePosition">Position</convert>
+	</widget>
+	<widget source="session.CurrentService" render="Label" position="1166,595" size="90,25" backgroundColor="#26181d20" transparent="1" font="mediaportal; 20" valign="center" halign="right" foregroundColor="#00ffffff">
+		<convert type="MPServicePosition">Remaining</convert>
+	</widget>
+	<eLabel text="Playmode" position="934,365" size="100,40" backgroundColor="#101214" transparent="1" foregroundColor="#555556" font="mediaportal;20" valign="center" halign="left" />
+	<widget name="playmode" position="1040,365" size="215,40" backgroundColor="#26181d20" transparent="1" font="mediaportal;18" valign="center" halign="left" />
+	<widget name="F1" position="96,661" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<widget name="F2" position="392,661" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<widget name="F3" position="688,661" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<widget name="F4" position="984,661" size="200,40" transparent="1" font="mediaportal; 16" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<ePixmap position="0,0" size="1280,640" zPosition="-2" pixmap="~/tec/images/defaultGenreScreen.png" />
+	<ePixmap position="0,638" size="1280,82" zPosition="-1" pixmap="~/tec/images/buttons200x40_rgyb.png" />
+</screen>

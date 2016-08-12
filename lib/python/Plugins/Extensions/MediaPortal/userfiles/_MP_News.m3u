@@ -1,0 +1,121 @@
+#EXTM3U,$MODE=IPTV
+#EXTINF:-1,ABC News
+http://abclive.abcnews.com/i/abc_live4@136330/master.m3u8
+#EXTINF:-1,CBS News HD
+http://cbsnewshd-lh.akamaihd.net/i/CBSN_2@199302/master.m3u8
+#EXTINF:-1,Fox 2 KTVU News
+http://play-prod1.live.anvato.net/server/play/ktvutestctg/master.m3u8
+#EXTINF:-1,WGN News Chicago
+http://wgntribune-lh.akamaihd.net/i/WGNPrimary_1@304622/master.m3u8
+#EXTINF:-1,WFTV Channel 9 Orlando
+http://bcoveliveios-i.akamaihd.net/hls/live/207141/268012959001/WFTV_EVENTLIVE1/WFTV_EVENTLIVE1_800.m3u8
+#EXTINF:-1,Global TV Halifax
+https://glblvhalifax-lh.akamaihd.net/i/glblvHalifax_1@119843/master.m3u8
+#EXTINF:-1,CPAC
+http://bcliveuniv-lh.akamaihd.net/i/cpac1eng2014_01@119330/master.m3u8
+#EXTINF:-1,C-SPAN
+http://cspan1-lh.akamaihd.net/i/cspan1_1@304727/master.m3u8
+#EXTINF:-1,C-SPAN 2
+http://cspan2-lh.akamaihd.net/i/cspan2_1@304728/master.m3u8
+#EXTINF:-1,C-SPAN 3
+http://cspan3-lh.akamaihd.net/i/cspan3_1@304729/master.m3u8
+#EXTINF:-1,NASA TV HD
+http://nasatv-lh.akamaihd.net/i/NASA_101@319270/master.m3u8
+#EXTINF:-1,tagesschau24
+http://tagesschau-lh.akamaihd.net/i/tagesschau_1@119231/master.m3u8
+#EXTINF:-1,N24
+http://n24-live.hls.adaptive.level3.net/hls-live/n24-pssimn24live/_definst_/live.m3u8
+#EXTINF:-1,Russia Today HD
+http://rt.ashttp14.visionip.tv/live/rt-global-live-HD/chunklist.m3u8
+#EXTINF:-1,Russia Today Documentary HD
+http://rt.ashttp14.visionip.tv/live/rt-doc-live-HD/chunklist.m3u8
+#EXTINF:-1,RT en Español HD
+http://rt.ashttp14.visionip.tv/live/RT_en_Espanol-HD/chunklist.m3u8
+#EXTINF:-1,RT International
+http://rt-a.akamaihd.net/ch_01@325605/master.m3u8
+#EXTINF:-1,RT Spanish
+http://rt-a.akamaihd.net/ch_02@325606/master.m3u8
+#EXTINF:-1,RT Doc
+http://rt-a.akamaihd.net/ch_05@325609/master.m3u8
+#EXTINF:-1,RT America
+http://rt-a.akamaihd.net/ch_04@325608/master.m3u8
+#EXTINF:-1,RT UK
+http://rt-a.akamaihd.net/ch_06@325610/master.m3u8
+#EXTINF:-1,RT Spanish
+http://rt-a.akamaihd.net/ch_02@325606/master.m3u8
+#EXTINF:-1,Sky News (Arabic)
+http://skynewsl.skynews.cshls.lldns.net/skynews/skynewsl/skynewsl/skynewsl_800.m3u8
+#EXTINF:-1,euronews (German)
+rtsp://ewns-hls-b-stream.hexaglobe.net/rtpeuronewslive/de_vidan750_rtp.sdp
+#EXTINF:-1,euronews (English)
+rtsp://ewns-hls-b-stream.hexaglobe.net/rtpeuronewslive/en_vidan750_rtp.sdp
+#EXTINF:-1,euronews (Spanish)
+rtsp://ewns-hls-b-stream.hexaglobe.net/rtpeuronewslive/es_vidan750_rtp.sdp
+#EXTINF:-1,euronews (French)
+rtsp://ewns-hls-b-stream.hexaglobe.net/rtpeuronewslive/fr_vidan750_rtp.sdp
+#EXTINF:-1,euronews (Italian)
+rtsp://ewns-hls-b-stream.hexaglobe.net/rtpeuronewslive/it_vidan750_rtp.sdp
+#EXTINF:-1,euronews (Portuguese)
+rtsp://ewns-hls-b-stream.hexaglobe.net/rtpeuronewslive/pt_vidan750_rtp.sdp
+#EXTINF:-1,euronews (Russian)
+rtsp://ewns-hls-b-stream.hexaglobe.net/rtpeuronewslive/ru_vidan750_rtp.sdp
+#EXTINF:-1,euronews (Turkish)
+rtsp://ewns-hls-b-stream.hexaglobe.net/rtpeuronewslive/tr_vidan750_rtp.sdp
+#EXTINF:-1,euronews (Arabic)
+rtsp://ewns-hls-b-stream.hexaglobe.net/rtpeuronewslive/ar_vidan750_rtp.sdp
+#EXTINF:-1,BBC World News
+http://wpc.c1a9.edgecastcdn.net/hls-live/20C1A9/bbc_world/ls_satlink/b_828.m3u8?token=20151214xjEfuGen5pHAwecru
+#EXTINF:-1,BBC Persian Television
+http://bbcwshdlive01-lh.akamaihd.net/i/ptv_1@78015/master.m3u8
+#EXTINF:-1,BBC Arabic Television
+http://bbcwshdlive01-lh.akamaihd.net/i/atv_1@61433/master.m3u8
+#EXTINF:-1,NHK World
+http://web-cache.stream.ne.jp/www11/nhkworld-tv/global/222714/live_tv.m3u8
+#EXTINF:-1,Al Jazeera English
+http://aljazeera-eng-apple-live.adaptive.level3.net/apple/aljazeera/english/appleman.m3u8
+#EXTINF:-1,Al Jazeera America
+http://wpc.c1a9.edgecastcdn.net/hls-live/20C1A9/aljazeera_america/ls_satlink/b_828.m3u8?token=20151214xjEfuGen5pHAwecru
+#EXTINF:-1,Al Jazeera Arabic
+http://www.livestation.com/hls/aljazeera_ar/800.m3u8
+#EXTINF:-1,Al Jazeera Mubasher
+http://www.livestation.com/hls/aljazeera_mubasher/800.m3u8
+#EXTINF:-1,Al Jazeera Doc
+http://aljazeera-doc-apple-live.adaptive.level3.net/apple/aljazeera/hq-doc/1600kStream.m3u8
+#EXTINF:-1,VoA Persian
+http://wpc.c1a9.edgecastcdn.net/hls-live/20C1A9/voa_persian/ls_satlink/b_828.m3u8?token=20151214xjEfuGen5pHAwecru
+#EXTINF:-1,Rai News 24
+http://everyrai-lh.akamaihd.net/i/rainews_1@127119/master.m3u8
+#EXTINF:-1,France 24 (English)
+http://static.france24.com/live/F24_EN_LO_HLS/live_web.m3u8
+#EXTINF:-1,France 24 (French)
+http://static.france24.com/live/F24_FR_LO_HLS/live_web.m3u8
+#EXTINF:-1,France 24 (Arabic)
+http://static.france24.com/live/F24_AR_LO_HLS/live_web.m3u8
+#EXTINF:-1,Press TV
+http://presstv-ch03.level3.hls.live.cdn.overon.es/livehigh/playlist.m3u8
+#EXTINF:-1,TRT HABER HD
+http://trtcanlitv-lh.akamaihd.net/i/TRTHABERHD_1@181942/master.m3u8
+#EXTINF:-1,WeatherNation
+http://cdnapi.kaltura.com/p/931702/sp/93170200/playManifest/entryId/1_oorxcge2/format/applehttp/protocol/http/uiConfId/28428751/a.m3u8
+#EXTINF:-1,Canal 10 News
+http://nana10live-lh.akamaihd.net/i/ch10news_0@93049/master.m3u8
+#EXTINF:-1,Arirang HD
+http://worldlive-ios.arirang.co.kr/arirang/arirangtvworldios.mp4.m3u8
+#EXTINF:-1,DW
+http://www.metafilegenerator.de/DWelle/tv/ios/master.m3u8
+#EXTINF:-1,DW (North America)
+http://www.metafilegenerator.de/DWelle/tv-northamerica/ios/master.m3u8
+#EXTINF:-1,DW (Arabia)
+http://www.metafilegenerator.de/DWelle/tv-arabia/ios/master.m3u8
+#EXTINF:-1,DW (Asia)
+http://www.metafilegenerator.de/DWelle/tv-asia/ios/master.m3u8
+#EXTINF:-1,DW (Latinoamérica)
+http://www.metafilegenerator.de/DWelle/tv-latinoamerica/ios/master.m3u8
+#EXTINF:-1,Bloomberg USA
+http://cdn3.videos.bloomberg.com/btv/us/master.m3u8
+#EXTINF:-1,Bloomberg Europe
+http://cdn3.videos.bloomberg.com/btv/eu/master.m3u8
+#EXTINF:-1,Bloomberg Asia
+http://cdn3.videos.bloomberg.com/btv/asia/master.m3u8
+#EXTINF:-1,Bloomberg USA Event
+http://cdn3.videos.bloomberg.com/btv/event/master.m3u8

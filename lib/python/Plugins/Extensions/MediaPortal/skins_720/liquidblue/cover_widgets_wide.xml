@@ -1,0 +1,4 @@
+﻿<widget name="length" position="200,581" size="80,20" backgroundColor="#00000000" transparent="1" font="mediaportal;14" valign="center" halign="right" zPosition="3" />
+<widget name="rating5" position="30,582" size="60,12" pixmap="~/tec/images/rating5.png" zPosition="4" transparent="1" />
+<widget name="rating0" position="30,582" size="60,12" pixmap="~/tec/images/rating0.png" zPosition="3" transparent="1" alphatest="blend" />
+<ePixmap pixmap="~/tec/images/coverbar270.png" position="20,580" size="270,16" zPosition="2"  alphatest="blend" />

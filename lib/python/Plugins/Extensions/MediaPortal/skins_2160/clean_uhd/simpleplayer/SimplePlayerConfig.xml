@@ -1,0 +1,6 @@
+<screen position="center,center" size="2200,1600" title="" backgroundColor="#80ffffff" flags="wfNoBorder" name="SimplePlayerConfig">
+    <widget name="config" position="10,140" size="2180,1400" scrollbarMode="showOnDemand" itemHeight="70" zPosition="1" />
+    <eLabel name="bg conf" position="2,105" size="2196,1490" backgroundColor="#20000000" />
+    <eLabel name="bg title" position="2,2" size="2196,100" backgroundColor="#20000000" />
+    <widget name="title" position="2,2" size="2196,100" font="mediaportal_clean;70" backgroundColor="#20000000" foregroundColor="#00ffffff" zPosition="1" halign="center" valign="center" />
+</screen>

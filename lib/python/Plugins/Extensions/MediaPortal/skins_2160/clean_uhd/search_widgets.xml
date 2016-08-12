@@ -1,0 +1,2 @@
+﻿<widget name="suchtitel" position="2830,1400" size="960,90" backgroundColor="#20000000" font="mediaportal;70" valign="center" halign="center" zPosition="5"/>
+<widget name="suche" position="2830,1500" size="960,120" backgroundColor="#20000000" font="mediaportal;100" valign="center" halign="center"  zPosition="5"/>

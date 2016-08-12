@@ -1,0 +1,65 @@
+﻿#EXTM3U,$MODE=IPTV
+#EXTINF:-1,group-title="Denmark",DR 1
+http://dr01-lh.akamaihd.net/i/dr01_0@147054/master.m3u8|X-Forwarded-For=78.157.96.0
+#EXTINF:-1,group-title="Denmark",DR 2
+http://dr02-lh.akamaihd.net/i/dr02_0@147055/master.m3u8|X-Forwarded-For=78.157.96.0
+#EXTINF:-1,group-title="Denmark",DR 3
+http://dr03-lh.akamaihd.net/i/dr03_0@147056/master.m3u8|X-Forwarded-For=78.157.96.0
+#EXTINF:-1,group-title="Denmark",DR K
+http://dr04-lh.akamaihd.net/i/dr04_0@147057/master.m3u8|X-Forwarded-For=78.157.96.0
+#EXTINF:-1,group-title="Denmark",DR Ramasjang
+http://dr05-lh.akamaihd.net/i/dr05_0@147058/master.m3u8|X-Forwarded-For=78.157.96.0
+#EXTINF:-1,group-title="Denmark",DR Ultra
+http://dr06-lh.akamaihd.net/i/dr06_0@147059/master.m3u8|X-Forwarded-For=78.157.96.0
+#EXTINF:-1,group-title="Denmark",TV 2/Bornholm
+http://live.tv2bornholm.dk/stream/live/playlist.m3u8
+#EXTINF:-1,group-title="Denmark",TV 2/Lorry
+http://cdnapi.kaltura.com/p/2045321/sp/204532100/playManifest/entryId/0_hmqq4uiy/format/applehttp/protocol/http/uiConfId/32599491/a.m3u8
+#EXTINF:-1,group-title="Denmark",TV 2/Fyn
+http://cdn-lt-live.tv2fyn.dk/dc-1/m/ny-live-publish3/kLive/smil:0_vsfrv0zm_all.smil/playlist.m3u8
+#EXTINF:-1,group-title="Denmark",TV 2/Nord Salto
+http://cdnapi.kaltura.com/p/1956931/sp/195693100/playManifest/entryId/0_74s20zcv/format/applehttp/protocol/http/uiConfId/30287901/a.m3u8
+#EXTINF:-1,group-title="Denmark",TV ØST
+http://cdnapi.kaltura.com/p/1953381/sp/195338100/playManifest/entryId/0_zphj9q61/format/applehttp/protocol/http/uiConfId/33111111/a.m3u8
+#EXTINF:-1,group-title="Denmark",TV Østjylland
+http://54.78.73.201/live/tv2oj-plus_2000/master.m3u8
+#EXTINF:-1,group-title="Denmark",tv mv
+http://cdnapi.kaltura.com/p/1953371/sp/195337100/playManifest/entryId/0_emj64be3/format/applehttp/protocol/http/uiConfId/33632201/a.m3u8
+#EXTINF:-1,group-title="Denmark",tvs
+http://cdnapi.kaltura.com/p/1956351/sp/195635100/playManifest/entryId/0_e9slj9wh/format/applehttp/protocol/http/uiConfId/33315471/a.m3u8
+#EXTINF:-1,group-title="Norway",NRK 1
+https://nrk1us-f.akamaihd.net/i/nrk1us_0@102847/master.m3u8|X-Forwarded-For=5.249.230.1
+#EXTINF:-1,group-title="Norway",NRK 2
+https://nrk2us-f.akamaihd.net/i/nrk2us_0@107231/master.m3u8|X-Forwarded-For=5.249.230.1
+#EXTINF:-1,group-title="Norway",NRK 3
+https://nrk3us-f.akamaihd.net/i/nrk3us_0@107233/master.m3u8|X-Forwarded-For=5.249.230.1
+#EXTINF:-1,group-title="Norway",NRK Super
+https://nrksuper-lh.akamaihd.net/i/nrksupertvus_0@108447/master.m3u8|X-Forwarded-For=5.249.230.1
+#EXTINF:-1,group-title="Norway",TV Haugaland
+http://flash0.15561-live0.dna.qbrick.com/15561-live0/live1/master.m3u8|X-Forwarded-For=5.249.230.1
+#EXTINF:-1,group-title="Sweden",SVT1
+https://svt10-lh.akamaihd.net/i/svt10_0@77505/master.m3u8|X-Forwarded-For=83.172.75.170
+#EXTINF:-1,group-title="Sweden",SVT2
+https://svt12-lh.akamaihd.net/i/svt12_0@77507/master.m3u8|X-Forwarded-For=83.172.75.170
+#EXTINF:-1,group-title="Sweden",SVT Barnkanalen/SVT24
+https://svt13-lh.akamaihd.net/i/svt13_0@77508/master.m3u8|X-Forwarded-For=83.172.75.170
+#EXTINF:-1,group-title="Sweden",SVT Kunskapskanalen
+https://svt11-lh.akamaihd.net/i/svt11_0@77506/master.m3u8|X-Forwarded-For=83.172.75.170
+#EXTINF:-1,group-title="Sweden",TV4
+http://tv4live-i.akamaihd.net/hls/live/200284/akamaihls2/master.m3u8|X-Forwarded-For=83.172.75.170
+#EXTINF:-1,group-title="Sweden",TV10
+http://cdn-kanal10.crossnet.net/kanal10/mpegts.stream/master.m3u8|X-Forwarded-For=83.172.75.170
+#EXTINF:-1,group-title="Finland",YLE TV1
+http://yletv-lh.akamaihd.net/i/yletv1hls_1@103188/master.m3u8|X-Forwarded-For=87.92.1.250
+#EXTINF:-1,group-title="Finland",YLE TV2
+http://yletv-lh.akamaihd.net/i/yletv2hls_1@103189/master.m3u8|X-Forwarded-For=87.92.1.250
+#EXTINF:-1,group-title="Finland",YLE FEM FI
+http://yletv-lh.akamaihd.net/i/ylefemfihls_1@103185/master.m3u8|X-Forwarded-For=87.92.1.250
+#EXTINF:-1,group-title="Finland",YLE FEM SE
+http://yletv-lh.akamaihd.net/i/ylefemsehls_1@103186/master.m3u8|X-Forwarded-For=87.92.1.250
+#EXTINF:-1,group-title="Finland",YLE TEEMA
+http://yletv-lh.akamaihd.net/i/yleteemahls_1@103187/master.m3u8|X-Forwarded-For=87.92.1.250
+#EXTINF:-1,group-title="Island",RUV 1
+http://ruvruverl-live.hls.adaptive.level3.net/ruv/ruv/index.m3u8|X-Forwarded-For=46.22.102.44
+#EXTINF:-1,group-title="Island",RUV 2
+http://ruvruv2erl-live.hls.adaptive.level3.net/ruv/ruv2/index.m3u8|X-Forwarded-For=46.22.102.44

@@ -1,0 +1,153 @@
+﻿#EXTM3U,$MODE=IPTV
+#EXTINF:-1,NRW.TV
+http://streaming006.broadcast.tneg.de:1935/nrwtv-new/_definst_/smil:nrw.smil/playlist.m3u8
+#EXTINF:-1,center.tv
+http://sdn-global-live-http-cache.3qsdn.com/live/_definst_/smil:3045-mbr.smil/playlist.m3u8
+#EXTINF:-1,Köln.tv
+http://dumontuniversal-lh.akamaihd.net/i/dumontuniversal_1@129833/master.m3u8
+#EXTINF:-1,blizz TV HD
+http://lb.hd-livestream.de/live/DasneueTV/playlist.m3u8
+#EXTINF:-1,Family TV HD
+http://83.169.58.38:1935/live/Stream3/playlist.m3u8
+#EXTINF:-1,Alex Berlin
+http://alex-stream.rosebud-media.de:1935/live/alexlivetv.smil/master.m3u8
+#EXTINF:-1,JOIZ HD
+http://ooyalahd2-f.akamaihd.net/i/joizgerm01_delivery@324125/master.m3u8
+#EXTINF:-1,ServusTV HD
+http://player.hdiosstv-f.akamaihd.net/i/servustvhdde_1@75540/master.m3u8
+#EXTINF:-1,N24
+http://n24-live.hls.adaptive.level3.net/hls-live/n24-pssimn24live/_definst_/live.m3u8
+#EXTINF:-1,DAF
+http://edge-h.daf.tmt.de/ios-live/daf-ios-live-livetv.stream/master.m3u8
+#EXTINF:-1,Welt der Wunder TV
+http://mf.weltderwunder.c.nmdn.net/wdwlive/WDW-HQ.stream/playlist.m3u8
+#EXTINF:-1,Bibel TV
+http://mf.bibeltv.c.nmdn.net/bibeltv_live/BIBEL_TV_HQ-480p.stream/master.m3u8
+#EXTINF:-1,OKTO TV
+http://d2jk87psbjrjdz.cloudfront.net/livehttporigin/okto/playlist.m3u8
+#EXTINF:-1,Hamburg 1
+http://stream2.telvi.de/hamburg1live/live/master.m3u8
+#EXTINF:-1,Potsdam TV
+http://stream2.telvi.de/potsdamtvlive/live/master.m3u8
+#EXTINF:-1,tv.berlin
+http://stream.tvb.de/hls/TVB.m3u8
+#EXTINF:-1,münchen.tv
+http://muenchentv.iptv-playoutcenter.de:1935/muenchentv/muenchentv.stream_1/master.m3u8
+#EXTINF:-1,Isar TV
+http://isar-tv.iptv-playoutcenter.de:1935/isar-tv/isar-tv.stream_1/master.m3u8
+#EXTINF:-1,Donau TV
+http://donautv.iptv-playoutcenter.de:1935/donautv/donautv.stream_1/master.m3u8
+#EXTINF:-1,Augsburg TV
+http://augsburgtv.iptv-playoutcenter.de:1935/augsburgtv/augsburgtv.stream_1/master.m3u8
+#EXTINF:-1,TVA
+http://tvaktuellr.iptv-playoutcenter.de:1935/tvaktuellr/tvaktuellr.stream_1/playlist.m3u8
+#EXTINF:-1,TVO (Oberfranken)
+http://tvoberfranken.iptv-playoutcenter.de:1935/tvoberfranken/tvoberfranken.stream_1/master.m3u8
+#EXTINF:-1,TRP1
+http://teleregionalpassau1.iptv-playoutcenter.de:1935/teleregionalpassau1/teleregionalpassau1.stream_1/master.m3u8
+#EXTINF:-1,TV Touring Würzburg
+http://tvtouringw.iptv-playoutcenter.de:1935/tvtouringw/tvtouringw.stream_1/master.m3u8
+#EXTINF:-1,TV Touring Schweinfurt
+http://tvtourings.iptv-playoutcenter.de:1935/tvtourings/tvtourings.stream_1/master.m3u8
+#EXTINF:-1,main.tv
+http://maintv.iptv-playoutcenter.de:1935/maintv/maintv.stream_2/master.m3u8
+#EXTINF:-1,Franken Fernsehen
+http://frankentv.iptv-playoutcenter.de:1935/frankentv/frankentv.stream_1/master.m3u8
+#EXTINF:-1,Oberpfalz TV
+http://oberpfalztv.iptv-playoutcenter.de:1935/oberpfalztv/oberpfalztv.stream_1/master.m3u8
+#EXTINF:-1,rfo
+http://rfo.iptv-playoutcenter.de:1935/rfo/rfo.stream_1/master.m3u8
+#EXTINF:-1,Allgäu-TV
+http://tvallgaeu.iptv-playoutcenter.de:1935/tvallgaeu/tvallgaeu.stream_2/master.m3u8
+#EXTINF:-1,rheinmaintv
+rtmp://217.23.11.44/live/myStream
+#EXTINF:-1,FRF1
+http://62.113.221.100/friesischerRundfunk-live/livestream/master.m3u8
+#EXTINF:-1,Filstalwelle
+http://62.113.210.27/filstalwelle-live/livestream/master.m3u8
+#EXTINF:-1,Dresden Fernsehen
+http://video07.kanal8.de:1935/dresdenfernsehenlive/myStream.sdp/master.m3u8
+#EXTINF:-1,Leipzig Fernsehen
+http://video61.kanal8.de:1935/leipzigfernsehenlive/myStream.sdp/master.m3u8
+#EXTINF:-1,Baden TV
+http://badentv-stream2.siebnich.info:1935/rtplive/vlc.sdp/master.m3u8
+#EXTINF:-1,bw family.tv
+http://live.bwfamily.tv:1935/rtplive/vlc.sdp/master.m3u8
+#EXTINF:-1,DRF1
+http://62.67.13.54:1935/drf1/drf1_livestream_3/playlist.m3u8
+#EXTINF:-1,AUSTRIA 24 TV
+http://streaming.austria24.tv/live/stream/master.m3u8
+#EXTINF:-1,Tirol TV
+http://lb.hd-livestream.de:1935/live/TirolTV/master.m3u8
+#EXTINF:-1,Burgenlandkreis Regional TV
+http://62.113.210.250/medienasa-live/BLKonline_high/master.m3u8
+#EXTINF:-1,Elbekanal Schönebeck
+http://62.113.210.250/medienasa-live/elbe_high/master.m3u8
+#EXTINF:-1,Halle TV
+http://62.113.210.250/medienasa-live/tvhalle_high/master.m3u8
+#EXTINF:-1,PUNKTum
+http://62.113.210.250/medienasa-live/punktum_high/playlist.m3u8
+#EXTINF:-1,MDF.1
+http://62.113.210.250/medienasa-live/mdf1_high/playlist.m3u8
+#EXTINF:-1,RFH
+http://62.113.210.250/medienasa-live/RFH_high/playlist.m3u8
+#EXTINF:-1,RBW
+http://62.113.210.250/medienasa-live/rbw_high/master.m3u8
+#EXTINF:-1,Ran1 Dessau
+http://62.113.210.250/medienasa-live/ran1_high/master.m3u8
+#EXTINF:-1,OK Dessau
+http://62.113.210.250/medienasa-live/ok-dessau_high/master.m3u8
+#EXTINF:-1,OK Magedeburg
+http://62.113.210.250/medienasa-live/ok-magdeburg_high/master.m3u8
+#EXTINF:-1,OK Merseburg
+http://62.113.210.250/medienasa-live/ok-merseburg_high/master.m3u8
+#EXTINF:-1,OK Salzwedel
+http://62.113.210.250/medienasa-live/ok-salzwedel_high/master.m3u8
+#EXTINF:-1,OK Stendal
+http://62.113.210.250/medienasa-live/ok-stendal_high/master.m3u8
+#EXTINF:-1,OK Wernigerode
+http://62.113.210.250/medienasa-live/ok-wernigerode_high/master.m3u8
+#EXTINF:-1,OK Wettin
+http://62.113.210.250/medienasa-live/ok-wettin_high/master.m3u8
+#EXTINF:-1,OK Kiel
+http://stream.oksh.de/live.m3u8
+#EXTINF:-1,OK Trier
+rtmp://stream-cdn.ok54.de/tv/ok54
+#EXTINF:-1,OK Koblenz / Neuwied / Andernach / Adenau
+rtmp://stream-cdn.ok54.de/tv/ok4
+#EXTINF:-1,OK Idar-Oberstein
+rtmp://stream-cdn.ok54.de/tv/nahetv
+#EXTINF:-1,OK Mainz
+rtmp://streaming.ok54.de/tv/oktvmainz
+#EXTINF:-1,OK Weinstraße
+rtmp://stream-cdn.ok54.de/tv/okweinstrasse
+#EXTINF:-1,OK Bremerhaven
+http://stream.radioweser.tv:1935/live/livestream2.sdp/master.m3u8
+#EXTINF:-1,Oldenburg Eins
+rtmp://188.40.16.94/live/studio
+#EXTINF:-1,STUDIO 47 Duisburg
+rtmp://93.89.13.30:80/live/studio47livestream
+#EXTINF:-1,RTV
+mms://wmsstream22.v4.mytv.ris.at/live/stream_151
+#EXTINF:-1,LL
+mms://wmsstream22.v4.mytv.ris.at/live/stream_156
+#EXTINF:-1,mühlviertel.tv
+mms://wmsstream22.v4.mytv.ris.at/live/stream_149
+#EXTINF:-1,noa4 Norderstedt
+http://hls1.wtnet.de/noa4/apple/wifi.m3u8
+#EXTINF:-1,noa4 Norderstedt FHD
+http://hls1.wtnet.de/noa4/apple/wifi6500.m3u8
+#EXTINF:-1,noa4 Hamburg
+http://hls1.wtnet.de/noa4hh/apple/wifi.m3u8
+#EXTINF:-1,noa4 Hamburg FHD
+http://hls1.wtnet.de/noa4hh/apple/wifi6500.m3u8
+#EXTINF:-1,TeleBärn
+http://rtmp.infomaniak.ch/livecast/barntele/master.m3u8
+#EXTINF:-1,TVO (Ostschweiz)
+http://rtmp.infomaniak.ch/livecast/tvo/master.m3u8
+#EXTINF:-1,TeleBielingue
+http://rtmp.infomaniak.ch/livecast/telebielinguech/master.m3u8
+#EXTINF:-1,TeleZüri HD
+http://kalsegsec-a.akamaihd.net/dc-1/m/ny-live-publish2/kLive/smil:1_hoislpiz_all.smil/master.m3u8
+#EXTINF:-1,TeleBasel
+http://xapp510394368c1000199.f.l.z.lb.core-cdn.net/10096xtelebase/ios_500/master.m3u8

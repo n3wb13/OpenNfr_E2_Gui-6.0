@@ -1,0 +1,26 @@
+<!-- hauptScreenSetup -->
+<screen name="MediaPortal_Setup" position="center,center" size="900,655" backgroundColor="#00060606" flags="wfNoBorder">
+	<eLabel position="0,0" size="900,60" backgroundColor="#00242424" />
+	<widget name="title" position="30,10" size="500,55" backgroundColor="#18101214" transparent="1" zPosition="1" font="mediaportal;24" valign="center" halign="left" />
+	<widget source="global.CurrentTime" render="Label" position="700,00" size="150,55" backgroundColor="#18101214" transparent="1" zPosition="1" font="mediaportal;24" valign="center" halign="right">
+		<convert type="ClockToText">Format:%-H:%M</convert>
+	</widget>
+	<widget source="global.CurrentTime" render="Label" position="450,20" size="400,55" backgroundColor="#18101214" transparent="1" zPosition="1" font="mediaportal;16" valign="center" halign="right">
+		<convert type="ClockToText">Format:%A, %d.%m.%Y</convert>
+	</widget>
+	<widget name="config" position="0,60" size="900,350" backgroundColor="#00101214" scrollbarMode="showOnDemand" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins_720/original/images/sel.png" foregroundColorSelected="#00e5b243" transparent="0" />
+	<eLabel position="215,460" size="675,2" backgroundColor="#00555556" />
+	<widget name="name" position="230,420" size="560,30" foregroundColor="#00e5b243" backgroundColor="#00101214" transparent="1" font="mediaportal;26" valign="top" />
+    <ePixmap pixmap="~/original/images/buttonred.png" position="20,635" size="100,2" alphatest="blend" />
+    <ePixmap pixmap="~/original/images/buttongreen.png" position="225,635" size="100,2" alphatest="blend" />
+    <ePixmap pixmap="~/original/images/buttonyellow.png" position="430,635" size="100,2" alphatest="blend" />
+    <ePixmap pixmap="~/original/images/buttonblue.png" position="635,635" size="100,2" alphatest="blend" />
+    <ePixmap pixmap="~/original/images/buttonred.png" position="120,635" size="100,2" alphatest="blend" />
+    <ePixmap pixmap="~/original/images/buttongreen.png" position="325,635" size="100,2" alphatest="blend" />
+    <ePixmap pixmap="~/original/images/buttonyellow.png" position="530,635" size="100,2" alphatest="blend" />
+    <ePixmap pixmap="~/original/images/buttonblue.png" position="735,635" size="100,2" alphatest="blend" />
+    <widget name="F1" position="20,610" size="200,30" transparent="1" font="mediaportal; 17" backgroundColor="#00101214" valign="center" halign="center" zPosition="1" />
+    <widget name="F2" position="225,610" size="200,30" transparent="1" font="mediaportal; 17" backgroundColor="#00101214" valign="center" halign="center" zPosition="1" />
+    <widget name="F3" position="430,610" size="200,30" transparent="1" font="mediaportal; 17" backgroundColor="#00101214" valign="center" halign="center" zPosition="1" />
+    <widget name="F4" position="635,610" size="200,30" transparent="1" font="mediaportal; 17" backgroundColor="#00101214" valign="center" halign="center" zPosition="1" />
+</screen>

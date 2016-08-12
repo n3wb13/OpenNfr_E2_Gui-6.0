@@ -1,0 +1,15 @@
+<!-- pluginSort_Screen -->
+<screen name="pluginSort" position="0,0" size="1280,720" flags="wfNoBorder">
+	<widget source="session.VideoPicture" render="Pig" position="937,15" size="320,180" zPosition="3" backgroundColor="transparent" />
+	<widget source="hidePig" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/video_bg_logo.png" position="937,15" size="320,180" zPosition="4">
+		<convert type="ConditionalShowHide" />
+	</widget>
+	<ePixmap position="14,31" size="508,48" zPosition="0" pixmap="~/liquidblue/images/mplogo.png" transparent="1" alphatest="blend" />
+	<ePixmap position="928,7" size="342,201" zPosition="5" pixmap="~/liquidblue/images/video_bg.png" backgroundColor="transparent" alphatest="blend" />
+	<eLabel text="User Plugin Sortierung" position="10,104" size="900,50" transparent="1" font="mediaportal; 26" backgroundColor="#26181d20" foregroundColor="#00999999" valign="center" halign="center" zPosition="0" />
+	<widget name="config2" position="12,220" size="898,400" scrollbarMode="showOnDemand" transparent="1" selectionPixmap="~/liquidblue/images/sel.png" foregroundColorSelected="#ffffff" />
+	<eLabel text="OK " position="1010,660" size="125,40" transparent="1" font="mediaportal; 18" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<eLabel text="Exit " position="1145,660" size="125,40" transparent="1" font="mediaportal; 18" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<ePixmap position="0,0" size="1280,720" zPosition="-2" pixmap="~/liquidblue/images/pluginSortScreen.png" />	
+	<ePixmap position="1010,632" size="270,82" zPosition="-1" pixmap="~/liquidblue/images/buttons_sort.png" />
+</screen>

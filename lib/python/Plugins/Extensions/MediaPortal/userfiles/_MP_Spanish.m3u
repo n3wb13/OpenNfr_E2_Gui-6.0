@@ -1,0 +1,19 @@
+﻿#EXTM3U,$MODE=IPTV
+#EXTINF:-1,La 1
+http://iphonelive.rtve.es/LA1_LV3_IPH/master.m3u8
+#EXTINF:-1,La 2
+http://iphonelive.rtve.es/LA2_LV3_IPH/master.m3u8
+#EXTINF:-1,Antena 3
+http://a3live-lh.akamaihd.net/i/antena3/antena3_1@35248/master.m3u8
+#EXTINF:-1,TeleCinco
+http://mdsios2-lh.akamaihd.net/i/mitele/esmediaset_21@168473/index_0_av-p.m3u8
+#EXTINF:-1,La Sexta
+http://a3live-lh.akamaihd.net/i/lasexta_1@35272/master.m3u8
+#EXTINF:-1,MEGA
+http://a3live-lh.akamaihd.net/i/mega/megageo_1@328914/master.m3u8
+#EXTINF:-1,24h
+http://iphonelive.rtve.es/24H_LV3_IPH/master.m3u8
+#EXTINF:-1,Andalucia TV
+http://iphone-andaluciatelevision.rtva.stream.flumotion.com/rtva/andaluciatelevision-iphone-multi/main.m3u8
+#EXTINF:-1,TV Galicia
+http://media3.crtvg.es/live/tvge/master.m3u8

@@ -1,0 +1,29 @@
+<screen name="MediaPortal" position="center,center" size="1140,655" backgroundColor="#00060606" flags="wfNoBorder">
+	<eLabel position="0,0" size="1140,60" backgroundColor="#00242424" />
+	<widget name="title" position="30,10" size="500,55" backgroundColor="#18101214" transparent="1" zPosition="1" font="mediaportal;24" valign="center" halign="left" />
+	<widget source="global.CurrentTime" render="Label" position="950,00" size="150,55" backgroundColor="#18101214" transparent="1" zPosition="1" font="mediaportal;24" valign="center" halign="right">
+		<convert type="ClockToText">Format:%-H:%M</convert>
+	</widget>
+	<widget source="global.CurrentTime" render="Label" position="700,20" size="400,55" backgroundColor="#18101214" transparent="1" zPosition="1" font="mediaportal;16" valign="center" halign="right">
+		<convert type="ClockToText">Format:%A, %d.%m.%Y</convert>
+	</widget>
+	<widget name="name" position="0,580" size="1140,30" foregroundColor="#00e5b243" backgroundColor="#00101214" transparent="1" font="mediaportal;28" valign="top" halign="center" />
+	<widget name="Mediatheken" position="20,60" size="260,25" backgroundColor="#00aaaaaa" zPosition="5" foregroundColor="#00000000" font="mediaportal;22" halign="center" />
+	<widget name="mediatheken" position="20,85" size="260,484" backgroundColor="#00101214" scrollbarMode="showOnDemand" selectionPixmap="~/original/images/sel.png" foregroundColorSelected="#00e5b243" transparent="0" />
+	<widget name="Grauzone" position="300,60" size="260,25" backgroundColor="#00aaaaaa" zPosition="5" foregroundColor="#00000000" font="mediaportal;22" halign="center" />
+	<widget name="grauzone" position="300,85" size="260,484" backgroundColor="#00101214" scrollbarMode="showOnDemand" selectionPixmap="~/original/images/sel.png" foregroundColorSelected="#00e5b243" transparent="0" />
+	<widget name="Funsport" position="580,60" size="260,25" backgroundColor="#00aaaaaa" zPosition="5" foregroundColor="#00000000" font="mediaportal;22" halign="center" />
+	<widget name="funsport" position="580,85" size="260,484" backgroundColor="#00101214" scrollbarMode="showOnDemand" selectionPixmap="~/original/images/sel.png" foregroundColorSelected="#00e5b243" transparent="0" />
+	<widget name="Porn" position="860,60" size="260,25" backgroundColor="#00aaaaaa" zPosition="5" foregroundColor="#00000000" font="mediaportal;22" halign="center" />
+	<widget name="porn" position="860,85" size="260,484" backgroundColor="#00101214" scrollbarMode="showOnDemand" selectionPixmap="~/original/images/sel.png" foregroundColorSelected="#00e5b243" transparent="0" />
+	<ePixmap position="580,645" size="100,2" zPosition="1" pixmap="~/original/images/buttonred.png" alphatest="blend" backgroundColor="#00101214" />
+	<widget name="red" position="580,620" size="100,25" transparent="1" font="mediaportal; 18" backgroundColor="#00101214" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<ePixmap position="690,645" size="100,2" zPosition="1" pixmap="~/original/images/buttongrey.png" alphatest="blend" backgroundColor="#00101214" />
+	<widget name="PVR" position="690,620" size="100,25" transparent="1" font="mediaportal; 18" backgroundColor="#00101214" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<ePixmap position="800,645" size="100,2" zPosition="1" pixmap="~/original/images/buttongrey.png" alphatest="blend" backgroundColor="#00101214" />
+	<widget name="Menu" position="800,620" size="100,25" transparent="1" font="mediaportal; 18" backgroundColor="#00101214" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<ePixmap position="910,645" size="100,2" zPosition="1" pixmap="~/original/images/buttongrey.png" alphatest="blend" backgroundColor="#00101214" />
+	<widget name="Help" position="910,620" size="100,25" transparent="1" font="mediaportal; 18" backgroundColor="#00101214" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+	<ePixmap position="1020,645" size="100,2" zPosition="1" pixmap="~/original/images/buttongrey.png" alphatest="blend" backgroundColor="#00101214" />
+	<widget name="Exit" position="1020,620" size="100,25" transparent="1" font="mediaportal; 18" backgroundColor="#00101214" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+</screen>

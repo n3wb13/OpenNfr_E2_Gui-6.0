@@ -1,0 +1,2 @@
+﻿<widget name="rating10" position="3000,600" size="600,60" pixmap="~/clean_uhd/images/starsbar_filled.png" zPosition="1" transparent="1"/>
+<widget name="rating0" position="3000,600" size="600,60" pixmap="~/clean_uhd/images/starsbar_empty.png" alphatest="on" />
