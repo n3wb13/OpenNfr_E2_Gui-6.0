@@ -179,10 +179,10 @@ class DownloadOnLineImage(Screen):
             self.feedurl = 'http://dev.nachtfalke.biz/nfr/feeds/%s/images' %ImageVersion
         elif self.distro == 'openatv':
             self.feed = 'openatv'
-            self.feedurl = 'http://images.mynonpublic.com/openatv/4.2'
+            self.feedurl = 'http://images1.mynonpublic.com/openatv/4.2'
         elif self.distro == 'openatv-5.2':
             self.feed = 'openatv'
-            self.feedurl = 'http://images.mynonpublic.com/openatv/5.2'    
+            self.feedurl = 'http://images1.mynonpublic.com/openatv/5.2'    
         elif self.distro == 'openatv-5.3':
             self.feed = 'openatv'
             self.feedurl = 'http://images.mynonpublic.com/openatv/5.3'
@@ -377,7 +377,15 @@ class DownloadOnLineImage(Screen):
                elif box in ('osmini'):
                     box = 'osmini'
                     urlbox = 'edision/osmini/' 
-                    stb = '1'                    
+                    stb = '1' 
+               elif box in ('spycatmini'):
+                    box = 'spycatmini'
+                    urlbox = 'spycat/spycatmini/' 
+                    stb = '1'
+               elif box in ('spycat'):
+                    box = 'spycat'
+                    urlbox = 'spycat/spycat/' 
+                    stb = '1'                      
             else:   
                 stb = 'no Image for this Box on this Side'
         elif self.distro == 'custom':
@@ -530,8 +538,8 @@ class DownloadOnLineImage(Screen):
                     t4 = line.find('opennfr-')
                     t5 = line.find('.zip"')
                     self.imagelist.append(line[t4 :t5+4])
-                elif line.find('href="openpli-' ) > -1:
-                    t4 = line.find('openpli-')
+                elif line.find('href="http://downloads.pli-images.org' ) > -1:
+                    t4 = line.find('OpenPLi-')
                     t5 = line.find('.zip"')
                     self.imagelist.append(line[t4 :t5+4])    
                 elif line.find('href="openhdf-') > -1:

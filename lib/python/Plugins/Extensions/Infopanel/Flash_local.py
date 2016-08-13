@@ -1,4 +1,5 @@
 from Plugins.SystemPlugins.Hotplug.plugin import hotplugNotifier
+from Plugins.Extensions.NFR4XBoot.plugin import *
 from Components.Button import Button
 from Components.Label import Label
 from Components.ActionMap import ActionMap
@@ -6,21 +7,29 @@ from Components.MenuList import MenuList
 from Components.FileList import FileList
 from Components.Task import Task, Job, job_manager, Condition
 from Components.Sources.StaticText import StaticText
+from Components.ProgressBar import ProgressBar
+from Components.SystemInfo import SystemInfo
+from Components.Input import Input
 from Screens.Console import Console
 from Screens.MessageBox import MessageBox
 from Screens.ChoiceBox import ChoiceBox
 from Screens.Screen import Screen
-from Screens.Console import Console
 from Screens.HelpMenu import HelpableScreen
 from Screens.TaskView import JobView
 from Tools.Downloader import downloadWithProgress
+from Tools.LoadPixmap import LoadPixmap
+from Tools.Directories import fileExists
+from skin import parseColor
+from enigma import fbClass
 import urllib2
 import os
 import shutil
 import math
-from boxbranding import getBoxType,  getImageDistro, getMachineName, getMachineBrand, getBrandOEM, getImageVersion
+from boxbranding import getBoxType,  getImageDistro, getMachineName, getMachineBrand, getBrandOEM, getImageVersion, getMachineKernelFile, getMachineRootFile
 distro =  getImageDistro()
 ImageVersion = getImageVersion()
+ROOTFSBIN = getMachineRootFile()
+KERNELBIN = getMachineKernelFile()
 
 #############################################################################################################
 image = 0 # 0=openNFR
@@ -57,7 +66,7 @@ class FlashOnline(Screen):
 		<ePixmap position="0,360"   zPosition="1" size="140,40" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Infopanel/pics/red.png" transparent="1" alphatest="on" />
 		<ePixmap position="140,360" zPosition="1" size="140,40" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Infopanel/pics/green.png" transparent="1" alphatest="on" />
 		<ePixmap position="280,360" zPosition="1" size="140,40" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Infopanel/pics/yellow.png" transparent="1" alphatest="on" />
-		<ePixmap position="420,360" zPosition="1" size="140,40" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Infopanel/pics/buttons/blue.png" transparent="1" alphatest="on" />
+		<ePixmap position="420,360" zPosition="1" size="140,40" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/Infopanel/pics/blue.png" transparent="1" alphatest="on" />
 		<widget name="key_red" position="0,360" zPosition="2" size="140,40" valign="center" halign="center" font="Regular;21" transparent="1" shadowColor="black" shadowOffset="-1,-1" />
 		<widget name="key_green" position="140,360" zPosition="2" size="140,40" valign="center" halign="center" font="Regular;21" transparent="1" shadowColor="black" shadowOffset="-1,-1" />
 		<widget name="key_yellow" position="280,360" zPosition="2" size="140,40" valign="center" halign="center" font="Regular;21" transparent="1" shadowColor="black" shadowOffset="-1,-1" />
@@ -69,12 +78,19 @@ class FlashOnline(Screen):
 	def __init__(self, session):
 		Screen.__init__(self, session)
 		self.session = session
-
+		self.selection = 0
+		self.devrootfs = "/dev/mmcblk0p3"
+		self.multi = 1
+		self.list = self.list_files("/boot")
+		
 		Screen.setTitle(self, _("Flash On the Fly"))
-		self["key_yellow"] = Button("Local")
+		if SystemInfo["HaveMultiBoot"]:
+			self["key_yellow"] = Button(_("STARTUP"))
+		else:
+			self["key_yellow"] = Button("")
 		self["key_green"] = Button("Online")
 		self["key_red"] = Button(_("Exit"))
-		self["key_blue"] = Button("")
+		self["key_blue"] = Button("Local")
 		self["info-local"] = Label(_("Local = Flash a image from local path /hdd/images"))
 		self["info-online"] = Label(_("Online = Download a image and flash it"))
 		
@@ -86,8 +102,17 @@ class FlashOnline(Screen):
 			"red": self.quit,
 			"cancel": self.quit,
 		}, -2)
+		if SystemInfo["HaveMultiBoot"]:
+			self.multi = self.read_startup("/boot/" + self.list[self.selection]).split(".",1)[1].split(" ",1)[0]
+			self.multi = self.multi[-1:]
+			print "[Flash Online] MULTI:",self.multi
 
 	def check_hdd(self):
+		if os.path.exists("/media/nfr4xboot"):
+			message = _('NFR4XBoot is still installed!\nNow removing NFR4XBoot and reboot the box. After reboot FlashLocal is available.\nYour installed images are not deleted and available after re-installing NFR4XBoot again.')
+			ybox = self.session.openWithCallback(self.removenfrxboot, MessageBox, message, MessageBox.TYPE_YESNO)
+			ybox.setTitle(_('Remove NFRXBoot'))
+			return False
 		if not os.path.exists("/media/hdd"):
 			self.session.open(MessageBox, _("No /hdd found !!\nPlease make sure you have a HDD mounted.\n\nExit plugin."), type = MessageBox.TYPE_ERROR)
 			return False
@@ -114,25 +139,70 @@ class FlashOnline(Screen):
 		except:
 			pass
 		return True
-
+	
+	def removenfrxboot(self, yesno):
+		if yesno:
+			os.system('rm /sbin/nfr4xinit')
+			os.system('rm /sbin/init')
+			os.system('ln -sfn /sbin/init.sysvinit /sbin/init')
+			os.system('chmod 777 /sbin/init')
+			os.system('mv /etc/init.d/volatile-media.sh.back /etc/init.d/volatile-media.sh')
+			os.system('rm /media/nfr4xboot/NFR4XBootI/.nfr4xboot')
+			os.system('rm /media/nfr4xboot/NFR4XBootI/.Flash')
+			os.system('rm /usr/lib/enigma2/python/Plugins/Extensions/NFR4XBoot/.nfr4xboot_location')
+			os.system('reboot -p')
+		else:
+			return
+            
 	def quit(self):
 		self.close()	
 		
 	def blue(self):
-		pass
+		if self.check_hdd():
+			self.session.open(doFlashImage, online = False, list=self.list[self.selection], multi=self.multi, devrootfs=self.devrootfs)
+		else:
+			self.close()
 
 	def green(self):
 		if self.check_hdd():
-			self.session.open(doFlashImage, online = True)
+			self.session.open(doFlashImage, online = True, list=self.list[self.selection], multi=self.multi, devrootfs=self.devrootfs)
 		else:
 			self.close()
-
 	def yellow(self):
-		if self.check_hdd():
-			self.session.open(doFlashImage, online = False)
-		else:
-			self.close()
+		if SystemInfo["HaveMultiBoot"]:
+			self.selection = self.selection + 1
+			if self.selection == len(self.list):
+				self.selection = 0
+			self["key_yellow"].setText(_(self.list[self.selection]))
+			self.multi = self.read_startup("/boot/" + self.list[self.selection]).split(".",1)[1].split(" ",1)[0]
+			self.multi = self.multi[-1:]
+			print "[Flash Online] MULTI:",self.multi
+			cmdline = self.read_startup("/boot/" + self.list[self.selection]).split("=",1)[1].split(" ",1)[0]
+			self.devrootfs = cmdline
+			print "[Flash Online] MULTI rootfs ", self.devrootfs
 
+	def read_startup(self, FILE):
+		file = FILE
+		with open(file, 'r') as myfile:
+			data=myfile.read().replace('\n', '')
+		myfile.close()
+		return data
+
+	def list_files(self, PATH):
+		files = []
+		if SystemInfo["HaveMultiBoot"]:
+			path = PATH
+			for name in os.listdir(path):
+				if os.path.isfile(os.path.join(path, name)):
+					cmdline = self.read_startup("/boot/" + name).split("=",1)[1].split(" ",1)[0]
+					cmdline_startup = self.read_startup("/boot/STARTUP").split("=",1)[1].split(" ",1)[0]
+					if (cmdline != cmdline_startup) and (name != "STARTUP"):
+						files.append(name)
+			files.insert(0,"STARTUP")
+		else:
+			files = "None"
+		return files
+			
 class doFlashImage(Screen):
 	skin = """
 	<screen position="center,center" size="560,500" title="Flash On the fly (select a image)">
@@ -147,7 +217,7 @@ class doFlashImage(Screen):
 		<widget name="imageList" position="10,10" zPosition="1" size="450,450" font="Regular;20" scrollbarMode="showOnDemand" transparent="1" />
 	</screen>"""
 		
-	def __init__(self, session, online ):
+	def __init__(self, session, online, list=None, multi=None, devrootfs=None ):
 		Screen.__init__(self, session)
 		self.session = session
 
@@ -161,6 +231,9 @@ class doFlashImage(Screen):
 		self.imagelist = []
 		self.simulate = False
 		self.Online = online
+		self.List = list
+		self.multi=multi
+		self.devrootfs=devrootfs
 		self.imagePath = imagePath
 		self.feedurl = feedurl_nfr
 		if image == 0:
@@ -182,6 +255,8 @@ class doFlashImage(Screen):
 
 		
 	def quit(self):
+	        if self.simulate or not self.List == "STARTUP":
+			fbClass.getInstance().unlock()
 		self.close()	
 		
 	def blue(self):
@@ -232,8 +307,8 @@ class doFlashImage(Screen):
 			box = box[0:3] + 'x00'
 		elif box == 'odinm9' and self.feed == "nfr":
 			box = 'maram9'
-		elif box == 'bre2ze' and self.feed == "nfr":
-			box = 'ew7362'			
+		elif box == 'bre2ze':
+			box = 'ew7362'	
 		return box
 
 	def green(self, ret = None):
@@ -408,29 +483,50 @@ class doFlashImage(Screen):
 
 	def Start_Flashing(self):
 		print "Start Flashing"
+		cmdlist = []
 		#######################fix multiboot###################
-		os.system('rm /sbin/init;ln -sfn /sbin/init.sysvinit /sbin/init')
+		os.system('rm /sbin/init;ln -sfn /sbin/init.sysvinit /sbin/init')		
 		if os.path.exists(ofgwritePath):
 			text = _("Flashing: ")
 			if self.simulate:
 				text += _("Simulate (no write)")
-				cmd = "%s -n -r -k %s > /dev/null 2>&1" % (ofgwritePath, flashTmp)
+				if SystemInfo["HaveMultiBoot"]:
+					cmdlist.append("%s -n -r -k -m%s %s > /dev/null 2>&1" % (ofgwritePath, self.multi, flashTmp))
+				else:
+					cmdlist.append("%s -n -r -k %s > /dev/null 2>&1" % (ofgwritePath, flashTmp))
 				self.close()
 				message = "echo -e '\n"
 				message += _('Show only found image and mtd partitions.\n')
 				message += "'"
 			else:
 				text += _("root and kernel")
-				cmd = "%s -r -k %s > /dev/null 2>&1" % (ofgwritePath, flashTmp)
+				if SystemInfo["HaveMultiBoot"]:
+					if not self.List == "STARTUP":
+						os.system('mkfs.ext4 -F ' + self.devrootfs)
+					cmdlist.append("%s -r -k -m%s %s > /dev/null 2>&1" % (ofgwritePath, self.multi, flashTmp))
+					if not self.List == "STARTUP":
+						cmdlist.append("umount -fl /oldroot_bind")
+						cmdlist.append("umount -fl /newroot")
+				else:
+					cmdlist.append("%s -r -k %s > /dev/null 2>&1" % (ofgwritePath, flashTmp))
 				message = "echo -e '\n"
-				message += _('ofgwrite will stop enigma2 now to run the flash.\n')
-				message += _('Your %s %s will freeze during the flashing process.\n') % (getMachineBrand(), getMachineName())
-				message += _('Please: DO NOT reboot your %s %s and turn off the power.\n') % (getMachineBrand(), getMachineName())
-				message += _('The image or kernel will be flashing and auto booted in few minutes.\n')
-				if self.box() == 'gb800solo':
-					message += _('GB800SOLO takes about 20 mins !!\n')
+				if not self.List == "STARTUP" and SystemInfo["HaveMultiBoot"]:
+					message += _('ofgwrite flashing ready.\n')
+					message += _('please press exit to go back to the menu.\n')
+				else:
+					message += _('ofgwrite will stop enigma2 now to run the flash.\n')
+					message += _('Your STB will freeze during the flashing process.\n')
+					message += _('Please: DO NOT reboot your STB and turn off the power.\n')
+					message += _('The image or kernel will be flashing and auto booted in few minutes.\n')
+					if self.box() == 'gb800solo':
+						message += _('GB800SOLO takes about 20 mins !!\n')
 				message += "'"
-			self.session.open(Console, text,[message, cmd])
+			        cmdlist.append(message)
+				self.session.open(Console, title = text, cmdlist = cmdlist, finishedCallback = self.quit, closeOnSuccess = False)
+				if not self.simulate:
+					fbClass.getInstance().lock()
+                                if not self.List == "STARTUP":
+					self.close()
 
 	def prepair_flashtmp(self, tmpPath):
 		if os.path.exists(flashTmp):
@@ -446,12 +542,12 @@ class doFlashImage(Screen):
 			for name in files:
 				if name.find('kernel') > -1 and name.endswith('.bin') and kernel:
 					binfile = os.path.join(path, name)
-					dest = flashTmp + '/kernel.bin'
+					dest = flashTmp + '/%s' %KERNELBIN
 					shutil.copyfile(binfile, dest)
 					kernel = False
-				elif name.find('root') > -1 and (name.endswith('.bin') or name.endswith('.jffs2')) and rootfs:
+				elif name.find('root') > -1 and (name.endswith('.bin') or name.endswith('.jffs2') or name.endswith('.bz2')) and rootfs:
 					binfile = os.path.join(path, name)
-					dest = flashTmp + '/rootfs.bin'
+					dest = flashTmp + '/%s' %ROOTFSBIN
 					shutil.copyfile(binfile, dest)
 					rootfs = False
 				elif name.find('uImage') > -1 and kernel:

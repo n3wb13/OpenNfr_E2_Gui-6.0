@@ -24,10 +24,11 @@ from Tools.Directories import *
 from os import system, popen, path, makedirs, listdir, access, stat, rename, remove, W_OK, R_OK
 from time import gmtime, strftime, localtime, sleep
 from datetime import date
-from boxbranding import getBoxType, getMachineBrand, getMachineName
+from boxbranding import getBoxType, getMachineBrand, getMachineName, getImageDistro
 import shutil
 
 boxtype = getBoxType()
+distro = getImageDistro()
 START = time()
 dt1 = strftime("%Y%m%d_%H%M", localtime(START))
 config.plugins.configurationbackup = ConfigSubsection()
@@ -49,9 +50,9 @@ def getBackupFilenameChannel():
 def getBackupPath():
 	backuppath = config.plugins.configurationbackup.backuplocation.value
 	if backuppath.endswith('/'):
-		return backuppath + 'backup_' + boxtype
+		return backuppath + 'backup_' + distro + '_'+ boxtype
 	else:
-		return backuppath + '/backup_' + boxtype
+		return backuppath + '/backup_' + distro + '_'+ boxtype
 
 def getOldBackupPath():
 	backuppath = config.plugins.configurationbackup.backuplocation.value
@@ -166,7 +167,7 @@ class BackupSelection(Screen):
 
 		self.selectedFiles = config.plugins.configurationbackup.backupdirs.value
 		defaultDir = '/'
-		inhibitDirs = ["/boot", "/dev", "/autofs", "/proc", "/sys", "/hdd", "/tmp", "/mnt", "/media"]
+		inhibitDirs = ["/bin", "/boot", "/etc/enigma2", "/dev", "/autofs", "/lib", "/proc", "/sbin", "/sys", "/hdd", "/tmp", "/mnt", "/media"]
 		self.filelist = MultiFileSelectList(self.selectedFiles, defaultDir, inhibitDirs = inhibitDirs )
 		self["checkList"] = self.filelist
 
@@ -323,7 +324,7 @@ class RestoreMenu(Screen):
 	def startRestore(self, ret = False):
 		if ret == True:
 			self.exe = True
-			self.session.open(Console, title = _("Restoring..."), cmdlist = ["tar -xzvf " + self.path + "/" + self.sel + " -C /", "reboot -p"])
+			self.session.open(Console, title = _("Restoring..."), cmdlist = ["rm -R /etc/enigma2", "tar -xzvf " + self.path + "/" + self.sel + " -C /", "killall -9 enigma2"])
 
 	def deleteFile(self):
 		if (self.exe == False) and (self.entry == True):

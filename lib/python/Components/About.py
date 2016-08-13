@@ -4,7 +4,7 @@ from os import path
 import sys
 import os
 import time
-from boxbranding import getImageVersion, getBoxType
+from boxbranding import getImageVersion, getMachineBuild, getBoxType
 from sys import modules
 import socket, fcntl, struct
 
@@ -13,7 +13,7 @@ def getVersionString():
 
 def getFlashDateString():
 	try:
-		return time.strftime(_("%Y-%m-%d"), time.localtime(os.stat("/boot").st_ctime))
+		return time.strftime(_("%Y-%m-%d"), time.localtime(os.stat("/home").st_ctime))
 	except:
 		return _("unknown")
 
@@ -128,18 +128,24 @@ def getModelString():
 		return "unknown"		
 
 def getChipSetString():
-	try:
-		system="unknown"
-		f = open('/proc/stb/info/chipset', 'r')
-		chipset = f.read()
-		f.close()
-		return str(chipset.lower().replace('\n','').replace('bcm','').replace('brcm','').replace('sti',''))
-	except IOError:
-		return "unavailable"
+	if getMachineBuild() in ('dm7080','dm820'):
+		return "7435"
+	elif getMachineBuild() in ('hd51'):
+		return "7251S"
+	else:
+		try:
+			f = open('/proc/stb/info/chipset', 'r')
+			chipset = f.read()
+			f.close()
+			return str(chipset.lower().replace('\n','').replace('bcm','').replace('brcm','').replace('sti',''))
+		except IOError:
+			return "unavailable"
 
 def getCPUSpeedString():
-	if getBoxType() in ('vusolo4k'):
+	if getMachineBuild() in ('vusolo4k', 'hd51'):
 		return "1,5 GHz"
+	elif getMachineBuild() in ('hd52'):
+		return "1,7 GHz"
 	else:
 		try:
 			file = open('/proc/cpuinfo', 'r')
@@ -159,8 +165,9 @@ def getCPUSpeedString():
 		except IOError:
 			return "unavailable"
 
+
 def getCPUString():
-	if getBoxType() in ('xc7362', 'vusolo4k'):
+	if getMachineBuild() in ('xc7362', 'vusolo4k', 'hd51', 'hd52'):
 		return "Broadcom"
 	else:
 		try:
