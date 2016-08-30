@@ -1,4 +1,4 @@
-<screen name="VirtualKeyBoardExt" position="center,center" size="900,550" zPosition="9999" title="">
+<screen name="VirtualKeyBoardExt" position="center,center" size="900,550" zPosition="9998" title="">
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins_720/tec/images/vkey_text.png" position="10,60" zPosition="-4" size="880,40" alphatest="on" />
 	<widget source="country" render="Pixmap" position="830,10" size="60,40" alphatest="on" borderWidth="2" borderColor="yellow" >
 		<convert type="ValueToPixmap">LanguageCode</convert>

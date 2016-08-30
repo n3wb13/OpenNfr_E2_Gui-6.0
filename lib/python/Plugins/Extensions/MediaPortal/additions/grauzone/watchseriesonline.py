@@ -40,7 +40,7 @@ from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.twagenthelper import TwAgentHelper
 
-wso_url = "watchseries-online.la"
+wso_url = "watchseries-online.se"
 
 class wsoMain(MPScreen):
 
@@ -150,12 +150,14 @@ class wsoIndex(MPScreen, SearchHelper):
 		getPage(url).addCallback(self.parseData).addErrback(self.dataError)
 
 	def parseData(self, data):
-		series = re.findall('<li><a\shref="(http://%s/category/.*?)">(.*?)</a></li>' % wso_url, data, re.S)
-		if series:
-			for (url, serie) in series:
-				self.streamList.append((decodeHtml(serie), url))
+		parse = re.search('<div class="ddmcc"><ul>\s<p class="sep" id="goto\_\#">((.|\s)*?)<div style="clear:both;"><!-- --></div>', data, re.S)
+		if parse:
+			series = re.findall('<li><a\shref="(http://%s/category/.*?)">(.*?)</a></li>' % wso_url, parse.group(1), re.S)
+			if series:
+				for (url, serie) in series:
+					self.streamList.append((decodeHtml(serie), url))
 		if len(self.streamList) == 0:
-			self.streamList.append((_('No shows found!'), None))
+			self.streamList.append((_('No shows found!!!'), None))
 		else:
 			self.streamList.sort(key=lambda t : t[0].lower())
 		self.ml.setList(map(self._defaultlistleft, self.streamList))
@@ -396,7 +398,8 @@ class wsoEpisodes(MPScreen):
 					if line:
 						self.watched_list.append("%s" % (line[0]))
 				self.updates_read.close()
-		parse = re.search('class="container Sheet-body"(.*?)<script type=', data, re.S)
+		parse = re.search('<div id="episode-list">((.|\s)*?)</div> <!-- \.post_wrapper -->', data, re.S)
+		#parse = re.search('class="container Sheet-body"(.*?)<script type=', data, re.S)
 		if parse:
 			episodes = re.findall("<a\shref='(http://%s/.*?)'.*?</span>(.*?)</a>" % wso_url, parse.group(1), re.S)
 			if episodes:

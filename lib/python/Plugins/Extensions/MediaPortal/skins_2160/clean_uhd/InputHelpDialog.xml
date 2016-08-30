@@ -1,4 +1,4 @@
-<screen backgroundColor="foreground" flags="wfNoBorder" name="VirtualKeyBoardExtInputHelpDialog" position="1040,1600" size="1724,282">
+<screen backgroundColor="foreground" flags="wfNoBorder" name="VirtualKeyBoardExtInputHelpDialog" zPosition="9999" position="1040,1600" size="1724,282">
         <widget font="mediaportal;50" halign="center" name="key1" position="2,2" size="572,68" valign="center" />
         <widget font="mediaportal;50" halign="center" name="key2" position="576,2" size="572,68" valign="center" />
         <widget font="mediaportal;50" halign="center" name="key3" position="1150,2" size="572,68" valign="center" />

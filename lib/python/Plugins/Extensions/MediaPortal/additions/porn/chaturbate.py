@@ -272,7 +272,7 @@ class m3u8Player:
 		self.streambasepost = ".ts"
 		if data:
 			try:
-				playlist = re.findall('(http.*?://.*?.stream.highwebmedia.com:1935.*?m3u8)', data)[0]
+				playlist = re.findall('(http[s]?://.*?.stream.highwebmedia.com.*?m3u8)', data)[0]
 				self.streambase = re.findall('(.*)playlist.*', playlist)[0]
 				getPage(playlist).addCallback(self.getplaylist).addErrback(self.dataError)
 			except:

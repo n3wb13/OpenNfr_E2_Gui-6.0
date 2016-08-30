@@ -63,7 +63,8 @@ class watchseriesNewSeriesScreen(MPScreen):
 		with open(path, "r") as f:
 			self.skin = f.read()
 			f.close()
-		MPScreen.__init__(self, session)
+
+		MPScreen.__init__(self, session)
 
 		self["actions"] = ActionMap(["MP_Actions"], {
 			"ok"    : self.keyOK,

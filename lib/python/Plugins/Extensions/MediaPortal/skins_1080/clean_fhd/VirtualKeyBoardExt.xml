@@ -1,4 +1,4 @@
-<screen name="VirtualKeyBoardExt" backgroundColor="#80ffffff" position="285,140" size="1350,800" zPosition="9999" title="" flags="wfNoBorder">
+<screen name="VirtualKeyBoardExt" backgroundColor="#80ffffff" position="285,140" size="1350,800" zPosition="9998" title="" flags="wfNoBorder">
     <widget name="title" position="2,2" size="1346,60" font="mediaportal_clean;40" backgroundColor="#20000000" foregroundColor="#00ffffff" zPosition="1" halign="center" valign="center" />
     <widget source="country" render="Pixmap" position="1250,210" size="75,50" alphatest="on" zPosition="2">
         <convert type="ValueToPixmap">LanguageCode</convert>

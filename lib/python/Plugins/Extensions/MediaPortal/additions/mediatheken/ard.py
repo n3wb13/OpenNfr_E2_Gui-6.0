@@ -16,8 +16,7 @@ helpText = "Tipps:\
 alienFound = "Kann nicht abgespielt werden! Entweder ist der Content...  \n\n\
 - in der Zukunft liegend, und noch nicht vorhanden, oder...\n\
 - nicht mehr vorhanden, oder...\n\
-- die Stream-Links werden auf Seiten der ARD-Server nun\n   anders zusammengesetzt.\n\n\
-In letzterem Fall muss auf ein Update dieses Plugins gewartet werden!"
+- die Stream-Links werden auf Seiten der ARD-Server nun\n   anders zusammengesetzt."
 placeHolder = ("---","99")
 ardPic = ""
 
@@ -768,6 +767,15 @@ class ARDStreamScreen(MPScreen, ThumbsHelper):
 						rtP = d
 						r_qUp += 1
 					elif int(a) == h_qUp and c == "":
+						htP = d
+						h_qUp += 1
+
+				if a == '1':
+					if int(a) == r_qUp+1 and c != "":
+						rtH = c
+						rtP = d
+						r_qUp += 1
+					elif int(a) == h_qUp+1 and c == "":
 						htP = d
 						h_qUp += 1
 

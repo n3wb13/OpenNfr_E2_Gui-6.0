@@ -1,4 +1,4 @@
-<screen name="VirtualKeyBoardExt" position="center,center" size="3840,2160" flags="wfNoBorder" backgroundColor="#80ffffff" >
+<screen name="VirtualKeyBoardExt" position="center,center" size="3840,2160" flags="wfNoBorder" zPosition="9998" backgroundColor="#80ffffff" >
     <widget backgroundColor="#20000000" font="mediaportal_clean;120" halign="right" position="2760,20" render="Label" size="460,180" source="global.CurrentTime" valign="center">
         <convert type="ClockToText">Default</convert>
     </widget>

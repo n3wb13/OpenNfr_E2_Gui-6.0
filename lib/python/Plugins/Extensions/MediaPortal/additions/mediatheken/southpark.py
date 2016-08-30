@@ -82,10 +82,11 @@ class SouthparkGenreScreen(MPScreen):
 		getPage(url).addCallback(self.parseData).addErrback(self.dataError)
 
 	def parseData(self, data):
-		raw = re.findall('<a\sclass="seasonbtn.*?"\shref="(.*?)">(.*?)</a>.*?</li>', data, re.S)
+		jsonurl = re.findall('data-url="(/feeds/carousel/.*?){', data, re.S)
+		raw = re.findall('data-value="(season.*?)"\sdata-title="(.*?)"', data, re.S)
 		if raw:
-			for (Url, Title) in raw:
-				Title = "Staffel " + Title
+			for (ID, Title) in raw:
+				Url = "http://www.southpark.de" + jsonurl[0] + "/30/1/json/!airdate/" + ID
 				self.filmliste.append((Title, Url))
 			self.ml.setList(map(self._defaultlistcenter, self.filmliste))
 			self.keyLocked = False
@@ -158,16 +159,24 @@ class SouthparkListScreen(MPScreen, ThumbsHelper):
 		getPage(url).addCallback(self.parseData).addErrback(self.dataError)
 
 	def parseData(self, data):
-		raw = re.findall('<li>.*?<a\sclass="content_eppreview"\shref="(.*?episoden/)(.*?)-(.*?)"><img\ssrc="(.*?)"width="120".*?<h5>(.*?)</h5>.*?<p>(.*?)</p>', data, re.S)
-		if raw:
-			for (Link1, Episode, Link2, Image, Title, Handlung) in raw:
-				Title = Episode.upper() + " - " + Title
-				Link = Link1 + Episode + "-" + Link2
-				Image = Image.replace("width=120","width=320")
-				self.filmliste.append((decodeHtml(Title), Link, Image, Handlung))
-			self.filmliste.sort()
-			self.ml.setList(map(self._defaultlistleft, self.filmliste))
-			self.ml.moveToIndex(0)
+		json_data = json.loads(data)
+		if json_data:
+			for node in json_data['results']:
+				try:
+					itemid = str(node['itemId']) if 'itemId' in node else ""
+					title = str(node['title']) if 'title' in node else ""
+					description = str(node['description']) if 'description' in node else ""
+					image = str(node['images']) if 'images' in node else ""
+					episode = str(node['episodeNumber']) if 'episodeNumber' in node else ""
+					avail = str(node['_availability']) if '_availability' in node else ""
+				except:
+					pass
+				title = "S" + episode[:2] + "E" + episode[2:] + " - " + title
+				self.filmliste.append((title, itemid, image, description, episode, avail))
+		if len(self.filmliste) == 0:
+			self.filmliste.append((_("No episodes found!"), None, '', '', '', ''))
+		self.ml.setList(map(self._defaultlistleft, self.filmliste))
+		self.ml.moveToIndex(0)
 		self.keyLocked = False
 		self.th_ThumbsQuery(self.filmliste, 0, 1, 2, None, None, 1, 1, mode=1)
 		self.showInfos()
@@ -176,18 +185,24 @@ class SouthparkListScreen(MPScreen, ThumbsHelper):
 		name = self['liste'].getCurrent()[0][0]
 		coverUrl = self['liste'].getCurrent()[0][2]
 		handlung = self['liste'].getCurrent()[0][3]
-		self['name'].setText(decodeHtml(name))
-		self['handlung'].setText(decodeHtml(handlung))
+		self['name'].setText(name)
+		self['handlung'].setText(handlung)
 		CoverHelper(self['coverArt']).getCover(coverUrl)
 
 	def keyOK(self):
 		if self.keyLocked:
 			return
-		Name = self['liste'].getCurrent()[0][0]
 		Link = self['liste'].getCurrent()[0][1]
-		Pic = self['liste'].getCurrent()[0][2]
-		Handlung = self['liste'].getCurrent()[0][3]
-		self.session.open(SouthparkAktScreen, Link, Name, Pic, Handlung)
+		if Link:
+			Name = self['liste'].getCurrent()[0][0]
+			Pic = self['liste'].getCurrent()[0][2]
+			Handlung = self['liste'].getCurrent()[0][3]
+			available = self['liste'].getCurrent()[0][5]
+			if available == "true":
+				self.session.open(SouthparkAktScreen, Link, Name, Pic, Handlung)
+			else:
+				message = self.session.open(MessageBoxExt, _("Sorry, this video is not found or no longer available due to date or rights restrictions."), MessageBoxExt.TYPE_INFO, timeout=5)
+				return
 
 class SouthparkAktScreen(MPScreen):
 
@@ -238,18 +253,8 @@ class SouthparkAktScreen(MPScreen):
 	def loadPage(self):
 		self.keyLocked = True
 		self.filmliste = []
-		url = self.Link
-		getPage(url).addCallback(self.getVidId).addErrback(self.dataError)
-
-	def getVidId(self, data):
-		vidid = re.findall('<script\ssrc="http://activities.niagara.comedycentral.com/register/spsi-de-DE/episodes/(.*?)"\stype="text/javascript"></script>', data, re.S)
-		if vidid:
-			url = "http://www.southpark.de/feeds/video-player/mrss/mgid:arc:episode:southpark.de:" + vidid[0]
-			getPage(url).addCallback(self.getxmls).addErrback(self.dataError)
-		else:
-			message = self.session.open(MessageBoxExt, _("Sorry, this video is not found or no longer available due to date or rights restrictions."), MessageBoxExt.TYPE_INFO, timeout=5)
-			self.keyLocked = False
-			self.close()
+		url = "http://www.southpark.de/feeds/video-player/mrss/mgid:arc:episode:southpark.de:" + self.Link
+		getPage(url).addCallback(self.getxmls).addErrback(self.dataError)
 
 	def getxmls(self, data):
 		if self.locale == "de":

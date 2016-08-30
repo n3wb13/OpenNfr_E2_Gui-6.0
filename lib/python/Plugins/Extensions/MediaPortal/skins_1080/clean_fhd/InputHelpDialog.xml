@@ -1,4 +1,4 @@
-<screen name="VirtualKeyBoardExtInputHelpDialog" position="664,705" zPosition="999" size="605,200" backgroundColor="#80ffffff" flags="wfNoBorder">
+<screen name="VirtualKeyBoardExtInputHelpDialog" position="664,705" zPosition="9999" size="605,200" backgroundColor="#80ffffff" flags="wfNoBorder">
     <eLabel position="2,2" size="601,196" backgroundColor="#20000000" zPosition="-1" />
     <widget name="key1" position="10,10" size="195,45" font="mediaportal;27" halign="center" valign="center" foregroundColor="#00ffffff" backgroundColor="#20000000" />
     <widget name="key2" position="205,10" size="195,45" font="mediaportal;27" halign="center" valign="center" foregroundColor="#00ffffff" backgroundColor="#20000000" />

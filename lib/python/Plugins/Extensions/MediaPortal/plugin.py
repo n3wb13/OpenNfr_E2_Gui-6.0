@@ -101,7 +101,10 @@ except:
 		import boxbranding
 		mp_globals.fakeScale = True
 	except:
-		mp_globals.fakeScale = False
+		if fileExists("/etc/.box"):
+			mp_globals.fakeScale = True
+		else:
+			mp_globals.fakeScale = False
 
 try:
 	import mechanize
@@ -152,8 +155,8 @@ config.mediaportal.epg_deepstandby = ConfigSelection(default = "skip", choices =
 		])
 
 # Allgemein
-config.mediaportal.version = NoSave(ConfigText(default="755"))
-config.mediaportal.versiontext = NoSave(ConfigText(default="7.5.5"))
+config.mediaportal.version = NoSave(ConfigText(default="756"))
+config.mediaportal.versiontext = NoSave(ConfigText(default="7.5.6"))
 config.mediaportal.autoupdate = ConfigYesNo(default = True)
 config.mediaportal.pincode = ConfigPIN(default = 0000)
 config.mediaportal.showporn = ConfigYesNo(default = False)
@@ -939,7 +942,7 @@ class MPList(Screen, HelpableScreen):
 		statusurl = tmp_infolines[4]
 		update_agent = getUserAgent()
 		twAgentGetPage(statusurl, agent=update_agent, timeout=30).addCallback(_status).addCallback(self.markDefect)
-		
+
 	def markDefect(self, dummy=None):
 		reloadit = False
 		for defitem in mp_globals.status:
