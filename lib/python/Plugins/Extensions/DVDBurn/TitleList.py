@@ -125,10 +125,10 @@ class TitleList(Screen, HelpableScreen):
 			j = self.backgroundJob
 			menu.append(("%s: %s (%d%%)" % (j.getStatustext(), j.name, int(100*j.progress/float(j.end))), self.showBackgroundJob))
 		menu.append((_("Medium toolbox"), self.toolbox))
-		if self.project.settings.output.value == "medium":
+		if self.project.settings.output.getValue() == "medium":
 			if len(self["titles"].list):
 				menu.append((_("Burn to medium"), self.burnProject))
-		elif self.project.settings.output.value == "iso":
+		elif self.project.settings.output.getValue() == "iso":
 			menu.append((_("Create ISO"), self.burnProject))
 		menu.append((_("Burn existing image to medium"), self.selectImage))
 		if len(self["titles"].list):
@@ -279,13 +279,13 @@ class TitleList(Screen, HelpableScreen):
 	def updateTitleList(self):
 		list = [ ]
 		for title in self.project.titles:
-			list.append((title, title.properties.menutitle.value, title.properties.menusubtitle.value, title.DVBchannel, title.formatDVDmenuText("$D.$M.$Y, $T", 0), title.formatDVDmenuText("$l", 0)))
+			list.append((title, title.properties.menutitle.getValue(), title.properties.menusubtitle.getValue(), title.DVBchannel, title.formatDVDmenuText("$D.$M.$Y, $T", 0), title.formatDVDmenuText("$l", 0)))
 		self["titles"].list = list
 		self.updateSize()
 		if len(list):
 			self["key_red"].text = _("Remove title")
 			self["key_yellow"].text = _("Title properties")
-			self["title_label"].text = _("Table of content for collection") + " \"" + self.project.settings.name.value + "\":"
+			self["title_label"].text = _("Table of content for collection") + " \"" + self.project.settings.name.getValue() + "\":"
 		else:
 			self["key_red"].text = ""
 			self["key_yellow"].text = ""

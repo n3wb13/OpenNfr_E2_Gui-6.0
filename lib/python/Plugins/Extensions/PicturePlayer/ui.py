@@ -3,8 +3,8 @@ from boxbranding import getMachineBrand
 from enigma import ePicLoad, eTimer, getDesktop, gMainDC, eSize
 
 from Screens.Screen import Screen
-from Tools.Directories import resolveFilename, pathExists, SCOPE_MEDIA
-from Components.About import about
+from Tools.Directories import resolveFilename, pathExists, SCOPE_MEDIA, SCOPE_ACTIVE_SKIN
+
 from Components.Pixmap import Pixmap, MovingPixmap
 from Components.ActionMap import ActionMap
 from Components.Sources.StaticText import StaticText
@@ -13,6 +13,7 @@ from Components.AVSwitch import AVSwitch
 from Components.Sources.List import List
 from Components.ConfigList import ConfigListScreen
 from Components.config import config, ConfigSubsection, ConfigInteger, ConfigSelection, ConfigText, ConfigYesNo, getConfigListEntry
+import skin
 
 def getScale():
 	return AVSwitch().getFramebufferScale()
@@ -27,11 +28,6 @@ config.pic.infoline = ConfigYesNo(default=True)
 config.pic.loop = ConfigYesNo(default=True)
 config.pic.bgcolor = ConfigSelection(default="#00000000", choices = [("#00000000", _("black")),("#009eb9ff", _("blue")),("#00ff5a51", _("red")), ("#00ffe875", _("yellow")), ("#0038FF48", _("green"))])
 config.pic.textcolor = ConfigSelection(default="#0038FF48", choices = [("#00000000", _("black")),("#009eb9ff", _("blue")),("#00ff5a51", _("red")), ("#00ffe875", _("yellow")), ("#0038FF48", _("green"))])
-if getMachineBrand == 'Vu+':
-	choices = [(None, _("Same resolution as skin")), ("(720, 576)","720x576"), ("(1280, 720)", "1280x720")]
-else:
-	choices = [(None, _("Same resolution as skin")), ("(720, 576)","720x576"), ("(1280, 720)", "1280x720"), ("(1920, 1080)", "1920x1080")]
-config.pic.fullview_resolution = ConfigSelection(default = None, choices = choices)
 
 class picshow(Screen):
 	skin = """
@@ -150,6 +146,7 @@ class Pic_Setup(Screen, ConfigListScreen):
 
 	def __init__(self, session):
 		Screen.__init__(self, session)
+		self.setTitle(_("PicturePlayer"))
 		# for the skin: first try MediaPlayerSettings, then Setup, this allows individual skinning
 		self.skinName = ["PicturePlayerSetup", "Setup"]
 		self.setup_title = _("Settings")
@@ -181,7 +178,7 @@ class Pic_Setup(Screen, ConfigListScreen):
 			getConfigListEntry(_("Slide picture in loop"), config.pic.loop),
 			getConfigListEntry(_("Background color"), config.pic.bgcolor),
 			getConfigListEntry(_("Text color"), config.pic.textcolor),
-			getConfigListEntry(_("Fullview resolution"), config.pic.fullview_resolution),
+			getConfigListEntry(_("Fulview resulution"), config.usage.pic_resolution),
 		]
 		self["config"].list = setup_list
 		self["config"].l.setList(setup_list)
@@ -191,6 +188,9 @@ class Pic_Setup(Screen, ConfigListScreen):
 
 	def keyRight(self):
 		ConfigListScreen.keyRight(self)
+
+	def keyCancel(self):
+		self.close()		
 
 	# for summary:
 	def changedEntry(self):
@@ -263,11 +263,9 @@ class Pic_Thumb(Screen):
 
 		self.textcolor = config.pic.textcolor.value
 		self.color = config.pic.bgcolor.value
-		textsize = 20
-		self.spaceX = 35
-		self.picX = 190
-		self.spaceY = 30
-		self.picY = 200
+		self.spaceX, self.picX, self.spaceY, self.picY, textsize, thumtxt  = skin.parameters.get("PicturePlayerThumb",(35, 190, 30, 200, 20, 14))
+
+		pic_frame = resolveFilename(SCOPE_ACTIVE_SKIN, "icons/pic_frame.png")
 
 		self.size_w = getDesktop(0).size().width()
 		self.size_h = getDesktop(0).size().height()
@@ -288,12 +286,15 @@ class Pic_Thumb(Screen):
 			absX = self.spaceX + (posX*(self.spaceX + self.picX))
 			absY = self.spaceY + (posY*(self.spaceY + self.picY))
 			self.positionlist.append((absX, absY))
-			skincontent += "<widget source=\"label" + str(x) + "\" render=\"Label\" position=\"" + str(absX+5) + "," + str(absY+self.picY-textsize) + "\" size=\"" + str(self.picX - 10) + ","  + str(textsize) + "\" font=\"Regular;14\" zPosition=\"2\" transparent=\"1\" noWrap=\"1\" foregroundColor=\"" + self.textcolor + "\" />"
+			skincontent += "<widget source=\"label" + str(x) + "\" render=\"Label\" position=\"" + str(absX+5) + "," + str(absY+self.picY-textsize) + "\" size=\"" + str(self.picX - 10) + ","  + str(textsize) \
+					+ "\" font=\"Regular;" + str(thumtxt) + "\" zPosition=\"2\" transparent=\"1\" noWrap=\"1\" foregroundColor=\"" + self.textcolor + "\" />"
 			skincontent += "<widget name=\"thumb" + str(x) + "\" position=\"" + str(absX+5)+ "," + str(absY+5) + "\" size=\"" + str(self.picX -10) + "," + str(self.picY - (textsize*2)) + "\" zPosition=\"2\" transparent=\"1\" alphatest=\"on\" />"
 
 		# Screen, backgroundlabel and MovingPixmap
 		self.skin = "<screen position=\"0,0\" size=\"" + str(self.size_w) + "," + str(self.size_h) + "\" flags=\"wfNoBorder\" > \
-			<eLabel position=\"0,0\" zPosition=\"0\" size=\""+ str(self.size_w) + "," + str(self.size_h) + "\" backgroundColor=\"" + self.color + "\" /><widget name=\"frame\" position=\"35,30\" size=\"190,200\" pixmap=\"pic_frame.png\" zPosition=\"1\" alphatest=\"on\" />"  + skincontent + "</screen>"
+			<eLabel position=\"0,0\" zPosition=\"0\" size=\""+ str(self.size_w) + "," + str(self.size_h) + "\" backgroundColor=\"" + self.color + "\" />" \
+			+ "<widget name=\"frame\" position=\"" + str(self.spaceX)+ "," + str(self.spaceY)+ "\" size=\"" + str(self.picX) + "," + str(self.picY) + "\" pixmap=\"" + pic_frame + "\" zPosition=\"1\" alphatest=\"on\" />" \
+			+ skincontent + "</screen>"
 
 		Screen.__init__(self, session)
 
@@ -446,16 +447,11 @@ class Pic_Full_View(Screen):
 		self.bgcolor = config.pic.bgcolor.value
 		space = config.pic.framesize.value
 
-		self.size_w = getDesktop(0).size().width()
-		self.size_h = getDesktop(0).size().height()
-		(size_w, size_h) = (self.size_w, self.size_h)
-		print 'A:',self.size_w
-		print 'B:',self.size_h
+		self.size_w = size_w = getDesktop(0).size().width()
+		self.size_h = size_h = getDesktop(0).size().height()
 
-		if config.pic.fullview_resolution.value and (self.size_w, self.size_h) != eval(config.pic.fullview_resolution.value):
-			(size_w, size_h) = eval(config.pic.fullview_resolution.value)
-			print 'C:',size_w
-			print 'D:',size_h
+		if config.usage.pic_resolution.value and (size_w, size_h) != eval(config.usage.pic_resolution.value):
+			(size_w, size_h) = eval(config.usage.pic_resolution.value)
 			gMainDC.getInstance().setResolution(size_w, size_h)
 			getDesktop(0).resize(eSize(size_w, size_h))
 
@@ -517,23 +513,9 @@ class Pic_Full_View(Screen):
 		self.slideTimer.callback.append(self.slidePic)
 
 		if self.maxentry >= 0:
-			# self.onLayoutFinish.append(self.setPicloadConf)
-			if config.pic.fullview_resolution.value and (self.size_w, self.size_h) != eval(config.pic.fullview_resolution.value):
-				self.createTimer = eTimer()
-				self.createTimer.callback.append(self.setPicloadConf)
-				self.onLayoutFinish.append(self.LayoutFinish)
-			else:
-				self.onLayoutFinish.append(self.setPicloadConf)
-
-	def LayoutFinish(self):
-		if about.getCPUString() != 'BCM7346B2' and about.getCPUString() != 'BCM7425B2':
-			self.createTimer.start(800)
-		else:
-			self.createTimer.start(1600)
+			self.onLayoutFinish.append(self.setPicloadConf)
 
 	def setPicloadConf(self):
-		if config.pic.fullview_resolution.value and (self.size_w, self.size_h) != eval(config.pic.fullview_resolution.value):
-			self.createTimer.stop()
 		sc = getScale()
 		self.picload.setPara([self["pic"].instance.size().width(), self["pic"].instance.size().height(), sc[0], sc[1], 0, int(config.pic.resize.value), self.bgcolor])
 
@@ -598,7 +580,7 @@ class Pic_Full_View(Screen):
 			self.slideTimer.stop()
 			self["play_icon"].hide()
 		else:
-			self.slideTimer.start(config.pic.slidetime.value * 1000)
+			self.slideTimer.start(config.pic.slidetime.value*1000)
 			self["play_icon"].show()
 			self.nextPic()
 
@@ -621,7 +603,7 @@ class Pic_Full_View(Screen):
 	def Exit(self):
 		del self.picload
 
-		if config.pic.fullview_resolution.value and (self.size_w, self.size_h) != eval(config.pic.fullview_resolution.value):
+		if config.usage.pic_resolution.value and (self.size_w, self.size_h) != eval(config.usage.pic_resolution.value):
 			gMainDC.getInstance().setResolution(self.size_w, self.size_h)
 			getDesktop(0).resize(eSize(self.size_w, self.size_h))
 

@@ -209,9 +209,9 @@ class RemuxTask(Task):
 	def getPIDs(self):
 		dvbpids = [self.title.VideoPID]
 		for audiotrack in self.title.properties.audiotracks:
-			if audiotrack.active.value:
+			if audiotrack.active.getValue():
 				if audiotrack.format.value == "AC3": #! only consider ac3 streams at the moment
-					dvbpids.append(int(audiotrack.pid.value))
+					dvbpids.append(int(audiotrack.pid.getValue()))
 		sourcepids = "--source-pids=" + ",".join(["0x%04x" % pid for pid in dvbpids])
 		self.bdmvpids = [0x1011]+range(0x1100,0x1107)[:len(dvbpids)-1]
 		resultpids = "--result-pids=" + ",".join(["0x%04x" % pid for pid in self.bdmvpids])
@@ -803,7 +803,7 @@ class CreateMetaTask(Task):
 		self.job = job
 		self.weighting = 10
 		self.postconditions.append(GenericPostcondition())
-		self.languageCode = iso639language.get_dvd_id(self.project.menutemplate.settings.menulang.value)
+		self.languageCode = iso639language.get_dvd_id(self.project.menutemplate.settings.menulang.getValue())
 
 	def run(self, callback):
 		self.callback = callback
@@ -858,7 +858,7 @@ class BDMVJob(Job):
 		self.conduct()
 
 	def conduct(self):
-		if self.project.settings.output.value == "iso":
+		if self.project.settings.output.getValue() == "iso":
 			CheckDiskspaceTask(self)
 		CreateStructureTask(self)
 		for i, title in enumerate(self.titles):
@@ -870,8 +870,8 @@ class BDMVJob(Job):
 			CreateClpiTask(self, title, i)
 			CopyThumbTask(self, title.inputfile, i)
 		CreateMetaTask(self, self.project)
-		output = self.project.settings.output.value
-		volName = self.project.settings.name.value
+		output = self.project.settings.output.getValue()
+		volName = self.project.settings.name.getValue()
 		tool = "growisofs"
 		if output == "medium":
 			self.name = _("Burn Bludisc")
@@ -879,7 +879,7 @@ class BDMVJob(Job):
 		elif output == "iso":
 			tool = "genisoimage"
 			self.name = _("Create Bludisc ISO file")
-			isopathfile = getISOfilename(self.project.settings.isopath.value, volName)
+			isopathfile = getISOfilename(self.project.settings.isopath.getValue(), volName)
 			burnargs = [ "-o", isopathfile ]
 		burnargs += [ "-udf", "-allow-limited-size", "-publisher", "Dreambox", "-V", volName, self.workspace ]
 		BurnTask(self, burnargs, tool)

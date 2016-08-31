@@ -70,8 +70,8 @@ class Title:
 
 	def initDVDmenuText(self, track):
 		s = self.project.menutemplate.settings
-		self.properties.menutitle.setValue(self.formatDVDmenuText(s.titleformat.value, track))
-		self.properties.menusubtitle.setValue(self.formatDVDmenuText(s.subtitleformat.value, track))
+		self.properties.menutitle.setValue(self.formatDVDmenuText(s.titleformat.getValue(), track))
+		self.properties.menusubtitle.setValue(self.formatDVDmenuText(s.subtitleformat.getValue(), track))
 
 	def formatDVDmenuText(self, template, track):
 		template = template.replace("$i", str(track))
@@ -84,10 +84,10 @@ class Title:
 		#if template.find("$A") >= 0:
 		audiolist = [ ]
 		for audiotrack in self.properties.audiotracks:
-			active = audiotrack.active.value
+			active = audiotrack.active.getValue()
 			if active:
-				trackstring = audiotrack.format.value
-				trackstring += ' (' + audiotrack.language.value + ')'
+				trackstring = audiotrack.format.getValue()
+				trackstring += ' (' + audiotrack.language.getValue() + ')'
 				audiolist.append(trackstring)
 		audiostring = ', '.join(audiolist)
 		template = template.replace("$A", audiostring)
@@ -154,7 +154,7 @@ class Title:
 	def getChapterMarks(self, template="$h:$m:$s.$t"):
 		timestamps = [ ]
 		chapters = [ ]
-		minutes = self.properties.autochapter.value
+		minutes = self.properties.autochapter.getValue()
 		if len(self.chaptermarks) < 1 and minutes > 0:
 			chapterpts = 0
 			while chapterpts < (self.length-60*minutes)*90000:
