@@ -1711,7 +1711,7 @@ msgid "Committed DiSEqC command"
 msgstr "DiSEqC-Befehl übertragen"
 
 msgid "Common Interface"
-msgstr "Common Interface"
+msgstr "Modul Schnittstelle"
 
 msgid "Common Interface Assignment"
 msgstr "Common Interface Zuweisung"
@@ -2199,8 +2199,8 @@ msgstr "Aktuell installiertes Image"
 msgid "Custom"
 msgstr "Benutzerdefiniert"
 
-msgid "Custom skip time for '1''3' buttons"
-msgstr "Gewünschte Sprungzeit für '1'/'3'-Tasten"
+msgid "Custom skip time for '1'/'3' buttons"
+msgstr "Benutzerdefinierte Sprungzeit für '1'/'3' Tasten"
 
 msgid "Custom skip time for '4'/'6' buttons"
 msgstr "Gewünschte Sprungzeit für '4'/'6'-Tasten"
@@ -5907,6 +5907,9 @@ msgstr "Speichern"
 msgid "Save EPG"
 msgstr "EPG Speichern"
 
+msgid "Save EPG data"
+msgstr "EPG Daten speichern"
+
 msgid "Save and record"
 msgstr "Speichern und aufnehmen"
 
@@ -7797,6 +7800,9 @@ msgstr "Zeit um Kommando oder Script auszuführen"
 msgid "Timeline font size"
 msgstr "Zeitachse Schriftgröße"
 
+msgid "Timeline 24 Hour"
+msgstr "Zeitskala im 24 Stunden Format"
+
 msgid "Timer List"
 msgstr "Timerliste"
 
@@ -8569,17 +8575,19 @@ msgid "Weighted position"
 msgstr "Gewichtete Position"
 
 msgid ""
-"Welcome to the cutlist editor.\n"
+"Welcome to the Cutlist editor.\n"
 "\n"
 "Seek to the start of the stuff you want to cut away. Press OK, select 'start cut'.\n"
 "\n"
 "Then seek to the end, press OK, select 'end cut'. That's it."
 msgstr ""
-"Willkommen zum Schnitt-Editor.\n"
+"Willkommen im Schnitteditor.\n"
 "\n"
-"Spule zum Anfang des Bereiches, der entfernt werden soll. Drücke OK und wähle 'Schnitt starten'.\n"
+"Suchen Sie den Anfang ab wo weggeschnitten werden soll\n"
+"und drücken OK. Wählen Sie 'Schnitt hier starten'.\n"
 "\n"
-"Dann spule zum Ende des Bereiches, drücke OK und wähle 'Schnitt beenden' - fertig."
+"Dann suchen Sie das Ende und drücken OK.\n"
+"Wählen Sie 'Schnitt endet hier'. Das war's."
 
 msgid ""
 "Welcome to the image upgrade wizard. The wizard will assist you in upgrading the firmware of your %s %s by "
@@ -12534,6 +12542,9 @@ msgstr "Zeige Aufnahmeindikator"
 msgid "Enable Autorecord"
 msgstr "Aktiviert automatische Aufnahme"
 
+msgid "Autorecord location"
+msgstr "Verzeichnis für automatische Aufnahme"
+
 msgid "Timeshift buffer delete after zap?"
 msgstr "Timeshift-Puffer beim Umschalten löschen?"
 
@@ -13030,3 +13041,36 @@ msgstr "Ermittlung verf. Kanäle inkl. Berücksichtigung der CI-Zuweisung"
 
 msgid "Include CI assignment"
 msgstr "Berücksichtigung der CI-Zuweisung"
+
+msgid "Use alternate bouquets numbering"
+msgstr "Alternative Bouquets Nummerierung verwenden"
+
+msgid "Enable preview"
+msgstr "Vorschau anzeigen"
+
+msgid "%sMode for SD (up to 576p)"
+msgstr "%sModus für SD (bis zu 576p)"
+
+msgid "%sRefresh rate for SD"
+msgstr "%sAktualisierungsrate für SD"
+
+msgid "%sMode for HD (up to 720p)"
+msgstr "%sModus für HD (bis zu 720p)"
+
+msgid "%sRefresh rate for HD"
+msgstr "%sAktualisierungsrate für HD"
+
+msgid "%sMode for FHD (up to 1080p)"
+msgstr "%sModus für FHD (bis zu 1080p)"
+
+msgid "%sRefresh rate for FHD"
+msgstr "%sAktualisierungsrate für FHD"
+
+msgid "Power On Display"
+msgstr "Display einschalten"
+
+msgid "Show HDD progress"
+msgstr "Zeige HDD Fortschritt"
+
+msgid "Backup current Channellist"
+msgstr "Aktuelle Senderliste sichern"
