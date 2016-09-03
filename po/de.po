@@ -13074,3 +13074,15 @@ msgstr "Zeige HDD Fortschritt"
 
 msgid "Backup current Channellist"
 msgstr "Aktuelle Senderliste sichern"
+
+msgid "Yes, delete from Timerlist"
+msgstr "Ja, aus der Timerliste löschen und die Aufnahme beenden."
+
+msgid "Yes, delete from Timerlist and delete recording"
+msgstr "Ja, aus der Timerliste löschen und die Aufnahme löschen."
+
+msgid "Question"
+msgstr "Frage"
+
+msgid "Do you really want to delete the recording?"
+msgstr "Wollen Sie die Aufnahme wirklich löschen?"
