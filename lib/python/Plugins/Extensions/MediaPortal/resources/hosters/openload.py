@@ -20,7 +20,7 @@ def openloadData(self, openloadNumbers, data):
 				img = Image.open(cStringIO.StringIO(imgdata))
 				width, height = img.size
 			except:
-				message = self.session.open(MessageBoxExt, _("Error module Image"), MessageBoxExt.TYPE_INFO, timeout=5)
+				message = self.session.open(MessageBoxExt, _("Error module Imaging"), MessageBoxExt.TYPE_INFO, timeout=5)
 				return
 
 			output = ''

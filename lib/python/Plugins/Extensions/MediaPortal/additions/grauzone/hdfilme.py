@@ -38,19 +38,24 @@
 
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
-from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage, TwAgentHelper
-from Plugins.Extensions.MediaPortal.resources.configlistext import ConfigListScreenExt
+from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage
 from Plugins.Extensions.MediaPortal.resources.youtubeplayer import YoutubePlayer
+import cfscrape
+import requests
+import urlparse
+import thread
 
-config.mediaportal.hdfilme_userName = ConfigText(default="USERNAME", fixed_size=False)
-config.mediaportal.hdfilme_userPass = ConfigPassword(default="PASSWORD", fixed_size=False)
+hf_cookies = CookieJar()
+hf_ck = {}
+hf_agent = ''
+BASE_URL = 'http://hdfilme.tv/'
 
-glob_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0'
-ck = CookieJar()
-initCookies = True
-BASEURL = 'http://hdfilme.tv/'
-proxyurl = '%s:80/noconnect' % BASEURL
-agent = TwAgentHelper(proxy_url=proxyurl, gzip_decoding=True, followRedirect=True, cookieJar=ck, headers={'User-Agent':glob_agent, 'Content-Type': 'application/x-www-form-urlencoded'})
+def hf_grabpage(pageurl):
+	s = requests.session()
+	url = urlparse.urlparse(pageurl)
+	headers = {'User-Agent': hf_agent}
+	page = s.get(url.geturl(), cookies=hf_cookies, headers=headers)
+	return page.content
 
 class hdfilmeMain(MPScreen):
 
@@ -72,8 +77,7 @@ class hdfilmeMain(MPScreen):
 			"up" : self.keyUp,
 			"down" : self.keyDown,
 			"right" : self.keyRight,
-			"left" : self.keyLeft,
-			"green": self.loginSetup
+			"left" : self.keyLeft
 		}, -1)
 
 		self['title'] = Label("HDFilme")
@@ -82,32 +86,36 @@ class hdfilmeMain(MPScreen):
 		self.suchString = ''
 		self.ml = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
 		self['liste'] = self.ml
-		self['F2'] = Label(_("Setup"))
 
 		self.keyLocked = False
 		self.onFirstExecBegin.append(self.layoutFinished)
-		self.onClose.append(self.hdfilmeExit)
 
 	def layoutFinished(self):
-		self.username = config.mediaportal.hdfilme_userName.value
-		self.password = config.mediaportal.hdfilme_userPass.value
-		self['ContentTitle'].setText(_("Try Login..."))
-		if self.username == "USERNAME" or self.password == "PASSWORD":
-			self['ContentTitle'].setText(_("Selection") + " - " + _("No Login"))
-			agent.getWebPage('%s/movie-movies' % BASEURL).addCallback(self.loadPage).addErrback(self.dataError)
-		else:
-			self.loginUrl = '%s/login.html' % BASEURL
-			loginData = {'email': self.username, 'password': self.password, '_submit': 'true', 'remember': 'on'}
-			agent.getWebPage(self.loginUrl, method='POST', postdata=urlencode(loginData)).addCallback(self.loginInfo).addErrback(self.dataError)
+		self.keyLocked = True
+		thread.start_new_thread(self.get_tokens,("GetTokens",))
+		self['name'].setText(_("Please wait..."))
 
-	def loginInfo(self, data):
-		if 'complete":true' in str(data):
-			self.loginOK = True
-			self['ContentTitle'].setText(_("Selection") + " - " + _("%s logged in") % self.username)
+	def get_tokens(self, threadName):
+		printl("Calling thread: %s" % threadName,self,'A')
+		global hf_ck
+		global hf_agent
+		if hf_ck == {} or hf_agent == '':
+			hf_ck, hf_agent = cfscrape.get_tokens(BASE_URL)
+			requests.cookies.cookiejar_from_dict(hf_ck, cookiejar=hf_cookies)
 		else:
-			self.loginOK = False
-			self['ContentTitle'].setText(_("Selection") + " - " + _("Login failed!"))
-		agent.getWebPage('%s/movie-movies' % BASEURL).addCallback(self.loadPage).addErrback(self.dataError)
+			s = requests.session()
+			url = urlparse.urlparse(BASE_URL)
+			headers = {'user-agent': hf_agent}
+			page = s.get(url.geturl(), cookies=hf_cookies, headers=headers)
+			if page.status_code == 503 and page.headers.get("Server") == "cloudflare-nginx":
+				hf_ck, hf_agent = cfscrape.get_tokens(BASE_URL)
+				requests.cookies.cookiejar_from_dict(hf_ck, cookiejar=hf_cookies)
+		self.keyLocked = False
+		reactor.callFromThread(self.getPage)
+
+	def getPage(self):
+		data = hf_grabpage('%s/movie-movies' % BASE_URL)
+		self.loadPage(data)
 
 	def loadPage(self, data):
 		self.keyLocked = True
@@ -116,10 +124,10 @@ class hdfilmeMain(MPScreen):
 			cats = re.findall('<option value="(\d+)"\s+>\s+(.*?)\s\s', parse.group(1), re.S)
 			if cats:
 				for tagid, name in cats:
-					self.streamList.append(("%s" % name, "%s/movie-movies?cat=%s&country=&order_f=id&order_d=desc&per_page=" % (BASEURL, str(tagid))))
+					self.streamList.append(("%s" % name, "%s/movie-movies?cat=%s&country=&order_f=id&order_d=desc&per_page=" % (BASE_URL, str(tagid))))
 		self.streamList.sort(key=lambda t : t[0].lower())
-		self.streamList.insert(0, ("Serien","%s/movie-series?&per_page=" % BASEURL))
-		self.streamList.insert(0, ("Kinofilme","%s/movie-cinemas?&per_page=" % BASEURL))
+		self.streamList.insert(0, ("Serien","%s/movie-series?&per_page=" % BASE_URL))
+		self.streamList.insert(0, ("Kinofilme","%s/movie-cinemas?&per_page=" % BASE_URL))
 		self.streamList.insert(0, ("--- Search ---", "search"))
 		self.ml.setList(map(self._defaultlistcenter, self.streamList))
 		self.keyLocked = False
@@ -132,49 +140,16 @@ class hdfilmeMain(MPScreen):
 		genre = self['liste'].getCurrent()[0][0]
 		url = self['liste'].getCurrent()[0][1]
 		if genre == "--- Search ---":
-			self.suchen(auto_text_init=True, suggest_func=self.getSuggestions)
+			self.suchen(auto_text_init=True)
 		else:
 			self.session.open(hdfilmeParsing, genre, url)
 
 	def SuchenCallback(self, callback = None, entry = None):
 		if callback is not None and len(callback):
 			self.suchString = callback.strip()
-			url = '%s/movie/search?key=%s' % (BASEURL, urllib.quote_plus(self.suchString))
+			url = '%s/movie/search?key=%s' % (BASE_URL, urllib.quote_plus(self.suchString))
 			genre = self['liste'].getCurrent()[0][0]
 			self.session.open(hdfilmeParsing, genre, url)
-
-	def hdfilmeExit(self):
-		global initCookies
-		initCookies = True
-		ck.clear()
-
-	def loginSetup(self):
-		if mp_globals.isDreamOS:
-			self.session.openWithCallback(self.callBackSetup, meSetupScreen, is_dialog=True)
-		else:
-			self.session.openWithCallback(self.callBackSetup, meSetupScreen)
-
-	def callBackSetup(self, answer):
-		if answer:
-			self.layoutFinished()
-
-	def getSuggestions(self, text, max_res):
-		url = "http://hdfilme.tv/movie/search_ac?term=%s" % urllib.quote_plus(text)
-		d = twAgentGetPage(url, agent=None, headers=std_headers, timeout=5)
-		d.addCallback(self.gotSuggestions, max_res)
-		d.addErrback(self.gotSuggestions, max_res, True)
-		return d
-
-	def gotSuggestions(self, suggestions, max_res, err=False):
-		list = []
-		if not err and suggestions:
-			for m in re.finditer('"label":"(.+?)"', suggestions):
-				list.append(decodeHtml(m.group(1)))
-				max_res -= 1
-				if not max_res: break
-		elif err:
-			printl(str(suggestions),self,'E')
-		return list
 
 class hdfilmeParsing(MPScreen, ThumbsHelper):
 
@@ -216,13 +191,7 @@ class hdfilmeParsing(MPScreen, ThumbsHelper):
 		self.page = 1
 		self.lastpage = 1
 		self.keyLocked = True
-		if initCookies:
-			self.onLayoutFinish.append(self.getCookies)
-		else:
-			self.onLayoutFinish.append(self.loadPage)
-
-	def getCookies(self):
-		agent.getWebPage(BASEURL).addCallback(lambda _:self.loadPage()).addErrback(self.dataError)
+		self.onLayoutFinish.append(self.loadPage)
 
 	def loadPage(self):
 		self.streamList = []
@@ -230,14 +199,10 @@ class hdfilmeParsing(MPScreen, ThumbsHelper):
 			url = self.url+str((self.page-1)*50)
 		else:
 			url = self.url
-		agent.getWebPage(url).addCallback(self.parseData).addErrback(self.dataError)
+		data = hf_grabpage(url)
+		self.parseData(data)
 
 	def parseData(self, data):
-		global initCookies
-		if initCookies and 'id="gaIframe"' in data:
-			return reactor.callLater(1,self.getCookies)
-		initCookies = False
-
 		self.getLastPage(data, '', '</i>\s*Seite.*?/\s*(\d+)')
 		movies = re.findall('data-popover="movie-data.*?">\s*<a href="(.*?)">\s*<img.*?src="(.*?)".*?alt="(.*?)"', data, re.I)
 		if movies:
@@ -342,8 +307,6 @@ class hdfilmeStreams(MPScreen):
 		self['leftContentTitle'] = Label(_("Stream Selection"))
 		self['ContentTitle'] = Label(_("Stream Selection"))
 		self['name'] = Label(self.movietitle)
-		self['F4'] = Label("Stream")
-		self['F4'].hide()
 
 		self.trailer = None
 		self.streamList = []
@@ -353,7 +316,8 @@ class hdfilmeStreams(MPScreen):
 		self.onLayoutFinish.append(self.loadPage)
 
 	def loadPage(self):
-		agent.getWebPage(self.url).addCallback(self.parseData).addErrback(self.dataError)
+		data = hf_grabpage(self.url)
+		self.parseData(data)
 
 	def parseData(self, data):
 		m = re.search('<a class="btn.*?href="(.*?)">Trailer</a>', data)
@@ -377,10 +341,10 @@ class hdfilmeStreams(MPScreen):
 			if streams:
 				for (epi_num, link) in streams:
 					if re.search('staffel ', self.movietitle, re.I):
-						folge = 'Folge ' 
+						folge = 'Folge '
 						_epi_num = epi_num
 					else:
-						folge = 'Stream ' 
+						folge = 'Stream '
 						_epi_num = ''
 					self.streamList.append((folge+epi_num, link, _epi_num))
 
@@ -412,10 +376,12 @@ class hdfilmeStreams(MPScreen):
 			stream_url = str(codecs.decode(base64.decodestring(link), 'rot_13'))
 		else:
 			stream_url = link
-		if stream_url.startswith(BASEURL):
-			agent.getWebPage(stream_url).addCallback(self.getBaseStreamUrl, stream_url).addErrback(self.dataError)
+		if stream_url.startswith(BASE_URL):
+			data = hf_grabpage(stream_url)
+			self.getBaseStreamUrl(data, stream_url)
 		elif '/picasaweb' in stream_url:
-			agent.getWebPage(stream_url).addCallback(self.extractPicasa, stream_url, videoPrio=int(config.mediaportal.videoquali_others.value)).addErrback(self.dataError)
+			data = hf_grabpage(stream_url)
+			self.extractPicasa(data, stream_url, videoPrio=int(config.mediaportal.videoquali_others.value))
 		elif '.youtube.' in stream_url:
 			m = re.search('\?v=(.*?)(&|)', stream_url)
 			if m:
@@ -441,7 +407,7 @@ class hdfilmeStreams(MPScreen):
 				'Accept-Language': 'en-us,en;q=0.5',
 				'Referer': stream_url
 			}
-			twAgentGetPage(m.group(1), agent=glob_agent, headers=std_headers).addCallback(self.extractVimeoStream, videoPrio=int(config.mediaportal.videoquali_others.value)).addErrback(self.dataError)
+			twAgentGetPage(m.group(1), agent=hf_agent, headers=std_headers).addCallback(self.extractVimeoStream, videoPrio=int(config.mediaportal.videoquali_others.value)).addErrback(self.dataError)
 		else:
 			m = re.search('<div\sid="myplayer">\s*<script>(.*?)</iframe></div>', data, re.S)
 			if m:
@@ -494,7 +460,6 @@ class hdfilmeStreams(MPScreen):
 		m = re.search('<div\sid="mediaplayer".*?<iframe\ssrc="(.*?)"', data, re.S)
 		if m:
 			link = m.group(1)
-			printl(link)
 			get_stream_link(self.session).check_link(link, self.play)
 		else:
 			self.stream_not_found()
@@ -562,8 +527,9 @@ class hdfilmeStreams(MPScreen):
 
 	def keyTrailer(self):
 		if self.trailer:
-			agent.getWebPage(self.trailer).addCallback(self.playTrailer).addErrback(self.dataError)
-			
+			data = hf_grabpage(self.trailer)
+			self.playTrailer(data)
+
 	def playTrailer(self, data):
 		from Plugins.Extensions.MediaPortal.resources.youtubeplayer import YoutubePlayer
 		m = re.search('//www.youtube\.com/(embed|v|p)/(.*?)(\?|" |&amp)', data)
@@ -579,41 +545,3 @@ class hdfilmeStreams(MPScreen):
 				)
 		else:
 			self.stream_not_found()
-
-class meSetupScreen(Screen, ConfigListScreenExt):
-	def __init__(self, session):
-		self.plugin_path = mp_globals.pluginPath
-		self.skin_path = mp_globals.pluginPath + mp_globals.skinsPath
-		path = "%s/%s/PluginUserDefault.xml" % (self.skin_path, config.mediaportal.skin.value)
-		if not fileExists(path):
-			path = self.skin_path + mp_globals.skinFallback + "/PluginUserDefault.xml"
-		with open(path, "r") as f:
-			self.skin = f.read()
-			f.close()
-
-		Screen.__init__(self, session)
-		self['title'] = Label("HDFilme " + _("Setup"))
-		self['F4'] = Label('')
-		self.setTitle("HDFilme " + _("Setup"))
-
-		self.list = []
-		ConfigListScreenExt.__init__(self, self.list)
-
-		self.list.append(getConfigListEntry(_("Username:"), config.mediaportal.hdfilme_userName))
-		self.list.append(getConfigListEntry(_("Password:"), config.mediaportal.hdfilme_userPass))
-		self["config"].setList(self.list)
-
-		self["setupActions"] = ActionMap(["MP_Actions"],
-		{
-			"ok":		self.saveConfig,
-			"cancel":	self.exit
-		}, -1)
-
-	def saveConfig(self):
-		for x in self["config"].list:
-			x[1].save()
-		configfile.save()
-		self.close(True)
-
-	def exit(self):
-		self.close(False)

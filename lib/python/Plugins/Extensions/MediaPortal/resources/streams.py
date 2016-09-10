@@ -104,7 +104,7 @@ class get_stream_link:
 	from hosters.rapidvideo import rapidvideo
 	from hosters.sharesix import sharesix
 	from hosters.streamin import streamin
-	from hosters.thevideo import thevideo
+	from hosters.thevideo import thevideo, thevideotoken
 	from hosters.trollvid import trollvid
 	from hosters.uptostream import uptostream
 	from hosters.videonest import videonest
@@ -926,7 +926,7 @@ class get_stream_link:
 
 	def errorload(self, error):
 		printl('[streams]: ' + str(error),'','E')
-		message = self.session.open(MessageBoxExt, _("Broken URL parsing, please report to the developers."), MessageBoxExt.TYPE_INFO, timeout=5)
+		message = self.session.open(MessageBoxExt, _("Unknown error, check MP logfile."), MessageBoxExt.TYPE_INFO, timeout=5)
 
 ###############################################################################################
 

@@ -8,6 +8,10 @@ from Plugins.Extensions.MediaPortal.resources.youtubeplayer import YoutubePlayer
 from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage
 from Plugins.Extensions.MediaPortal.resources.menuhelper import MenuHelper
 from Components.ProgressBar import ProgressBar
+import cfscrape
+import requests
+import urlparse
+import thread
 
 if fileExists('/usr/lib/enigma2/python/Plugins/Extensions/TMDb/plugin.pyo'):
 	from Plugins.Extensions.TMDb.plugin import *
@@ -23,7 +27,6 @@ else:
 IS_Version = "STREAMIT v2.10"
 IS_siteEncoding = 'utf-8'
 BASE_URL = "http://streamit.ws"
-cookies = CookieJar()
 search_headers = {
 	'Accept':'*/*',
 	'Accept-Language':'de,en-US;q=0.7,en;q=0.3',
@@ -31,7 +34,10 @@ search_headers = {
 	'Content-Type':'application/x-www-form-urlencoded',
 	'X-Requested-With':'XMLHttpRequest',
 	}
-agent='Mozilla/5.0 (Windows NT 6.1; rv:44.0) Gecko/20100101 Firefox/44.0'
+
+sit_cookies = CookieJar()
+sit_ck = {}
+sit_agent = ''
 
 class showstreamitGenre(MenuHelper):
 
@@ -51,17 +57,38 @@ class showstreamitGenre(MenuHelper):
 	def __init__(self, session, m_level='main', m_path='/'):
 		self.m_level = m_level
 		self.m_path = m_path
-		MenuHelper.__init__(self, session, 0, None, BASE_URL, "", self._defaultlistcenter, cookieJar=cookies)
+		MenuHelper.__init__(self, session, 0, None, BASE_URL, "", self._defaultlistcenter, cookieJar=sit_cookies)
 
 		self['title'] = Label(IS_Version)
 		self['ContentTitle'] = Label("Genres")
 		self.param_search = ''
 		self.search_token = None
 
-		self.onLayoutFinish.append(self.mh_initMenu)
+		self.onLayoutFinish.append(self.mh_start)
+
+	def mh_start(self):
+		thread.start_new_thread(self.get_tokens,("GetTokens",))
+		self['name'].setText(_("Please wait..."))
+
+	def get_tokens(self, threadName):
+		printl("Calling thread: %s" % threadName,self,'A')
+		global sit_ck
+		global sit_agent
+		if sit_ck == {} or sit_agent == '':
+			sit_ck, sit_agent = cfscrape.get_tokens(BASE_URL)
+			requests.cookies.cookiejar_from_dict(sit_ck, cookiejar=sit_cookies)
+		else:
+			s = requests.session()
+			url = urlparse.urlparse(BASE_URL)
+			headers = {'user-agent': sit_agent}
+			page = s.get(url.geturl(), cookies=sit_cookies, headers=headers)
+			if page.status_code == 503 and page.headers.get("Server") == "cloudflare-nginx":
+				sit_ck, sit_agent = cfscrape.get_tokens(BASE_URL)
+				requests.cookies.cookiejar_from_dict(sit_ck, cookiejar=sit_cookies)
+		reactor.callFromThread(self.mh_initMenu)
 
 	def mh_initMenu(self):
-		self.mh_buildMenu(self.mh_baseUrl + self.m_path)
+		self.mh_buildMenu(self.mh_baseUrl + self.m_path, agent=sit_agent)
 
 	def mh_parseCategorys(self, data):
 		if self.m_level == 'main':
@@ -89,7 +116,6 @@ class showstreamitGenre(MenuHelper):
 					if not href.startswith('/'):
 						href = '/' + href
 					menu.append((0, href, decodeHtml(nm)))
-
 		self.mh_genMenu2(menu)
 
 	def mh_callGenreListScreen(self):
@@ -112,7 +138,7 @@ class showstreamitGenre(MenuHelper):
 	def getSuggestions(self, text, max_res):
 		url = "http://streamit.ws/livesearch.php"
 		data = urlencode({'val':text})
-		d = twAgentGetPage(url, method="POST", postdata=data, cookieJar=cookies, agent=agent, headers=search_headers, timeout=5)
+		d = twAgentGetPage(url, method="POST", postdata=data, cookieJar=sit_cookies, agent=sit_agent, headers=search_headers, timeout=5)
 		d.addCallback(self.gotSuggestions, max_res)
 		d.addErrback(self.gotSuggestions, max_res, True)
 		return d
@@ -281,7 +307,7 @@ class streamitFilmListeScreen(MPScreen, ThumbsHelper):
 		while not self.filmQ.empty():
 			url = self.filmQ.get_nowait()
 		if not self.seriesTag.startswith('Epi'):
-			twAgentGetPage(url).addCallback(self.loadPageData).addErrback(self.dataError)
+			twAgentGetPage(url, cookieJar=sit_cookies, agent=sit_agent).addCallback(self.loadPageData).addErrback(self.dataError)
 		else:
 			self.loadPageData(self.seasonData)
 
@@ -349,7 +375,7 @@ class streamitFilmListeScreen(MPScreen, ThumbsHelper):
 			self.keyLocked = False
 			if not self.seriesTag:
 				self.ml.setList(map(self.streamitFilmListEntry,	self.filmListe))
-				self.th_ThumbsQuery(self.filmListe, 0, 1, 2, None, None, self.page, self.pages)
+				self.th_ThumbsQuery(self.filmListe, 0, 1, 2, None, None, self.page, self.pages, agent=sit_agent, cookies=sit_ck)
 			else:
 				self.ml.setList(map(self._defaultlistleft, self.filmListe))
 
@@ -403,7 +429,7 @@ class streamitFilmListeScreen(MPScreen, ThumbsHelper):
 		streamPic = self['liste'].getCurrent()[0][2]
 		streamUrl = self['liste'].getCurrent()[0][1]
 		self.updateP = 1
-		CoverHelper(self['coverArt'], self.showCoverExit).getCover(streamPic)
+		CoverHelper(self['coverArt'], self.showCoverExit).getCover(streamPic, agent=sit_agent, cookieJar=sit_cookies)
 		if not self.seriesTag:
 			rate = self['liste'].getCurrent()[0][4]
 			hd = self['liste'].getCurrent()[0][5]
@@ -608,10 +634,10 @@ class streamitStreams(MPScreen):
 		self.streamListe.append((_('Please wait...'),"","",""))
 		self.ml.setList(map(self.streamitStreamListEntry, self.streamListe))
 		seriesStreams = self.postData != None
-		twAgentGetPage(self.filmUrl).addCallback(lambda x: self.parseData(x, seriesStreams)).addErrback(self.dataError)
+		twAgentGetPage(self.filmUrl, cookieJar=sit_cookies, agent=sit_agent).addCallback(lambda x: self.parseData(x, seriesStreams)).addErrback(self.dataError)
 
 	def getSeriesStreams(self):
-		twAgentGetPage(self.postUrl, method='POST', postdata=self.postData, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseStreams).addErrback(self.dataError)
+		twAgentGetPage(self.postUrl, method='POST', postdata=self.postData, cookieJar=sit_cookies, agent=sit_agent, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseStreams).addErrback(self.dataError)
 
 	def parseStreams(self, data):
 		self.streamListe = []
@@ -662,9 +688,8 @@ class streamitStreams(MPScreen):
 		else:
 			desc += "Keine weiteren Info's !"
 
-
 		self['handlung'].setText(decodeHtml(desc))
-		CoverHelper(self['coverArt']).getCover(self.imageUrl)
+		CoverHelper(self['coverArt']).getCover(self.imageUrl, agent=sit_agent, cookieJar=sit_cookies)
 
 		if not seriesStreams:
 			self.parseStreams(data)
@@ -701,15 +726,13 @@ class streamitStreams(MPScreen):
 		if self.keyLocked:
 			return
 		streamLink = self['liste'].getCurrent()[0][1]
-		twAgentGetPage(streamLink).addCallback(self.getUrl).addErrback(self.dataError)
+		twAgentGetPage(streamLink, cookieJar=sit_cookies, agent=sit_agent).addCallback(self.getUrl).addErrback(self.dataError)
 
 	def getUrl(self,data):
-		import urlparse
 		try:
 			link = re.search('id="download" class="cd" style="display:none"><a href="(.*?)">', data).group(1)
 			us = urlparse.urlsplit(link)
 			link = urlparse.urlunsplit(us[0:1]+(us[1].lower(),)+us[2:])
 		except:
 			link = "http://fuck.com"
-
 		get_stream_link(self.session).check_link(link, self.gotLink)

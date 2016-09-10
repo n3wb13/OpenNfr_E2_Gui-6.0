@@ -157,7 +157,7 @@ class wsoIndex(MPScreen, SearchHelper):
 				for (url, serie) in series:
 					self.streamList.append((decodeHtml(serie), url))
 		if len(self.streamList) == 0:
-			self.streamList.append((_('No shows found!!!'), None))
+			self.streamList.append((_('No shows found!'), None))
 		else:
 			self.streamList.sort(key=lambda t : t[0].lower())
 		self.ml.setList(map(self._defaultlistleft, self.streamList))

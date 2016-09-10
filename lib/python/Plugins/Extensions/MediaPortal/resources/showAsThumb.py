@@ -18,6 +18,9 @@ else:
 	IMDbPresent = False
 	TMDbPresent = False
 
+thumb_ck = {}
+thumb_agent = ''
+
 class ThumbsHelper:
 	def __init__(self):
 		self.defaultThumb = config.mediaportal.showAsThumb.value
@@ -40,7 +43,7 @@ class ThumbsHelper:
 				return
 			self.th_keyShowThumb(self.th_filmList, self.th_filmnamePos, self.th_filmurlPos, self.th_filmimageurlPos, self.th_filmnameaddPos, self.th_pageregex, self.th_filmpage, self.th_filmpages, mode=self.th_mode, pagefix=self.th_pagefix, maxtoken=self.th_maxtoken, coverlink=self.th_coverlink)
 
-	def th_ThumbsQuery(self, th_filmList, th_filmnamePos, th_filmurlPos, th_filmimageurlPos=None, th_filmnameaddPos=None, th_pageregex=None, th_filmpage=1, th_filmpages=999, mode=0 , pagefix=0, maxtoken=16, coverlink=None):
+	def th_ThumbsQuery(self, th_filmList, th_filmnamePos, th_filmurlPos, th_filmimageurlPos=None, th_filmnameaddPos=None, th_pageregex=None, th_filmpage=1, th_filmpages=999, mode=0 , pagefix=0, maxtoken=16, coverlink=None, agent=None, cookies=None):
 		self.th_filmList = th_filmList
 		self.th_filmnamePos = th_filmnamePos
 		self.th_filmurlPos = th_filmurlPos
@@ -53,6 +56,10 @@ class ThumbsHelper:
 		self.th_pagefix = pagefix
 		self.th_maxtoken = maxtoken
 		self.th_coverlink = coverlink
+		global thumb_ck
+		thumb_ck = cookies
+		global thumb_agent
+		thumb_agent = agent
 
 		try:
 			self.keyLocked = False
@@ -632,10 +639,10 @@ class ShowThumbscreen(MPScreen):
 				elif self.method == 'POST':
 					#print "[MediaPortal] mit linkparser und POST Mode"
 					values = {'mID': self.url_list[nr][2]}
-					d = ds.run(getPage, self.posturl, method='POST', postdata=urlencode(values), headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseUrldata, self.url_list[nr][4], self.url_list[nr][3]).addCallback(self.download, self.url_list[nr][1]).addCallback(self.ShowCoverFile, self.url_list[nr][1], nr).addErrback(self.nocoverfound, self.url_list[nr], nr).addErrback(self.dataError, self.url_list[nr], nr)
+					d = ds.run(getPage, self.posturl, method='POST', postdata=urlencode(values), agent=thumb_agent, cookies=thumb_ck, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseUrldata, self.url_list[nr][4], self.url_list[nr][3]).addCallback(self.download, self.url_list[nr][1]).addCallback(self.ShowCoverFile, self.url_list[nr][1], nr).addErrback(self.nocoverfound, self.url_list[nr], nr).addErrback(self.dataError, self.url_list[nr], nr)
 				else:
 					#print "[MediaPortal] mit linkparser"
-					d = ds.run(getPage, self.url_list[nr][3], agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseUrldata, self.url_list[nr][4], self.url_list[nr][3]).addCallback(self.download, self.url_list[nr][1]).addCallback(self.ShowCoverFile, self.url_list[nr][1], nr).addErrback(self.nocoverfound, self.url_list[nr], nr).addErrback(self.dataError, self.url_list[nr], nr)
+					d = ds.run(getPage, self.url_list[nr][3], agent=thumb_agent, cookies=thumb_ck).addCallback(self.parseUrldata, self.url_list[nr][4], self.url_list[nr][3]).addCallback(self.download, self.url_list[nr][1]).addCallback(self.ShowCoverFile, self.url_list[nr][1], nr).addErrback(self.nocoverfound, self.url_list[nr], nr).addErrback(self.dataError, self.url_list[nr], nr)
 				self.deferreds.append(d)
 				nr += 1
 		self.paintFrame()
@@ -693,7 +700,7 @@ class ShowThumbscreen(MPScreen):
 		if not image:
 			return ('no_cover')
 		else:
-			return downloadPage(image.replace('\/','/'), jpg_store)
+			return downloadPage(image.replace('\/','/'), jpg_store, agent=thumb_agent, cookies=thumb_ck)
 
 	def nocoverfound(self, error, url_list, nr):
 		myerror = error.getErrorMessage()

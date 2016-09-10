@@ -38,6 +38,15 @@
 
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
+import cfscrape
+import requests
+import urlparse
+import thread
+
+BASE_URL = "http://serienstream.to"
+ss_cookies = CookieJar()
+ss_ck = {}
+ss_agent = ''
 
 class ssMain(MPScreen):
 
@@ -74,12 +83,30 @@ class ssMain(MPScreen):
 
 	def layoutFinished(self):
 		self.keyLocked = True
+		thread.start_new_thread(self.get_tokens,("GetTokens",))
 		self.streamList.append(("Neue Episoden","neue"))
 		self.streamList.append(("Serien von A-Z","serien"))
 		self.streamList.append(("Watchlist","watchlist"))
 		self.ml.setList(map(self._defaultlistcenter, self.streamList))
+		self['name'].setText(_("Please wait..."))
+
+	def get_tokens(self, threadName):
+		printl("Calling thread: %s" % threadName,self,'A')
+		global ss_ck
+		global ss_agent
+		if ss_ck == {} or ss_agent == '':
+			ss_ck, ss_agent = cfscrape.get_tokens(BASE_URL)
+			requests.cookies.cookiejar_from_dict(ss_ck, cookiejar=ss_cookies)
+		else:
+			s = requests.session()
+			url = urlparse.urlparse(BASE_URL)
+			headers = {'user-agent': ss_agent}
+			page = s.get(url.geturl(), cookies=ss_cookies, headers=headers)
+			if page.status_code == 503 and page.headers.get("Server") == "cloudflare-nginx":
+				ss_ck, ss_agent = cfscrape.get_tokens(BASE_URL)
+				requests.cookies.cookiejar_from_dict(ss_ck, cookiejar=ss_cookies)
 		self.keyLocked = False
-		self.showInfos()
+		reactor.callFromThread(self.showInfos)
 
 	def keyOK(self):
 		exist = self['liste'].getCurrent()
@@ -144,14 +171,14 @@ class ssSerien(MPScreen, SearchHelper):
 		self.showSearchkey(num)
 
 	def loadPage(self):
-		url = "http://serienstream.to/serien"
-		getPage(url).addCallback(self.parseData).addErrback(self.dataError)
+		url = BASE_URL + "/serien"
+		getPage(url, agent=ss_agent, cookies=ss_ck).addCallback(self.parseData).addErrback(self.dataError)
 
 	def parseData(self, data):
 		serien = re.findall('<li>.*?<a href="http://serienstream.to/serie/stream/(.*?)".*?title=".*?Stream anschauen">(.*?)</a>.*?</li>', data, re.S)
 		if serien:
 			for (id, serie) in serien:
-				url = "http://serienstream.to/serie/stream/%s" % id
+				url = BASE_URL + "/serie/stream/%s" % id
 				self.streamList.append((decodeHtml(serie), url))
 		if len(self.streamList) == 0:
 			self.streamList.append((_('No shows found!'), None))
@@ -172,13 +199,13 @@ class ssSerien(MPScreen, SearchHelper):
 
 	def getCover(self):
 		url = self['liste'].getCurrent()[0][1]
-		getPage(url).addCallback(self.setCoverUrl).addErrback(self.dataError)
+		getPage(url, agent=ss_agent, cookies=ss_ck).addCallback(self.setCoverUrl).addErrback(self.dataError)
 
 	def setCoverUrl(self, data):
 		cover = re.findall('<div class=".*?picture">.*?<img src="(http://serienstream.to/public/img/cover/.*?)"', data, re.S)
 		if cover:
 			self.cover = cover[0]
-			CoverHelper(self['coverArt']).getCover(self.cover)
+			CoverHelper(self['coverArt']).getCover(self.cover, agent=ss_agent, cookieJar=ss_cookies)
 
 	def keyOK(self):
 		exist = self['liste'].getCurrent()
@@ -241,8 +268,8 @@ class ssNeueEpisoden(MPScreen):
 
 	def loadPage(self):
 		self.streamList = []
-		url = "http://serienstream.to"
-		getPage(url).addCallback(self.parseData).addErrback(self.dataError)
+		url = BASE_URL
+		getPage(url, agent=ss_agent, cookies=ss_ck).addCallback(self.parseData).addErrback(self.dataError)
 
 	def parseData(self, data):
 		neue = re.findall('<td><a\shref="(/serie/stream/.*?)">(.*?)</a>.{0,1}</td>', data)
@@ -264,7 +291,7 @@ class ssNeueEpisoden(MPScreen):
 						title = "%s - %s%s" % (title, staffel, episode)
 				else:
 					title = episodenName
-				url = "http://serienstream.to" + url
+				url = BASE_URL + url
 				self.streamList.append((title, url))
 		if len(self.streamList) == 0:
 			self.streamList.append((_('No episodes found!'), None))
@@ -291,13 +318,13 @@ class ssNeueEpisoden(MPScreen):
 
 	def getCover(self):
 		url = self['liste'].getCurrent()[0][1]
-		getPage(url).addCallback(self.setCoverUrl).addErrback(self.dataError)
+		getPage(url, agent=ss_agent, cookies=ss_ck).addCallback(self.setCoverUrl).addErrback(self.dataError)
 
 	def setCoverUrl(self, data):
 		cover = re.findall('<div class=".*?picture">.*?<img src="(http://serienstream.to/public/img/cover/.*?)"', data, re.S)
 		if cover:
 			self.cover = cover[0]
-			CoverHelper(self['coverArt']).getCover(self.cover)
+			CoverHelper(self['coverArt']).getCover(self.cover, agent=ss_agent, cookieJar=ss_cookies)
 
 	def reloadList(self):
 		self.keyLocked = True
@@ -372,13 +399,13 @@ class ssWatchlist(MPScreen):
 
 	def getCover(self):
 		url = self['liste'].getCurrent()[0][1]
-		getPage(url).addCallback(self.setCoverUrl).addErrback(self.dataError)
+		getPage(url, agent=ss_agent, cookies=ss_ck).addCallback(self.setCoverUrl).addErrback(self.dataError)
 
 	def setCoverUrl(self, data):
 		cover = re.findall('<div class=".*?picture">.*?<img src="(http://serienstream.to/public/img/cover/.*?)"', data, re.S)
 		if cover:
 			self.cover = cover[0]
-			CoverHelper(self['coverArt']).getCover(self.cover)
+			CoverHelper(self['coverArt']).getCover(self.cover, agent=ss_agent, cookieJar=ss_cookies)
 
 	def keyOK(self):
 		exist = self['liste'].getCurrent()
@@ -442,14 +469,14 @@ class ssStaffeln(MPScreen):
 		self.onLayoutFinish.append(self.loadPage)
 
 	def loadPage(self):
-		getPage(self.Url).addCallback(self.parseData).addErrback(self.dataError)
+		getPage(self.Url, agent=ss_agent, cookies=ss_ck).addCallback(self.parseData).addErrback(self.dataError)
 
 	def parseData(self, data):
 		parse = re.search('class="hosterSiteDirectNav">(.*?)</div>', data, re.S)
 		staffeln = re.findall('<a\s.*?href="(/serie/stream/.*?/staffel-(\d+))"', parse.group(1), re.S)
 		if staffeln:
 			for url, staffel in staffeln:
-				url = "http://serienstream.to" + url
+				url = BASE_URL + url
 				self.streamList.append((_("Season")+" "+staffel, url, staffel))
 		if len(self.streamList) == 0:
 			self.streamList.append((_('No seasons found!'), None))
@@ -462,7 +489,7 @@ class ssStaffeln(MPScreen):
 		if self.keyLocked or exist == None:
 			return
 		title = self['liste'].getCurrent()[0][0]
-		CoverHelper(self['coverArt']).getCover(self.cover)
+		CoverHelper(self['coverArt']).getCover(self.cover, agent=ss_agent, cookieJar=ss_cookies)
 		self['name'].setText(self.Title)
 
 	def keyOK(self):
@@ -513,7 +540,7 @@ class ssEpisoden(MPScreen):
 
 	def loadPage(self):
 		self.streamList = []
-		getPage(self.Url).addCallback(self.parseData).addErrback(self.dataError)
+		getPage(self.Url, agent=ss_agent, cookies=ss_ck).addCallback(self.parseData).addErrback(self.dataError)
 
 	def parseData(self, data):
 		self.watched_liste = []
@@ -552,7 +579,7 @@ class ssEpisoden(MPScreen):
 				episodenName = staffel + episode + " - " + title
 				checkname = check
 				checkname2 = check.replace('ä','ae').replace('ö','oe').replace('ü','ue').replace('Ä','Ae').replace('Ö','Oe').replace('Ü','Ue')
-				url = "http://serienstream.to" + url
+				url = BASE_URL + url
 				if (checkname in self.watched_liste) or (checkname2 in self.watched_liste):
 					self.streamList.append((decodeHtml(episodenName), url, True, Flag))
 				else:
@@ -562,7 +589,7 @@ class ssEpisoden(MPScreen):
 		else:
 			self.keyLocked = False
 		self.ml.setList(map(self._defaultlistleftmarked, self.streamList))
-		CoverHelper(self['coverArt']).getCover(self.cover)
+		CoverHelper(self['coverArt']).getCover(self.cover, agent=ss_agent, cookieJar=ss_cookies)
 
 	def keyOK(self):
 		exist = self['liste'].getCurrent()
@@ -611,7 +638,7 @@ class ssStreams(MPScreen):
 		self.onLayoutFinish.append(self.loadPage)
 
 	def loadPage(self):
-		getPage(self.serienUrl).addCallback(self.parseData).addErrback(self.dataError)
+		getPage(self.serienUrl, agent=ss_agent, cookies=ss_ck).addCallback(self.parseData).addErrback(self.dataError)
 
 	def parseData(self, data):
 		streams = re.findall('episodeLink\d+"\sdata-lang-key="(.*?)">.*?"(.*?)".*?class="icon\s(.*?)"', data, re.S)
@@ -630,7 +657,7 @@ class ssStreams(MPScreen):
 		else:
 			self.keyLocked = False
 		self.ml.setList(map(self._defaultlistleftmarked, self.streamList))
-		CoverHelper(self['coverArt']).getCover(self.cover)
+		CoverHelper(self['coverArt']).getCover(self.cover, agent=ss_agent, cookieJar=ss_cookies)
 
 	def keyOK(self):
 		exist = self['liste'].getCurrent()

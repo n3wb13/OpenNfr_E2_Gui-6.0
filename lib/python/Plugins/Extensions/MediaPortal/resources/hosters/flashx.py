@@ -17,7 +17,7 @@ def flashx(self, data, id):
 						'referer':  '',
 						'hash': p6.group(1),
 						'imhuman': 'Proceed+to+video'})
-		url = re.findall('src="(http://www.flashx.tv/code.js[^"]+)"', data)
+		url = re.findall('src="(http://www.flashx.tv/coding.js[^"]+)"', data)
 		if url:
 			twAgentGetPage(url[0], agent=None, headers=std_headers).addCallback(self.flashxCheckUrl, id, info).addErrback(self.errorload)
 			return
@@ -32,7 +32,7 @@ def flashxCalllater(self, *args, **kwargs):
 	twAgentGetPage(*args, **kwargs).addCallback(self.flashxdata).addErrback(self.errorload)
 
 def flashxdata(self, data):
-	get_packedjava = re.findall("<script type=.text.javascript.>(eval.function.*?)</script>", data, re.S)
+	get_packedjava = re.findall("<script type=.text.javascript.>\n{0,1}(eval.function.*?)</script>", data, re.S)
 	if get_packedjava:
 		sJavascript = get_packedjava[0]
 		sUnpacked = unpack(sJavascript)

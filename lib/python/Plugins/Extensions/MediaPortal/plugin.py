@@ -155,8 +155,8 @@ config.mediaportal.epg_deepstandby = ConfigSelection(default = "skip", choices =
 		])
 
 # Allgemein
-config.mediaportal.version = NoSave(ConfigText(default="756"))
-config.mediaportal.versiontext = NoSave(ConfigText(default="7.5.6"))
+config.mediaportal.version = NoSave(ConfigText(default="758"))
+config.mediaportal.versiontext = NoSave(ConfigText(default="7.5.8"))
 config.mediaportal.autoupdate = ConfigYesNo(default = True)
 config.mediaportal.pincode = ConfigPIN(default = 0000)
 config.mediaportal.showporn = ConfigYesNo(default = False)
@@ -3661,13 +3661,17 @@ def startMP(session):
 
 	reactor.callLater(2, import_lru_caches)
 
+	registerFont(resolveFilename(SCOPE_PLUGINS, "Extensions/MediaPortal/resources/") + "mediaportal%s.ttf" % config.mediaportal.font.value, "mediaportal", 100, False)
+	registerFont(resolveFilename(SCOPE_PLUGINS, "Extensions/MediaPortal/resources/") + "mediaportal_clean.ttf", "mediaportal_clean", 100, False)
+	mp_globals.font = 'mediaportal'
+	_stylemanager(1)
+
 	if watcher == None:
 		watcher = HangWatcher()
 	watcher.start()
 	if SHOW_HANG_STAT:
 		lc_stats = task.LoopingCall(watcher.print_stats)
 		lc_stats.start(60)
-
 
 	if config.mediaportal.epg_enabled.value and not config.mediaportal.epg_runboot.value and not mpepg.has_epg:
 		def importFini(msg):
@@ -3677,11 +3681,6 @@ def startMP(session):
 	if config.mediaportal.premiumize_use.value:
 		if not mp_globals.premium_yt_proxy_host:
 			CheckPremiumize(session).premiumizeProxyConfig(False)
-
-	registerFont(resolveFilename(SCOPE_PLUGINS, "Extensions/MediaPortal/resources/") + "mediaportal%s.ttf" % config.mediaportal.font.value, "mediaportal", 100, False)
-	registerFont(resolveFilename(SCOPE_PLUGINS, "Extensions/MediaPortal/resources/") + "mediaportal_clean.ttf", "mediaportal_clean", 100, False)
-	mp_globals.font = 'mediaportal'
-	_stylemanager(1)
 
 	mp_globals.currentskin = config.mediaportal.skin.value
 	lastservice = session.nav.getCurrentlyPlayingServiceReference()

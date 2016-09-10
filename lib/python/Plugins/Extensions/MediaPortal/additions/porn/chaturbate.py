@@ -453,7 +453,7 @@ class chaturbateFilmScreen(MPScreen, ThumbsHelper, m3u8Player):
 		self.close()
 
 	def play_stream2(self, data):
-		url = re.findall('(http.*?://.*?.stream.highwebmedia.com:1935.*?m3u8)', data)[0]
+		url = re.findall('(http[s]?://.*?.stream.highwebmedia.com.*?m3u8)', data)[0]
 		title = self['liste'].getCurrent()[0][0]
 		self['name'].setText(title)
 		if config.mediaportal.use_hls_proxy.value:
