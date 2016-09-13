@@ -116,13 +116,13 @@ class MPUpdateScreen(Screen):
 		if mp_globals.isDreamOS:
 			self.container.appClosed_conn = self.container.appClosed.connect(self.finishedPluginUpdate)
 			self.container.stdoutAvail_conn = self.container.stdoutAvail.connect(self.mplog)
-			self.container.execute("apt-get update ; wget -q -O /tmp/foobar %s ; dpkg --install --force-depends --force-overwrite /tmp/foobar ; apt-get -y -f install" % str(self.updateurl))
+			self.container.execute("apt-get update ; wget -q -O /tmp/foobar %s ; dpkg --install /tmp/foobar ; apt-get -y -f install" % str(self.updateurl))
 		else:
 			self.container.appClosed.append(self.finishedPluginUpdate)
 			self.container.stdoutAvail.append(self.mplog)
 			#self.container.stderrAvail.append(self.mplog)
 			#self.container.dataAvail.append(self.mplog)
-			self.container.execute("opkg update ; opkg install --force-overwrite --force-depends " + str(self.updateurl))
+			self.container.execute("opkg update ; opkg install " + str(self.updateurl))
 
 	def finishedPluginUpdate(self,retval):
 		self.container.kill()
@@ -132,7 +132,7 @@ class MPUpdateScreen(Screen):
 			configfile.save()
 			self.session.openWithCallback(self.restartGUI, MessageBoxExt, _("MediaPortal successfully updated!\nDo you want to restart the Enigma2 GUI now?"), MessageBoxExt.TYPE_YESNO)
 		elif retval == 2:
-			self.session.openWithCallback(self.restartGUI2, MessageBoxExt, _("MediaPortal update failed! Please check free space on your root filesystem, at least 12MB are required for installation.\nCheck the update log carefully!\nThe Enigma2 GUI will restart now!"), MessageBoxExt.TYPE_ERROR)
+			self.session.openWithCallback(self.returnGUI, MessageBoxExt, _("MediaPortal update failed! Please check free space on your root filesystem, at least 12MB are required for installation.\nCheck the update log carefully!"), MessageBoxExt.TYPE_ERROR)
 		else:
 			self.session.openWithCallback(self.returnGUI, MessageBoxExt, _("MediaPortal update failed! Check the update log carefully!"), MessageBoxExt.TYPE_ERROR)
 
@@ -141,9 +141,6 @@ class MPUpdateScreen(Screen):
 			self.session.open(TryQuitMainloop, 3)
 		else:
 			self.close()
-
-	def restartGUI2(self, answer):
-		self.session.open(TryQuitMainloop, 3)
 
 	def returnGUI(self, answer):
 		self.close()

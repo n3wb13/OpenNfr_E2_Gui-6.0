@@ -8,7 +8,7 @@ suchCache = ""	# Letzte Sucheingabe
 AdT = " "		# Default: Anzahl der Treffer/Clips/Sendungen
 pageTrigger = 25# Max. Zeilen in Listfenster (25/50)
 suchTrigger = 0	# pageTrigger OnTop: Die ZDF-Suche kann bis 100 (.../75/100)
-mainLink = "http://www.zdf.de/ZDFmediathek"
+BASE_URL = "http://www.zdf.de/ZDFmediathek"
 isWeg = "Leider nicht (mehr) auf den ZDF-Servern vorhanden, oder Maximum erreicht!\n(gegebenenfalls Zeilenanzahl erhöhen)"
 helpText2 = "Tipp: Die gelbe Taste legt die maximale Anzahl der zu listenden Zeilen (25 oder 50) fest. Für die Suche kann auf bis zu 100 erhöht werden. Für beides gilt: Je kleiner die Anzahl, desto geringer die Wartezeit. Allerdings liefern die ZDF-Server dann auch weniger Ergebnisse."
 zdfPic = "http://www.zdf-werbefernsehen.de/typo3temp/pics/f2691d753e.jpg"
@@ -48,7 +48,7 @@ class ZDFGenreScreen(MPScreen):
 
 	def loadPage(self):
 		self.keyLocked = True
-		url = "%s/xmlservice/web/senderliste" % mainLink
+		url = "%s/xmlservice/web/senderliste" % BASE_URL
 		getPage(url).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
@@ -57,7 +57,7 @@ class ZDFGenreScreen(MPScreen):
 			for image in folgen:
 				self.bildchen.append(image)
 		self.genreliste = []
-		ZDFtiviPic = "%s/contentblob/2049596/timg485x273blob/8935329" % mainLink
+		ZDFtiviPic = "%s/contentblob/2049596/timg485x273blob/8935329" % BASE_URL
 		self.genreliste.append(("Suche (alle Sender)", "1", zdfPic))
 		self.genreliste.append(("Sendungen A bis Z (alle Sender)", "2", zdfPic))
 		self.genreliste.append(("Startseite (alle Sender)", "3", zdfPic))
@@ -154,17 +154,17 @@ class ZDFPreSelect(MPScreen, ThumbsHelper):
 		url = ""
 		self['name'].setText("Auswahl des Preselect")
 		if self.gF == "1":
-			self['handlung'].setText(helpText2+"\n\nZeilen:\t"+str(suchTrigger+pageTrigger)+"\t(25 / 50 / 75 / 100)")
+			self['handlung'].setText(helpText2+"\n\nZeilen: "+str(suchTrigger+pageTrigger)+" (25 / 50 / 75 / 100)")
 		else:
-			self['handlung'].setText(helpText2+"\n\nZeilen:\t"+str(pageTrigger)+"\t(25 / 50)")
+			self['handlung'].setText(helpText2+"\n\nZeilen: "+str(pageTrigger)+" (25 / 50)")
 		if self.gF == "6":
-			url = "%s/xmlservice/web/rubriken" % mainLink
+			url = "%s/xmlservice/web/rubriken" % BASE_URL
 		elif self.gF == "7":
-			url = "%s/xmlservice/web/themen" % mainLink
+			url = "%s/xmlservice/web/themen" % BASE_URL
 		elif self.gF == "8":
-			url = "%s/xmlservice/web/podcasts" % mainLink
+			url = "%s/xmlservice/web/podcasts" % BASE_URL
 		elif int(self.gF) > 8 and int(self.gF) != 13:
-			url = "%s/xmlservice/web/senderliste" % mainLink
+			url = "%s/xmlservice/web/senderliste" % BASE_URL
 		elif self.gF == "13":
 			url = "http://www.tivi.de/tiviVideos/navigation?view=flashXml"
 		if int(self.gF) <= 5:
@@ -223,7 +223,7 @@ class ZDFPreSelect(MPScreen, ThumbsHelper):
 					themrubr = decodeHtml(themrubr)
 					if len(info) < 170:
 						info = "\n"+info
-					handlung = "Clips:\t%s\n%s" % (anzahl,info)
+					handlung = "Clips: %s\n%s" % (anzahl,info)
 					self.genreliste.append((themrubr,assetId,handlung,image,anzahl))
 				self.genreliste.sort(key=lambda t : t[0].lower())
 		elif self.gF == "8":	# Podcasts
@@ -237,7 +237,7 @@ class ZDFPreSelect(MPScreen, ThumbsHelper):
 					self['name'].setText("Podcasts")
 					if len(info) < 170:
 						info = "\n"+info
-					handlung = "Clips:\t%s\n%s" % (anzahl,info)
+					handlung = "Clips: %s\n%s" % (anzahl,info)
 					self.genreliste.append((title,assetId,handlung,image,anzahl))
 		elif self.gF == "9":	# ZDF
 			self.genreliste.append(("Aktuellste", "1"," ",self.pP,AdT))
@@ -296,7 +296,7 @@ class ZDFPreSelect(MPScreen, ThumbsHelper):
 		extra = self['liste'].getCurrent()[0][1]
 		if self.gF == "1": # Suche
 			TrigCount = suchTrigger+pageTrigger
-			sL = mainLink+"/xmlservice/web/detailsSuche?searchString="+suchCache.replace(' ', '+')+"&maxLength="+str(TrigCount)
+			sL = BASE_URL+"/xmlservice/web/detailsSuche?searchString="+suchCache.replace(' ', '+')+"&maxLength="+str(TrigCount)
 			if extra == "1":
 				streamLink = sL
 			if extra == "2":
@@ -305,96 +305,96 @@ class ZDFPreSelect(MPScreen, ThumbsHelper):
 				self.session.open(ZDFStreamScreen,streamLink,self.gN,self.gF,"+")
 		elif self.gF == "2": # ABC
 			if auswahl == "0-9":
-				streamLink = "%s/xmlservice/web/sendungenAbisZ?detailLevel=2&characterRangeStart=0-9&characterRangeEnd=0-9" % mainLink
+				streamLink = "%s/xmlservice/web/sendungenAbisZ?detailLevel=2&characterRangeStart=0-9&characterRangeEnd=0-9" % BASE_URL
 			else:
-				streamLink = "%s/xmlservice/web/sendungenAbisZ?characterRangeStart=%s&detailLevel=2&characterRangeEnd=%s" % (mainLink,auswahl[:1],auswahl[-1:])
+				streamLink = "%s/xmlservice/web/sendungenAbisZ?characterRangeStart=%s&detailLevel=2&characterRangeEnd=%s" % (BASE_URL,auswahl[:1],auswahl[-1:])
 		elif self.gF == "3":	# Startseite
 			if extra == "1":
-				streamLink = "%s/xmlservice/web/tipps?id=_STARTSEITE&maxLength=%s" % (mainLink,str(pageTrigger))
+				streamLink = "%s/xmlservice/web/tipps?id=_STARTSEITE&maxLength=%s" % (BASE_URL,str(pageTrigger))
 				passThru = 1
 				self.session.open(ZDFStreamScreen,streamLink,self.gN,self.gF,AdT)
 			elif extra == "2":
-				streamLink = "%s/xmlservice/web/meistGesehen?id=_GLOBAL&maxLength=%s" % (mainLink,str(pageTrigger))
+				streamLink = "%s/xmlservice/web/meistGesehen?id=_GLOBAL&maxLength=%s" % (BASE_URL,str(pageTrigger))
 				passThru = 1
 				self.session.open(ZDFStreamScreen,streamLink,self.gN,self.gF,AdT)
 			elif  extra == "3":
-				streamLink = "%s/xmlservice/web/aktuellste?id=_STARTSEITE&maxLength=%s" % (mainLink,str(pageTrigger))
+				streamLink = "%s/xmlservice/web/aktuellste?id=_STARTSEITE&maxLength=%s" % (BASE_URL,str(pageTrigger))
 				passThru = 1
 				self.session.open(ZDFStreamScreen,streamLink,self.gN,self.gF,AdT)
 		elif self.gF == "4":	# Nachrichten
 			if extra == "1":
-				streamLink = "%s/xmlservice/web/aktuellste?id=_NACHRICHTEN&maxLength=%s" % (mainLink,str(pageTrigger))
+				streamLink = "%s/xmlservice/web/aktuellste?id=_NACHRICHTEN&maxLength=%s" % (BASE_URL,str(pageTrigger))
 				passThru = 1
 				self.session.open(ZDFStreamScreen,streamLink,self.gN,self.gF,AdT)
 			elif extra == "2":
-				streamLink = "%s/xmlservice/web/ganzeSendungen" % mainLink
+				streamLink = "%s/xmlservice/web/ganzeSendungen" % BASE_URL
 			elif  extra == "3":
-				streamLink = "%s/xmlservice/web/meistGesehen?id=_NACHRICHTEN&maxLength=%s" % (mainLink,str(pageTrigger))
+				streamLink = "%s/xmlservice/web/meistGesehen?id=_NACHRICHTEN&maxLength=%s" % (BASE_URL,str(pageTrigger))
 				passThru = 1
 				self.session.open(ZDFStreamScreen,streamLink,self.gN,self.gF,AdT)
 		elif self.gF == "5":	# Sendung verpasst?
-			streamLink = "%s/xmlservice/web/sendungVerpasst?startdate=%s&enddate=%s&maxLength=%s" % (mainLink,extra,extra,str(pageTrigger))
+			streamLink = "%s/xmlservice/web/sendungVerpasst?startdate=%s&enddate=%s&maxLength=%s" % (BASE_URL,extra,extra,str(pageTrigger))
 			passThru = 1
 			self.session.open(ZDFStreamScreen,streamLink,self.gN,self.gF,AdT)
 		elif self.gF == "6":	# Rubriken
-			streamLink = "%s/xmlservice/web/aktuellste?id=%s&maxLength=%s" % (mainLink,extra,str(pageTrigger))
+			streamLink = "%s/xmlservice/web/aktuellste?id=%s&maxLength=%s" % (BASE_URL,extra,str(pageTrigger))
 		elif self.gF == "7":	# Themen
-			streamLink = "%s/xmlservice/web/aktuellste?id=%s&maxLength=%s" % (mainLink,extra,str(pageTrigger))
+			streamLink = "%s/xmlservice/web/aktuellste?id=%s&maxLength=%s" % (BASE_URL,extra,str(pageTrigger))
 			passThru = 1
 			self.session.open(ZDFStreamScreen,streamLink,self.gN,self.gF,AdT)
 		elif self.gF == "8":	# Podcasts
 			assetId = self['liste'].getCurrent()[0][1]
 			image = self['liste'].getCurrent()[0][3]
-			streamLink = "%s/podcast/%s?view=podcast,%s" % (mainLink,assetId,image)	# Schmuggle Image-URL unter, mit "," als Trenner
+			streamLink = "%s/podcast/%s?view=podcast,%s" % (BASE_URL,assetId,image)	# Schmuggle Image-URL unter, mit "," als Trenner
 			passThru = 1
 			self.session.open(ZDFStreamScreen,streamLink,self.gN,self.gF,"-")
 		elif self.gF == "9":	# ZDF
 			if extra == "1":
-				streamLink = "%s/xmlservice/web/tipps?id=_STARTSEITE&maxLength=%s" % (mainLink,str(pageTrigger))
+				streamLink = "%s/xmlservice/web/tipps?id=_STARTSEITE&maxLength=%s" % (BASE_URL,str(pageTrigger))
 				passThru = 1
 				self.session.open(ZDFStreamScreen,streamLink,self.gN,self.gF,AdT)
 			elif extra == "2":
-				streamLink = "%s/xmlservice/web/meistGesehen?id=_GLOBAL&maxLength=%s" % (mainLink,str(pageTrigger))
+				streamLink = "%s/xmlservice/web/meistGesehen?id=_GLOBAL&maxLength=%s" % (BASE_URL,str(pageTrigger))
 				passThru = 1
 				self.session.open(ZDFStreamScreen,streamLink,self.gN,self.gF,AdT)
 			elif  extra == "3":
-				streamLink = "%s" % mainLink
+				streamLink = "%s" % BASE_URL
 		elif self.gF == "10":	# ZDFneo
 			if extra == "1":
-				streamLink = "%s/senderstartseite/sst0/1209122?flash=off" % mainLink
+				streamLink = "%s/senderstartseite/sst0/1209122?flash=off" % BASE_URL
 				passThru = 1
 				self.session.open(ZDFStreamScreen,streamLink,self.gN,self.gF,AdT)
 			elif extra == "2":
-				streamLink = "%s/senderstartseite/sst1/1209122?flash=off" % mainLink
+				streamLink = "%s/senderstartseite/sst1/1209122?flash=off" % BASE_URL
 		elif self.gF == "11":	# ZDF.kultur
 			if extra == "1":
-				streamLink = "%s/senderstartseite/sst0/1317640?flash=off" % mainLink
+				streamLink = "%s/senderstartseite/sst0/1317640?flash=off" % BASE_URL
 				passThru = 1
 				self.session.open(ZDFStreamScreen,streamLink,self.gN,self.gF,AdT)
 			elif extra == "2":
-				streamLink = "%s/senderstartseite/sst1/1317640?flash=off" % mainLink
+				streamLink = "%s/senderstartseite/sst1/1317640?flash=off" % BASE_URL
 			elif  extra == "3":
-				streamLink = "%s/senderstartseite/sst2/1317640?flash=off" % mainLink
+				streamLink = "%s/senderstartseite/sst2/1317640?flash=off" % BASE_URL
 				passThru = 1
 				self.session.open(ZDFStreamScreen,streamLink,self.gN,self.gF,AdT)
 		elif self.gF == "12":	# ZDFinfo
 			if extra == "1":
-				streamLink = "%s/senderstartseite/sst0/1209120?flash=off" % mainLink
+				streamLink = "%s/senderstartseite/sst0/1209120?flash=off" % BASE_URL
 				passThru = 1
 				self.session.open(ZDFStreamScreen,streamLink,self.gN,self.gF,AdT)
 			elif extra == "2":
-				streamLink = "%s/senderstartseite/sst1/1209120?flash=off" % mainLink
+				streamLink = "%s/senderstartseite/sst1/1209120?flash=off" % BASE_URL
 			elif  extra == "3":
-				streamLink = "%s/senderstartseite/sst2/1209120?flash=off" % mainLink
+				streamLink = "%s/senderstartseite/sst2/1209120?flash=off" % BASE_URL
 				passThru = 1
 				self.session.open(ZDFStreamScreen,streamLink,self.gN,self.gF,AdT)
 		elif self.gF == "14":	# 3sat
 			if extra == "1":
-				streamLink = "%s/senderstartseite/sst1/1209116?flash=off" % mainLink
+				streamLink = "%s/senderstartseite/sst1/1209116?flash=off" % BASE_URL
 				passThru = 1
 				self.session.open(ZDFStreamScreen,streamLink,self.gN,self.gF,AdT)
 			elif extra == "2":
-				streamLink = "%s/senderstartseite/sst2/1209116?flash=off" % mainLink
+				streamLink = "%s/senderstartseite/sst2/1209116?flash=off" % BASE_URL
 		else:
 			return
 		if passThru == 0 and self.gF == "1":
@@ -471,7 +471,7 @@ class ZDFPostSelect(MPScreen, ThumbsHelper):
 			for (image,info,title,anzahl) in treffer:
 				info = info.replace("\n"," ")
 				decodeHtml(info)
-				handlung = "Clips:\t%s\n" % anzahl
+				handlung = "Clips: %s\n" % anzahl
 				title = decodeHtml(title)
 				asset = image.split('/')
 				assetId = asset[3]
@@ -480,7 +480,7 @@ class ZDFPostSelect(MPScreen, ThumbsHelper):
 				image = "%s%s" % ("http://www.zdf.de",image)
 				if len(info) < 170:
 					info = "\n"+info
-				handlung = "Clips:\t%s\n%s" % (anzahl,info)
+				handlung = "Clips: %s\n%s" % (anzahl,info)
 				self.genreliste.append((title,assetId,handlung,image,anzahl))
 			self.gN = "Sendung"	# Überschreibe den Wert als Kennung für Sendungen statt Clips
 
@@ -492,7 +492,7 @@ class ZDFPostSelect(MPScreen, ThumbsHelper):
 					title = decodeHtml(title)
 					image = "http://www.tivi.de%s" % image
 					image = image.replace("tiviNavBild","tiviTeaserbild")
-					handlung = "Clips:\tKeine Angabe"
+					handlung = "Clips: Keine Angabe"
 					self.genreliste.append((title,url,handlung,image,AdT))
 		else:
 			self.genreliste = []
@@ -504,7 +504,7 @@ class ZDFPostSelect(MPScreen, ThumbsHelper):
 					title = decodeHtml(title)
 					if len(info) < 170:
 						info = "\n"+info
-					handlung = "Clips:\t%s\n%s" % (anzahl,info)
+					handlung = "Clips: %s\n%s" % (anzahl,info)
 					self.genreliste.append((title,assetId,handlung,image,anzahl))
 		# remove duplicates
 		self.genreliste = list(set(self.genreliste))
@@ -531,7 +531,7 @@ class ZDFPostSelect(MPScreen, ThumbsHelper):
 			streamLink = self['liste'].getCurrent()[0][1]
 			self.session.open(ZDFStreamScreen,streamLink,self['liste'].getCurrent()[0][0],self.gF,anzahl)
 		else:
-			streamLink = "%s/xmlservice/web/aktuellste?id=%s&maxLength=%s" % (mainLink,self['liste'].getCurrent()[0][1],str(pageTrigger))
+			streamLink = "%s/xmlservice/web/aktuellste?id=%s&maxLength=%s" % (BASE_URL,self['liste'].getCurrent()[0][1],str(pageTrigger))
 			self.session.open(ZDFStreamScreen,streamLink,self.gN,self.gF,anzahl)
 
 class ZDFStreamScreen(MPScreen, ThumbsHelper):
@@ -631,7 +631,7 @@ class ZDFStreamScreen(MPScreen, ThumbsHelper):
 						sendung = decodeHtml(sendung)
 					if len(info) < 170:
 						info = "\n"+info
-					handlung = "Sender:\t%s\nClip-Datum:\t%s\nDauer:\t%s\n%s" % (sender,airtime,dur,info)
+					handlung = "Sender: %s\nClip-Datum: %s\nDauer: %s\n%s" % (sender,airtime,dur,info)
 					self.filmliste.append((member+": "+decodeHtml(title),assetId,handlung,image,sendung))
 		elif self.gF == "8": # Podcasts
 			self['page'].setText('1 / 1')
@@ -649,7 +649,7 @@ class ZDFStreamScreen(MPScreen, ThumbsHelper):
 					title = decodeHtml(title)
 					if len(info) < 170:
 						info = "\n"+info
-					handlung = "Sender:\tPodcast\nClip-Datum:\t%s\nDauer:\t---\n%s" % (airtime,info)
+					handlung = "Sender: Podcast\nClip-Datum: %s\nDauer: ---\n%s" % (airtime,info)
 					self.filmliste.append((title,streamLink[0],handlung,image,title))
 		elif int(self.gF) > 9 and self.gN != "Sendung" and self.gF !="13":	# ZDFneo, ZDFinfo, ZDF.kultur,3sat
 				getPage(self.streamLink).addCallback(self.videoPre).addErrback(self.dataError)
@@ -678,7 +678,7 @@ class ZDFStreamScreen(MPScreen, ThumbsHelper):
 					dur = "%s:%s:%s" % (std,min,sec)
 					if len(info) < 170:
 						info = "\n"+info
-					handlung = "Sender:\tZDFtivi (ZDF)\nDauer:\t%s\n%s" % (dur,info)
+					handlung = "Sender: ZDFtivi (ZDF)\nDauer: %s\n%s" % (dur,info)
 					self.filmliste.append((decodeHtml(name),url,handlung,image,self.gN))
 		else:
 			treffer = re.findall('<type>video</type>.*?key="485x273">(.*?)</te.*?<title>(.*?)</ti.*?<detail>(.*?)</de.*?<assetId>(.*?)</as.*?<channel>(.*?)</ch.*?<length>(.*?)</le.*?<airtime>(.*?)</ai', data, re.S)
@@ -693,7 +693,7 @@ class ZDFStreamScreen(MPScreen, ThumbsHelper):
 						sendung = decodeHtml(sendung)
 					if len(info) < 170:
 						info = "\n"+info
-					handlung = "Sender:\t%s\nClip-Datum:\t%s\nDauer:\t%s\n%s" % (sender,airtime,dur,info)
+					handlung = "Sender: %s\nClip-Datum: %s\nDauer: %s\n%s" % (sender,airtime,dur,info)
 					self.filmliste.append((decodeHtml(title),assetId,handlung,image,sendung))
 			else:
 				self.filmliste.append(("Einschränkung der ZDF-Server...",None,None,None))
@@ -733,7 +733,7 @@ class ZDFStreamScreen(MPScreen, ThumbsHelper):
 				sendung = decodeHtml(sendung)
 			if len(info) < 170:
 				info = "\n"+info
-			handlung = "Sender:\t%s\nClip-Datum:\t%s\nDauer:\t%s\n%s" % (sender,airtime,dur,info)
+			handlung = "Sender: %s\nClip-Datum: %s\nDauer: %s\n%s" % (sender,airtime,dur,info)
 			self.filmliste.append((title,assetId,handlung,image,sendung))
 		if pos == count:
 			# remove duplicates
@@ -776,15 +776,14 @@ class ZDFStreamScreen(MPScreen, ThumbsHelper):
 			if self.gF == "13":
 				url = self['liste'].getCurrent()[0][1]
 			else:
-				url = "%s/xmlservice/web/beitragsDetails?ak=web&id=%s" % (mainLink,self['liste'].getCurrent()[0][1])
-			if url == None:
-				return
-			getPage(url).addCallback(self.get_Http).addErrback(self.dataError)
+				url = "%s/xmlservice/web/beitragsDetails?ak=web&id=%s" % (BASE_URL,self['liste'].getCurrent()[0][1])
+			if url:
+				getPage(url).addCallback(self.get_Http).addErrback(self.dataError)
 
 	def get_Http(self, data):
 		self.keyLocked = True
 		streamName = self['liste'].getCurrent()[0][0]
-		streamQ = re.findall('basetype="h264_aac_mp4_http.*?quality>veryhigh</.*?quality>.*?url>(http://[nrodl|rodl].*?)</.*?url>', data, re.S)
+		streamQ = re.findall('basetype="h264_aac_mp4_http.*?quality>veryhigh</.*?quality>.*?url>(http://[nrodl|rodl|tvdl].*?)</.*?url>', data, re.S)
 		if streamQ:
 			stream = streamQ[0]
 		self.keyLocked = False

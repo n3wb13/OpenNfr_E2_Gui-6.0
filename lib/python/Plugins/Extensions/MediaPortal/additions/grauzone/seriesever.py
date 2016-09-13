@@ -43,7 +43,7 @@ from Plugins.Extensions.MediaPortal.resources.imports import *
 glob_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0'
 premium = False
 keckse = {}
-BASE_URL = 'http://seriesever.com'
+BASE_URL = 'http://seriesever.net'
 
 config.mediaportal.seriesever_userName = ConfigText(default="USERNAME", fixed_size=False)
 config.mediaportal.seriesever_userPass = ConfigPassword(default="PASSWORD", fixed_size=False)
@@ -216,9 +216,7 @@ class serieseverParsing(MPScreen, ThumbsHelper):
 			self.ml.moveToIndex(0)
 			self.keyLocked = False
 		else:
-			#for serie in re.finditer('<img class="img" src="(http://seriesever.com/uploads/posters/.*?)".*?<a href="(http://seriesever.com/serien/.*?)".*?<a href="(http://seriesever.com/.*?)" title="(.*?)" class="seep">', data, re.S):
 			for serie in re.finditer('<div class="box-content">.*?a href="(http://seriesever.*?)" class="play" title="(.*?)"><span class="i-play">.*?<img class="img" src="(http://seriesever.net.*?)".*?<div class="box-title">.*?<a href="(http://seriesever.net/.*?)"', data, re.S):
-				#Image,UrlSerie,UrlEpisode,Title = serie.groups()
 				UrlEpisode,Title,Image,UrlSerie = serie.groups()
 				Image = Image.replace('thumb/','')
 				self.streamList.append((decodeHtml(Title), UrlEpisode, Image, UrlSerie))
@@ -393,13 +391,13 @@ class showStaffeln(MPScreen):
 
 	def loadPage(self):
 		self.staffeln = []
-		self.staffeln.append(('Loading...', None))
+		self.staffeln.append((_('Please wait...'), None))
 		self.ml.setList(map(self._defaultlistcenter, self.staffeln))
 		self.staffeln = []
 		getPage(self.url, agent=glob_agent).addCallback(self.parseData).addErrback(self.dataError)
 
 	def parseData(self, data):
-		cover = re.findall('<a class="cover" href=".*?" title=".*?"><img src="(http://seriesever.com/uploads/posters/.*?)"', data, re.S)
+		cover = re.findall('<a class="cover" href=".*?" title=".*?"><img src="(http://seriesever.net/uploads/posters/.*?)"', data, re.S)
 		if cover:
 			self.coverUrl = cover[0].replace('thumb/','')
 			CoverHelper(self['coverArt']).getCover(self.coverUrl)
@@ -418,7 +416,7 @@ class showStaffeln(MPScreen):
 				Title = "%s%s" % (Staffel,Episode)
 				self.staffeln.append((Title, Url))
 			if len(self.staffeln) == 0:
-				self.staffeln.append(('Parsing Fehler !', None))
+				self.staffeln.append((_('Parsing error!'), None))
 			self.ml.setList(map(self._defaultlistcenter, self.staffeln))
 			self.ml.moveToIndex(0)
 			self.keyLocked = False

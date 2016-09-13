@@ -657,7 +657,7 @@ class bsStreams(MPScreen):
 			if parse[0][2][:4] == "http":
 				url = parse[0][2].replace('\/','/')
 			else:
-				if parse[0][0] == "OpenLoad":
+				if parse[0][0] == "OpenLoad" or parse[0][0] == "OpenLoadHD":
 					url = "https://openload.co/embed/" + parse[0][1].replace('\/','/')
 				else:
 					message = self.session.open(MessageBoxExt, _("Received broken 'fullurl', please report to the developers."), MessageBoxExt.TYPE_INFO, timeout=3)

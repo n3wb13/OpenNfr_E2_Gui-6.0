@@ -40,22 +40,36 @@ from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage
 from Plugins.Extensions.MediaPortal.resources.youtubeplayer import YoutubePlayer
-import cfscrape
-import requests
+
+try:
+	import cfscrape
+except:
+	cfscrapeModule = False
+else:
+	cfscrapeModule = True
+
+try:
+	import requests
+except:
+	requestsModule = False
+else:
+	requestsModule = True
+
 import urlparse
 import thread
 
 hf_cookies = CookieJar()
 hf_ck = {}
 hf_agent = ''
-BASE_URL = 'http://hdfilme.tv/'
+BASE_URL = 'http://hdfilme.tv'
 
 def hf_grabpage(pageurl):
-	s = requests.session()
-	url = urlparse.urlparse(pageurl)
-	headers = {'User-Agent': hf_agent}
-	page = s.get(url.geturl(), cookies=hf_cookies, headers=headers)
-	return page.content
+	if requestsModule:
+		s = requests.session()
+		url = urlparse.urlparse(pageurl)
+		headers = {'User-Agent': hf_agent}
+		page = s.get(url.geturl(), cookies=hf_cookies, headers=headers)
+		return page.content
 
 class hdfilmeMain(MPScreen):
 
@@ -96,22 +110,29 @@ class hdfilmeMain(MPScreen):
 		self['name'].setText(_("Please wait..."))
 
 	def get_tokens(self, threadName):
-		printl("Calling thread: %s" % threadName,self,'A')
-		global hf_ck
-		global hf_agent
-		if hf_ck == {} or hf_agent == '':
-			hf_ck, hf_agent = cfscrape.get_tokens(BASE_URL)
-			requests.cookies.cookiejar_from_dict(hf_ck, cookiejar=hf_cookies)
-		else:
-			s = requests.session()
-			url = urlparse.urlparse(BASE_URL)
-			headers = {'user-agent': hf_agent}
-			page = s.get(url.geturl(), cookies=hf_cookies, headers=headers)
-			if page.status_code == 503 and page.headers.get("Server") == "cloudflare-nginx":
+		if requestsModule and cfscrapeModule:
+			printl("Calling thread: %s" % threadName,self,'A')
+			global hf_ck
+			global hf_agent
+			if hf_ck == {} or hf_agent == '':
 				hf_ck, hf_agent = cfscrape.get_tokens(BASE_URL)
 				requests.cookies.cookiejar_from_dict(hf_ck, cookiejar=hf_cookies)
-		self.keyLocked = False
-		reactor.callFromThread(self.getPage)
+			else:
+				s = requests.session()
+				url = urlparse.urlparse(BASE_URL)
+				headers = {'user-agent': hf_agent}
+				page = s.get(url.geturl(), cookies=hf_cookies, headers=headers)
+				if page.status_code == 503 and page.headers.get("Server") == "cloudflare-nginx":
+					hf_ck, hf_agent = cfscrape.get_tokens(BASE_URL)
+					requests.cookies.cookiejar_from_dict(hf_ck, cookiejar=hf_cookies)
+			self.keyLocked = False
+			reactor.callFromThread(self.getPage)
+		else:
+			reactor.callFromThread(self.hf_error)
+
+	def hf_error(self):
+		message = self.session.open(MessageBoxExt, _("Some mandatory Python modules are missing!"), MessageBoxExt.TYPE_ERROR)
+		self.keyCancel()
 
 	def getPage(self):
 		data = hf_grabpage('%s/movie-movies' % BASE_URL)

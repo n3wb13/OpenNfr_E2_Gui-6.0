@@ -8,8 +8,21 @@ from Plugins.Extensions.MediaPortal.resources.youtubeplayer import YoutubePlayer
 from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage
 from Plugins.Extensions.MediaPortal.resources.menuhelper import MenuHelper
 from Components.ProgressBar import ProgressBar
-import cfscrape
-import requests
+
+try:
+	import cfscrape
+except:
+	cfscrapeModule = False
+else:
+	cfscrapeModule = True
+
+try:
+	import requests
+except:
+	requestsModule = False
+else:
+	requestsModule = True
+
 import urlparse
 import thread
 
@@ -71,21 +84,28 @@ class showstreamitGenre(MenuHelper):
 		self['name'].setText(_("Please wait..."))
 
 	def get_tokens(self, threadName):
-		printl("Calling thread: %s" % threadName,self,'A')
-		global sit_ck
-		global sit_agent
-		if sit_ck == {} or sit_agent == '':
-			sit_ck, sit_agent = cfscrape.get_tokens(BASE_URL)
-			requests.cookies.cookiejar_from_dict(sit_ck, cookiejar=sit_cookies)
-		else:
-			s = requests.session()
-			url = urlparse.urlparse(BASE_URL)
-			headers = {'user-agent': sit_agent}
-			page = s.get(url.geturl(), cookies=sit_cookies, headers=headers)
-			if page.status_code == 503 and page.headers.get("Server") == "cloudflare-nginx":
+		if requestsModule and cfscrapeModule:
+			printl("Calling thread: %s" % threadName,self,'A')
+			global sit_ck
+			global sit_agent
+			if sit_ck == {} or sit_agent == '':
 				sit_ck, sit_agent = cfscrape.get_tokens(BASE_URL)
 				requests.cookies.cookiejar_from_dict(sit_ck, cookiejar=sit_cookies)
-		reactor.callFromThread(self.mh_initMenu)
+			else:
+				s = requests.session()
+				url = urlparse.urlparse(BASE_URL)
+				headers = {'user-agent': sit_agent}
+				page = s.get(url.geturl(), cookies=sit_cookies, headers=headers)
+				if page.status_code == 503 and page.headers.get("Server") == "cloudflare-nginx":
+					sit_ck, sit_agent = cfscrape.get_tokens(BASE_URL)
+					requests.cookies.cookiejar_from_dict(sit_ck, cookiejar=sit_cookies)
+			reactor.callFromThread(self.mh_initMenu)
+		else:
+			reactor.callFromThread(self.mh_errorMenu)
+
+	def mh_errorMenu(self):
+		message = self.session.open(MessageBoxExt, _("Some mandatory Python modules are missing!"), MessageBoxExt.TYPE_ERROR)
+		self.keyCancel()
 
 	def mh_initMenu(self):
 		self.mh_buildMenu(self.mh_baseUrl + self.m_path, agent=sit_agent)

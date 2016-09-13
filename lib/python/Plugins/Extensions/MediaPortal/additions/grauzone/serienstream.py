@@ -38,8 +38,21 @@
 
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
-import cfscrape
-import requests
+
+try:
+	import cfscrape
+except:
+	cfscrapeModule = False
+else:
+	cfscrapeModule = True
+
+try:
+	import requests
+except:
+	requestsModule = False
+else:
+	requestsModule = True
+
 import urlparse
 import thread
 
@@ -91,22 +104,29 @@ class ssMain(MPScreen):
 		self['name'].setText(_("Please wait..."))
 
 	def get_tokens(self, threadName):
-		printl("Calling thread: %s" % threadName,self,'A')
-		global ss_ck
-		global ss_agent
-		if ss_ck == {} or ss_agent == '':
-			ss_ck, ss_agent = cfscrape.get_tokens(BASE_URL)
-			requests.cookies.cookiejar_from_dict(ss_ck, cookiejar=ss_cookies)
-		else:
-			s = requests.session()
-			url = urlparse.urlparse(BASE_URL)
-			headers = {'user-agent': ss_agent}
-			page = s.get(url.geturl(), cookies=ss_cookies, headers=headers)
-			if page.status_code == 503 and page.headers.get("Server") == "cloudflare-nginx":
+		if requestsModule and cfscrapeModule:
+			printl("Calling thread: %s" % threadName,self,'A')
+			global ss_ck
+			global ss_agent
+			if ss_ck == {} or ss_agent == '':
 				ss_ck, ss_agent = cfscrape.get_tokens(BASE_URL)
 				requests.cookies.cookiejar_from_dict(ss_ck, cookiejar=ss_cookies)
-		self.keyLocked = False
-		reactor.callFromThread(self.showInfos)
+			else:
+				s = requests.session()
+				url = urlparse.urlparse(BASE_URL)
+				headers = {'user-agent': ss_agent}
+				page = s.get(url.geturl(), cookies=ss_cookies, headers=headers)
+				if page.status_code == 503 and page.headers.get("Server") == "cloudflare-nginx":
+					ss_ck, ss_agent = cfscrape.get_tokens(BASE_URL)
+					requests.cookies.cookiejar_from_dict(ss_ck, cookiejar=ss_cookies)
+			self.keyLocked = False
+			reactor.callFromThread(self.showInfos)
+		else:
+			reactor.callFromThread(self.ss_error)
+
+	def ss_error(self):
+		message = self.session.open(MessageBoxExt, _("Some mandatory Python modules are missing!"), MessageBoxExt.TYPE_ERROR)
+		self.keyCancel()
 
 	def keyOK(self):
 		exist = self['liste'].getCurrent()

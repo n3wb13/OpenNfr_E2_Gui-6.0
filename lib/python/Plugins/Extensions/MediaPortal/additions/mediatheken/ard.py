@@ -10,13 +10,13 @@ mainLink = "http://www.ardmediathek.de"
 tDef = "Keine Informationen/Angaben"
 isWeg = "Nicht (oder nicht mehr) auf den ARD-Servern vorhanden!"
 helpText = "Tipps:\
-\t- 'INFO' zeigt Inhaltsangaben bei gefundenen Inhalten.\n\n\
-\t- 'BLAU' listet einige passende Clips zur aktiven Auswahl.\n\n\
-\t- 'GELB' bei der Suche: Relevanz/Datum (Default=Datum)."
-alienFound = "Kann nicht abgespielt werden! Entweder ist der Content...  \n\n\
+'INFO' zeigt Inhaltsangaben bei gefundenen Inhalten.\n\
+'BLAU' listet einige passende Clips zur aktiven Auswahl.\n\
+'GELB' bei der Suche: Relevanz/Datum (Default=Datum)."
+alienFound = "Kann nicht abgespielt werden! Entweder ist der Content...  \n\
 - in der Zukunft liegend, und noch nicht vorhanden, oder...\n\
 - nicht mehr vorhanden, oder...\n\
-- die Stream-Links werden auf Seiten der ARD-Server nun\n   anders zusammengesetzt."
+- die Stream-Links werden auf Seiten der ARD-Server nun anders zusammengesetzt."
 placeHolder = ("---","99")
 ardPic = ""
 
@@ -495,7 +495,7 @@ class ARDPostSelect(MPScreen, ThumbsHelper):
 					media = "Radio"
 				else:
 					media = "?"
-				handlung = "Media:\t%s\nGenre:\t%s\nSender:\t%s\nClips:\t%s" % (media,self.gN,sender,ausgaben)
+				handlung = "Media: %s\nGenre: %s\nSender: %s\nClips: %s" % (media,self.gN,sender,ausgaben)
 		if self.textTrigger == 1:
 			streamHandlung = itxt
 		elif self.textTrigger == 0:
@@ -711,7 +711,7 @@ class ARDStreamScreen(MPScreen, ThumbsHelper):
 				media = "Radio"
 			else:
 				media = "?"
-			handlung = "Media:\t%s\nGenre:\t%s\nSender:\t%s\nClip-Datum:\t%s%s\nDauer:\t%s" % (media,self.gN,sender,airtime,uhr,dur)
+			handlung = "Media: %s\nGenre: %s\nSender: %s\nClip-Datum: %s%s\nDauer: %s" % (media,self.gN,sender,airtime,uhr,dur)
 		if self.textTrigger == 1:
 			streamHandlung = itxt
 		elif self.textTrigger == 0:
@@ -754,6 +754,7 @@ class ARDStreamScreen(MPScreen, ThumbsHelper):
 		rtH = ""
 		rtP = ""
 		htP = ""
+		hls = ""
 		r_qUp = 0
 		h_qUp = 0
 		qualitycheck = re.findall('"_quality":(.*?),.*?"_server":"(.*?)",.*?"_stream":"(.*?)"', data, re.S)
@@ -761,7 +762,9 @@ class ARDStreamScreen(MPScreen, ThumbsHelper):
 			for (a,c,d) in qualitycheck:
 				if "?sen=" in d:	# Für ARD-Links, sonst wird von rtmp auf http geschwenkt - "?sen=[...]" vermutlich wegen Untertitel für Hörgeschädigte in PC-Browser
 					d = d.split("?")[0]
-				if a != '"auto"':
+				if a == '"auto"':
+					hls = d
+				else:
 					if int(a) == r_qUp and c != "":
 						rtH = c
 						rtP = d
@@ -784,6 +787,8 @@ class ARDStreamScreen(MPScreen, ThumbsHelper):
 				htP = m.group(1)
 				if "?sen=" in htP:	# Für ARD-Links, sonst wird von rtmp auf http geschwenkt - "?sen=[...]" vermutlich wegen Untertitel für Hörgeschädigte in PC-Browser
 					htP = htP.split("?")[0]
+			if hls != '':
+				htP = hls
 
 			if len(rtH+rtP+htP) == 0:	# Hier stimmt gar nichts!
 				message = self.session.open(MessageBoxExt, "\n' -----------| "+decodeHtml(self.streamName)+" |----------- '\n\n"+alienFound, MessageBoxExt.TYPE_INFO, timeout=15)
@@ -799,14 +804,17 @@ class ARDStreamScreen(MPScreen, ThumbsHelper):
 			if htP == "" and rtH != "":	# Wenn kein einziger http-Link vorhanden (ausschliesslich rtmp-Links), umgehe nachfolgende http-Abfrage, und "vertraue darauf" dass Content existiert.
 				self.playStream(None, rtP, rtH, htP)
 			elif htP != "":	# http-Abfrage, ob Content existiert. Wenn ja, und es werden ebenfalls rtmp-Links angeboten, dann existieren immer beide Contents! Eine rtmp-Abfrage wäre zu kompliziert.
-				getPage(htP, method='HEAD').addCallback(self.playStream, rtP, rtH, htP).addErrback(self.httpURLError)
+				if hls != '':
+					self.playStream(None, '', '', hls)
+				else:
+					getPage(htP, method='HEAD').addCallback(self.playStream, rtP, rtH, htP).addErrback(self.httpURLError)
 			else:
 				message = self.session.open(MessageBoxExt, "\n' -----------| "+decodeHtml(self.streamName)+" |----------- '\n\n"+alienFound, MessageBoxExt.TYPE_INFO, timeout=15)
 				streamName = self['liste'].getCurrent()[0][0]
 				self['name'].setText(streamName)
 
 	def httpURLError(self, error):
-		message = self.session.open(MessageBoxExt, "\n' "+decodeHtml(self.streamName)+" '\n\n"+isWeg, MessageBoxExt.TYPE_INFO, timeout=7)
+		message = self.session.open(MessageBoxExt, "'"+decodeHtml(self.streamName)+"'\n\n"+isWeg, MessageBoxExt.TYPE_INFO, timeout=7)
 		streamName = self['liste'].getCurrent()[0][0]
 		self['name'].setText(streamName)
 
