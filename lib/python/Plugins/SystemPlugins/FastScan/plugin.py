@@ -160,6 +160,13 @@ class FastScanScreen(ConfigListScreen, Screen):
 		self.providers['Freesat_Romania'] = (0, 900, True)		
 		self.providers['Freesat_Slovenske'] = (0, 900, True)
 		self.providers['HDPlus'] = (0, 900, True)
+		self.providers['Own_Scan'] = (0, 900, True)		
+		self.providers['Sky_de_Full'] = (0, 900, True)
+		self.providers['Sky_de_Bundesliga'] = (0, 900, True)
+                self.providers['Sky_de_Cinema'] = (0, 900, True)
+                self.providers['Sky_de_Entertainment'] = (0, 900, True)
+		self.providers['Sky_de_Sport'] = (0, 900, True)		
+		self.providers['Sky_de_Starter'] = (0, 900, True)		
 		self.providers['UPC'] = (0, 900, True)                		
 		
 		#orgin
@@ -167,15 +174,15 @@ class FastScanScreen(ConfigListScreen, Screen):
 		self.providers['Canal Digitaal Astra 1'] = (0, 900, True)
 		self.providers['TV Vlaanderen'] = (1, 910, True)
 		self.providers['TV Vlaanderen  Astra 1'] = (0, 910, True)
-		self.providers['TéléSAT'] = (0, 920, True)
-		self.providers['TéléSAT Astra3'] = (1, 920, True)
+		self.providers['TÃƒÆ’Ã‚Â©lÃƒÆ’Ã‚Â©SAT'] = (0, 920, True)
+		self.providers['TÃƒÆ’Ã‚Â©lÃƒÆ’Ã‚Â©SAT Astra3'] = (1, 920, True)
 		self.providers['HD Austria'] = (0, 950, False)
 		self.providers['Fast Scan Deutschland'] = (0, 960, False)
 		self.providers['Fast Scan Deutschland Astra3'] = (1, 960, False) 
 		self.providers['Skylink Czech Republic'] = (1, 30, False)
 		self.providers['Skylink Slovak Republic'] = (1, 31, False)
-		self.providers['AustriaSat Magyarország Eutelsat 9E'] = (2, 951, False)
-		self.providers['AustriaSat Magyarország Astra 3'] = (1, 951, False)
+		self.providers['AustriaSat MagyarorszÃƒÆ’Ã‚Â¡g Eutelsat 9E'] = (2, 951, False)
+		self.providers['AustriaSat MagyarorszÃƒÆ’Ã‚Â¡g Astra 3'] = (1, 951, False)
 		
 				
 		
@@ -205,7 +212,6 @@ class FastScanScreen(ConfigListScreen, Screen):
 		lastConfiguration = eval(config.misc.fastscan.last_configuration.value)
 		if not lastConfiguration:
 			lastConfiguration = (nimList[0][0], providerList[0], True, True, False, config.usage.alternative_number_mode.value)
-                print "nimList;", nimList
 		self.scan_nims = ConfigSelection(default = lastConfiguration[0], choices = nimList)
 		self.scan_provider = ConfigSelection(default = lastConfiguration[1], choices = providerList)
 		self.scan_hd = ConfigYesNo(default = lastConfiguration[2])
@@ -237,8 +243,6 @@ class FastScanScreen(ConfigListScreen, Screen):
 
 
 	def addSatTransponder(self, tlist, frequency, symbol_rate, polarisation, fec, inversion, orbital_position, system, modulation, rolloff, pilot):
-		print "Add Sat: frequ: " + str(frequency) + " symbol: " + str(symbol_rate) + " pol: " + str(polarisation) + " fec: " + str(fec) + " inversion: " + str(inversion) + " modulation: " + str(modulation) + " system: " + str(system) + " rolloff" + str(rolloff) + " pilot" + str(pilot)
-		print "orbpos: " + str(orbital_position)
 		parm = eDVBFrontendParametersSatellite()
 		parm.modulation = modulation
 		parm.system = system
@@ -258,7 +262,7 @@ class FastScanScreen(ConfigListScreen, Screen):
 
 
 	def readXML(self, xml):
-	        global ret
+                global ret
                 self.session.nav.stopService()
 		tlist = []
 		self.path = "/etc/enigma2"
@@ -353,7 +357,6 @@ class FastScanScreen(ConfigListScreen, Screen):
 			
 				self.pilot = 2 # 0 - off, 1 - on 2 - AUTO
 		
-				print "add sat transponder"
 				self.addSatTransponder(tlist, int(self.frequency),
 							int(self.symbolrate),
 							int(self.polarization),
@@ -365,8 +368,7 @@ class FastScanScreen(ConfigListScreen, Screen):
 							int(self.rolloff),
 							int(self.pilot))
 		 
-                        print "tuner:", int(self.scan_nims.value)
-                	self.session.openWithCallback(self.bouqmake, ServiceScan, [{"transponders": tlist, "feid": int(self.scan_nims.value), "flags": 0, "networkid": 0}])
+                        self.session.openWithCallback(self.bouqmake, ServiceScan, [{"transponders": tlist, "feid": int(self.scan_nims.value), "flags": 0, "networkid": 0}])
                 except:
                         #self.session.open(MessageBox, _("xml File missing, please check it."), MessageBox.TYPE_ERROR)
                         print "xml File missing, please check it."
@@ -374,70 +376,158 @@ class FastScanScreen(ConfigListScreen, Screen):
 	def bouqmake(self, session):
 		prov = self.scan_provider.value.lower()
 		global sname
-		self.path = "/etc/enigma2"
-		lastsc = self.path + "/userbouquet.LastScanned.tv"
-		newbouq = self.path + "/userbouquet." + self.scan_provider.value + ".tv"
-		newbouq_unsort = self.path + "/userbouquet." + self.scan_provider.value + ".tv_unsort"
-       		favlist = self.path + "/bouquets.tv"
-       		newbouq_unsortlist = self.path + newbouq_unsort
-       		newbouq1 = '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.' + self.scan_provider.value + '.tv" ORDER BY bouquet\r'
-       		newbouq2 = '#NAME ' + self.scan_provider.value + ' '
-       		newbouq3 = '"userbouquet.' + self.scan_provider.value + '.tv"'
-               	newbouq11 = '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.LastScanned.tv" ORDER BY bouquet'
-               	path = self.path
-       		prefix = self.scan_provider.value 
-       		try:
-               		txtdoc = "/usr/lib/enigma2/python/Plugins/SystemPlugins/FastScan/xml/" + self.scan_provider.value.lower() + ".txt"
-       			hh = []
-               		gg = open(txtdoc, "r")
-       			reta = gg.read().split("\n")
-			gg.close()
-               		ff = open(lastsc, "r")
-       			retb = ff.read().split("\n")
-			ff.close()
-       			i = 1
-       			wx = [newbouq2]
-       			wx1 = [newbouq2]
-                		
-                        while i+1 < len(retb):	       
-              			self.updateServiceName(int(i))
-                               	print "sname:", sname
-                               	if sname in reta:
-                                       	wx.append(sname + " " + retb[i])
+		global ret
+		ret1 = ret
+#####new		
+		if prov == "sky_de_full":
+		        provlist = ['Sky_de_Bundesliga', 'Sky_de_Cinema', 'Sky_de_Entertainment', 'Sky_de_Sport', 'Sky_de_Starter']
+                        for xprov in provlist:
+                                newprov = xprov
+				self.path = "/etc/enigma2"
+				lastsc = self.path + "/userbouquet.LastScanned.tv"
+				newbouq = self.path + "/userbouquet." + newprov + ".tv"
+				newbouq_unsort = self.path + "/userbouquet." + newprov + ".tv_unsort"
+       				favlist = self.path + "/bouquets.tv"
+       				newbouq_unsortlist = self.path + newbouq_unsort
+       				newbouq1 = '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.' + newprov + '.tv" ORDER BY bouquet\r'
+       				newbouq2 = '#NAME ' + newprov + ' '
+       				newbouq3 = '"userbouquet.' + newprov + '.tv"'
+               			newbouq11 = '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.LastScanned.tv" ORDER BY bouquet'
+               			path = self.path
+       				#prefix = self.scan_provider.value 
+       				try:
+               				txtdoc = "/usr/lib/enigma2/python/Plugins/SystemPlugins/FastScan/xml/" + newprov.lower() + ".txt"
+       					hh = []
+               				gg = open(txtdoc, "r")
+       					reta = gg.read().split("\n")
+					gg.close()
+               				ff = open(lastsc, "r")
+       					retb = ff.read().split("\n")
+					ff.close()
+       					i = 1
+       					wx = [newbouq2]
+       					wx1 = [newbouq2]
+                			if retb[1].startswith("#SERVICE"):
+                        			while i+1 < len(retb):
+              						self.updateServiceName(int(i))
+                               				if sname in reta:
+                                       				wx.append(sname + " " + retb[i])
                         	
-                       		i +=1
-                	wz = open(newbouq_unsort, "w")
-                	wz.write("\n".join(map(lambda x: str(x), wx)))    #wx ersetzen mit neuer liste
-                	wz.close()
-                        for wwww in reta:
-                        	for s in wx:
-                                        if wwww in s:
-                                                s1 = s.lstrip(wwww)
-                                       		wx1.append(s1)
-                               	                break
-                	wz1 = open(newbouq, "w")
-                	wz1.write("\n".join(map(lambda x: str(x), wx1)))    #wx ersetzen mit neuer liste
-                	wz1.close()
+                       					i +=1
+                				wz = open(newbouq_unsort, "w")
+                				wz.write("\n".join(map(lambda x: str(x), wx)))    
+                				wz.close()
+                        			for wwww in reta:
+                        				for s in wx:
+                        	                		www1 = s.rsplit("#", 1)
+                        	                		wwww1 = www1[0].rstrip()
+                                        			if wwww1 == wwww:
+                                        	        		s1 = "#" + www1[1]
+                                       					wx1.append(s1)
+                               	                			break
+                                                wz1 = open(newbouq, "w")
+                				wz1.write("\n".join(map(lambda x: str(x), wx1)))    
+                				wz1.close()
+                				rety = []
+                        			if os.path.isfile(favlist):
+                        				os.remove(favlist)
+                        			if os.path.isfile(newbouq_unsortlist):
+                        				os.remove(newbouq_unsortlist)
+                        			for zz in ret1:
+                        				if newbouq3 in zz:
+                        					print "no Service add"
+                               				else:
+                                       				rety.append(zz)
+                        			rety[1:1] = [newbouq1]
+                                                ret1 = rety
+                				wv = open(favlist, "w")
+                				wv.write("\n".join(map(lambda x: str(x), rety)))
+                				wv.close()
+                				#eDVBDB.getInstance().reloadBouquets()
+                        		else:
+                				wv = open(favlist, "w")
+                				wv.write("\n".join(map(lambda x: str(x), ret1)))
+                				wv.close()                   
+                				#eDVBDB.getInstance().reloadBouquets()                         	
+                        			self.keyCancel()
+                		except:
+                        		print 'My error, value:no xml found'
+                        eDVBDB.getInstance().reloadBouquets()         
+                       			#self.session.open(MessageBox, _("Chanel-txt File missing, please check it."), MessageBox.TYPE_ERROR)		
+###new end
+		else:
+			self.path = "/etc/enigma2"
+			lastsc = self.path + "/userbouquet.LastScanned.tv"
+			newbouq = self.path + "/userbouquet." + self.scan_provider.value + ".tv"
+			newbouq_unsort = self.path + "/userbouquet." + self.scan_provider.value + ".tv_unsort"
+       			favlist = self.path + "/bouquets.tv"
+       			newbouq_unsortlist = self.path + newbouq_unsort
+       			newbouq1 = '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.' + self.scan_provider.value + '.tv" ORDER BY bouquet\r'
+       			newbouq2 = '#NAME ' + self.scan_provider.value + ' '
+       			newbouq3 = '"userbouquet.' + self.scan_provider.value + '.tv"'
+               		newbouq11 = '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.LastScanned.tv" ORDER BY bouquet'
+               		path = self.path
+       			prefix = self.scan_provider.value 
+       			try:
+               			txtdoc = "/usr/lib/enigma2/python/Plugins/SystemPlugins/FastScan/xml/" + self.scan_provider.value.lower() + ".txt"
+       				hh = []
+               			gg = open(txtdoc, "r")
+       				reta = gg.read().split("\n")
+				gg.close()
+               			ff = open(lastsc, "r")
+       				retb = ff.read().split("\n")
+				ff.close()
+       				i = 1
+       				wx = [newbouq2]
+       				wx1 = [newbouq2]
+                		if retb[1].startswith("#SERVICE"):
+                        		while i+1 < len(retb):	       
+              					self.updateServiceName(int(i))
+                               			if sname in reta:
+                                       			wx.append(sname + " " + retb[i])
+                        	
+                       				i +=1
+                			wz = open(newbouq_unsort, "w")
+                			wz.write("\n".join(map(lambda x: str(x), wx)))    
+                			wz.close()
+                        		for wwww in reta:
+                        			for s in wx:
+                        	                	www1 = s.rsplit("#", 1)
+                        	                	wwww1 = www1[0].rstrip()
+                                        		if wwww1 == wwww:
+                                        	        	s1 = "#" + www1[1]
+                                       				wx1.append(s1)
+                               	                		break
+                			wz1 = open(newbouq, "w")
+                			wz1.write("\n".join(map(lambda x: str(x), wx1)))    
+                			wz1.close()
                         		
                  		
-                	rety = []
-                        if os.path.isfile(favlist):              
-                        	os.remove(favlist)                            	
-                        if os.path.isfile(newbouq_unsortlist):              
-                        	os.remove(newbouq_unsortlist)                
-                        for zz in ret: 	       
-                        	if newbouq3 in zz:
-                        		print "no add"
-                               	else:
-                                       	rety.append(zz)
-                        rety[1:1] = [newbouq1]
-                	wv = open(favlist, "w")
-                	wv.write("\n".join(map(lambda x: str(x), rety)))
-                	wv.close()                   
-                	eDVBDB.getInstance().reloadBouquets()
-                except:
-                	print "Chanel-txt File missing, please check it."
-                       	#self.session.open(MessageBox, _("Chanel-txt File missing, please check it."), MessageBox.TYPE_ERROR)
+                			rety = []
+                        		if os.path.isfile(favlist):              
+                        			os.remove(favlist)                            	
+                        		if os.path.isfile(newbouq_unsortlist):              
+                        			os.remove(newbouq_unsortlist)
+                        		for zz in ret:
+                        			if newbouq3 in zz:
+                        				print "no Service add"
+                               			else:
+                                       			rety.append(zz)
+                        		rety[1:1] = [newbouq1]
+                			wv = open(favlist, "w")
+                			wv.write("\n".join(map(lambda x: str(x), rety)))
+                			wv.close()
+                			eDVBDB.getInstance().reloadBouquets()
+                                 
+                        	else:
+                			wv = open(favlist, "w")
+                			wv.write("\n".join(map(lambda x: str(x), ret)))
+                			wv.close()                   
+                			eDVBDB.getInstance().reloadBouquets()                         	
+                        		self.keyCancel()
+                	except:
+                        	print 'My error, value:no xml found' 
+                       		#self.session.open(MessageBox, _("Chanel-txt File missing, please check it."), MessageBox.TYPE_ERROR)
 	
         
         def searchNumberHelper(self, serviceHandler, num, bouquet):
@@ -469,7 +559,6 @@ class FastScanScreen(ConfigListScreen, Screen):
 				if bouquet.flags & eServiceReference.isDirectory:
 					service, number = self.searchNumberHelper(serviceHandler, number, bouquet)
                 if service is not None:
-                        print "service:", service
 			info = serviceHandler.info(service)
 			sname = info.getName(service).replace('\xc2\x86', '').replace('\xc2\x87', '')
 		else:
@@ -478,7 +567,7 @@ class FastScanScreen(ConfigListScreen, Screen):
 
         def keyGo(self):
 		prov = self.scan_provider.value.lower()
-                if prov == "astra_19_austriasat" or prov == "digitv" or prov == "focussat" or prov == "freesat_czech_republic" or prov == "freesat_hungary" or prov == "freesat_moldavia" or prov == "freesat_slovenske" or prov == "freesat_romania" or prov == "hdplus" or prov == "upc":
+                if prov == "astra_19_austriasat" or prov == "digitv" or prov == "focussat" or prov == "freesat_czech_republic" or prov == "freesat_hungary" or prov == "freesat_moldavia" or prov == "freesat_slovenske" or prov == "freesat_romania" or prov == "hdplus" or prov == "own_scan" or prov == "sky_de_starter" or prov == "sky_de_cinema" or prov == "sky_de_sport" or prov == "sky_de_bundesliga" or prov == "sky_de_entertainment" or prov == "sky_de_full" or prov == "upc":           
                   if self.scan_alternative_number_mode.value == True:
                         config.usage.alternative_number_mode.value = True
                         config.usage.alternative_number_mode.save()
@@ -531,7 +620,6 @@ def FastScanMain(session, **kwargs):
 		# collect all nims which are *not* set to "nothing"
 		for n in nimmanager.nim_slots:
 		        #nim  = nimmanager.nim_slots
-			print "n.config_mode:", n.config_mode
                         if not n.isCompatible("DVB-S"):
 				continue
 			if n.config_mode == "nothing":
@@ -540,17 +628,9 @@ def FastScanMain(session, **kwargs):
 				root_id = nimmanager.sec.getRoot(n.slot_id, int(n.config.connectedTo.value))
 				if n.type == nimmanager.nim_slots[root_id].type: # check if connected from a DVB-S to DVB-S2 Nim or vice versa
 					continue
-			
-                        
-                        #if nim.description.find("FBC") == -1:
-                                #print "fbc-tuner;", nim.slot 
-                                #print "fbcliste:", nim.description 
-				#if nim.slot %8 > 1:
-					#continue
 				
                         nimList.append((str(n.slot), n.friendly_full_description))
 		if nimList:
-		        print "nimlist1:", nimList
 			session.open(FastScanScreen, nimList)
 		else:
 			print "No suitable sat tuner found!"
@@ -565,7 +645,7 @@ def FastScanStart(menuid, **kwargs):
 
 def Plugins(**kwargs):
 	if nimmanager.hasNimType("DVB-S"):
-		return PluginDescriptor(name=_("Fast Scan"), description="Scan Dutch/Belgian sat provider", where = PluginDescriptor.WHERE_MENU, fnc=FastScanStart)
+		return PluginDescriptor(name=_("Fast Scan"), description="Scan Diefferent sat provider", where = PluginDescriptor.WHERE_MENU, fnc=FastScanStart)
 	else:
 		return []
 
