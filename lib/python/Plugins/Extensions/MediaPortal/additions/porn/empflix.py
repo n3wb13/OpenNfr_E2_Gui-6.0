@@ -41,11 +41,19 @@ from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage
 
 myagent = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:40.0) Gecko/20100101 Firefox/40.0'
-BASE_URL = "https://www.tnaflix.com"
 
-class TnAflixGenreScreen(MPScreen):
+class empflixGenreScreen(MPScreen):
 
-	def __init__(self, session):
+	def __init__(self, session, mode):
+		self.mode = mode
+
+		if self.mode == "empflix":
+			self.portal = "Empflix.com"
+			self.baseurl = "https://www.empflix.com"
+		if self.mode == "moviefap":
+			self.portal = "MovieFap.com"
+			self.baseurl = "http://www.moviefap.com"
+
 		self.plugin_path = mp_globals.pluginPath
 		self.skin_path = mp_globals.pluginPath + mp_globals.skinsPath
 		path = "%s/%s/defaultGenreScreen.xml" % (self.skin_path, config.mediaportal.skin.value)
@@ -67,7 +75,7 @@ class TnAflixGenreScreen(MPScreen):
 			"left" : self.keyLeft
 		}, -1)
 
-		self['title'] = Label("TnAflix.com")
+		self['title'] = Label(self.portal)
 		self['ContentTitle'] = Label("Genre:")
 		self.keyLocked = True
 		self.suchString = ''
@@ -79,26 +87,37 @@ class TnAflixGenreScreen(MPScreen):
 		self.onLayoutFinish.append(self.layoutFinished)
 
 	def layoutFinished(self):
-		url = BASE_URL
+		url = self.baseurl
+		if self.mode == "moviefap":
+			url = url + "/browse/"
 		twAgentGetPage(url, agent=myagent).addCallback(self.genreData).addErrback(self.dataError)
 
 	def genreData(self, data):
-		parse = re.search('categories-wrapper"></div>(.*?)</div', data, re.S)
-		if parse:
-			Cats = re.findall('<li>\s*<a\shref="(.*?)".*?>(.*?)</a>', parse.group(1), re.S)
-			if Cats:
-				for (Url, Title) in Cats:
-					Url = BASE_URL + Url + "&page="
+		if self.mode == "moviefap":
+			parse = re.search('Categories</h1></div>(.*?)</div', data, re.S)
+		else:
+			parse = re.search('List\sof\stags(.*?)>Channels</', data, re.S)
+		Cats = re.findall('<li>\s*<a\shref="(?:.*?empflix.com|.*?moviefap.com|)(.*?)(?:1.html|)".*?>(.*?)(?:<i>|</a></li>)', parse.group(1), re.S)
+		if Cats:
+
+			for (Url, Title) in Cats:
+				if not Title == "All":
+					Url = self.baseurl + Url
+					if self.mode == "moviefap":
+						Url = Url + "mr/"
 					self.genreliste.append((decodeHtml(Title), Url))
-				self.genreliste.sort()
-				self.genreliste.insert(0, ("Featured", '%s/featured/?d=all&period=all&page=' % BASE_URL))
-				self.genreliste.insert(0, ("Top Rated", '%s/toprated/?d=all&period=all&page=' % BASE_URL))
-				self.genreliste.insert(0, ("Most Popular", '%s/popular/?d=all&period=all&page=' % BASE_URL))
-				self.genreliste.insert(0, ("Most Recent", '%s/new/?d=all&period=all&page=' % BASE_URL))
-				self.genreliste.insert(0, ("--- Search ---", "callSuchen"))
-				self.ml.setList(map(self._defaultlistcenter, self.genreliste))
-				self.ml.moveToIndex(0)
-				self.keyLocked = False
+			self.genreliste.sort()
+			if self.mode == "moviefap":
+				split = "/"
+			else:
+				split = ".php"
+			self.genreliste.insert(0, ("Being Watched", '%s/browse%s?category=bw&page=' % (self.baseurl, split)))
+			self.genreliste.insert(0, ("Top Rated", '%s/browse%s?category=tr&page=' % (self.baseurl, split)))
+			self.genreliste.insert(0, ("Most Recent", '%s/browse%s?category=mr&page=' % (self.baseurl, split)))
+			self.genreliste.insert(0, ("--- Search ---", "callSuchen"))
+			self.ml.setList(map(self._defaultlistcenter, self.genreliste))
+			self.ml.moveToIndex(0)
+			self.keyLocked = False
 
 	def keyOK(self):
 		if self.keyLocked:
@@ -108,19 +127,21 @@ class TnAflixGenreScreen(MPScreen):
 			self.suchen()
 		else:
 			Link = self['liste'].getCurrent()[0][1]
-			self.session.open(TnAflixFilmScreen, Link, Name)
+			self.session.open(empflixFilmScreen, Link, Name, self.portal, self.baseurl)
 
 	def SuchenCallback(self, callback = None, entry = None):
 		if callback is not None and len(callback):
-			self.suchString = callback.replace(' ', '%20')
+			self.suchString = callback.replace(' ', '+')
 			Link = '%s' % (self.suchString)
 			Name = "--- Search ---"
-			self.session.open(TnAflixFilmScreen, Link, Name)
+			self.session.open(empflixFilmScreen, Link, Name, self.portal, self.baseurl)
 
-class TnAflixFilmScreen(MPScreen, ThumbsHelper):
+class empflixFilmScreen(MPScreen, ThumbsHelper):
 
-	def __init__(self, session, Link, Name):
+	def __init__(self, session, Link, Name, portal, baseurl):
 		self.Link = Link
+		self.portal = portal
+		self.baseurl = baseurl
 		self.Name = Name
 		self.plugin_path = mp_globals.pluginPath
 		self.skin_path = mp_globals.pluginPath + mp_globals.skinsPath
@@ -148,7 +169,7 @@ class TnAflixFilmScreen(MPScreen, ThumbsHelper):
 			"green" : self.keyPageNumber
 		}, -1)
 
-		self['title'] = Label("TnAflix.com")
+		self['title'] = Label(self.portal)
 		self['ContentTitle'] = Label("Genre: %s" % self.Name)
 		self['F2'] = Label(_("Page"))
 
@@ -168,19 +189,38 @@ class TnAflixFilmScreen(MPScreen, ThumbsHelper):
 		self['name'].setText(_('Please wait...'))
 		self.filmliste = []
 		if re.match(".*?Search", self.Name):
-			url = "%s/search.php?what=%s&page=%s" % (BASE_URL, self.Link, str(self.page))
+			if re.match(".*?moviefap", self.baseurl):
+				url = "%s/search/%s/relevance/%s" % (self.baseurl, self.Link, str(self.page))
+			else:
+				url = "%s/search.php?what=%s&page=%s" % (self.baseurl, self.Link, str(self.page))
 		else:
-			url = "%s%s" % (self.Link, str(self.page))
+			pager = ""
+			if re.match(".*?empflix", self.baseurl):
+				pager = ".html"
+			url = "%s%s%s" % (self.Link, str(self.page), pager)
 		twAgentGetPage(url).addCallback(self.loadData).addErrback(self.dataError)
 
 	def loadData(self, data):
-		self.getLastPage(data, 'class="navigation\sclear">(.*?)</div>')
-		Movies = re.findall("data-vid='(.*?)'\sdata-nk='(.*?)'\sdata-vk='(.*?)'.*?data-name='(.*?)'.*?data-original='(.*?)'.*?videoDuration'>(.*?)</div>", data, re.S)
+		if re.match(".*?moviefap", self.baseurl):
+			self.getLastPage(data, 'class="pagination">(.*?)</div>')
+			Movies = re.findall('class="video.*?<a\s{1,2}href="(.*?)"\stitle="(.*?)".*?img\ssrc="(.*?)".*?videoleft">(.*?)<', data, re.S)
+		else:
+			self.getLastPage(data, 'class="newPagination">(.*?)</div>')
+			Movies = re.findall('class="video\s.*?<a\s{1,2}href="(.*?)"\sclass=".*?class="duringTime">(.*?)</span>.*?<img\ssrc="(.*?)"\sonMouseOver=.*?title="(.*?)"\salt=', data, re.S)
 		if Movies:
-			for (vid, nk, vk, Title, Image, runtime) in Movies:
-				self.filmliste.append((decodeHtml(Title), vid, Image, runtime, nk, vk))
+			if re.match(".*?moviefap", self.baseurl):
+				for (Url, Title, Image, Runtime) in Movies:
+					self.filmliste.append((decodeHtml(Title), Url, Image, Runtime))
+			else:
+				for (Url, Runtime, Image, Title) in Movies:
+					if Url[:2] == "//":
+						Url = "http:" + Url
+					else:
+						Url = self.baseurl + Url
+					Image = "http:" + Image
+					self.filmliste.append((decodeHtml(Title), Url, Image, Runtime))
 		if len(self.filmliste) == 0:
-			self.filmliste.append((_('No videos found!'), None, None, '', '', ''))
+			self.filmliste.append((_('No videos found!'), '', None, ''))
 		self.ml.setList(map(self._defaultlistleft, self.filmliste))
 		self.ml.moveToIndex(0)
 		self.keyLocked = False
@@ -198,11 +238,15 @@ class TnAflixFilmScreen(MPScreen, ThumbsHelper):
 	def keyOK(self):
 		if self.keyLocked:
 			return
-		vid = self['liste'].getCurrent()[0][1]
-		nk = self['liste'].getCurrent()[0][4]
-		vk = self['liste'].getCurrent()[0][5]
+		Link = self['liste'].getCurrent()[0][1]
 		self.keyLocked = True
-		url = 'https://cdn-fck.tnaflix.com/tnaflix/%s.fid?key=%s&VID=%s&nomp4=1&catID=0&rollover=1&startThumb=31&embed=0&utm_source=0&multiview=0&premium=1&country=0user=0&vip=1&cd=0&ref=0&alpha' % (vk, nk, vid)
+		twAgentGetPage(Link).addCallback(self.getXMLPage).addErrback(self.dataError)
+
+	def getXMLPage(self, data):
+		xml = re.findall('flashvars.config.*?//(.*?)"', data, re.S)
+		if not xml:
+			xml = re.findall('name="config".*?//(.*?)"', data, re.S)
+		url = "http://" + xml[0]
 		twAgentGetPage(url).addCallback(self.getVideoPage).addErrback(self.dataError)
 
 	def getVideoPage(self, data):
@@ -211,4 +255,4 @@ class TnAflixFilmScreen(MPScreen, ThumbsHelper):
 			self.keyLocked = False
 			Title = self['liste'].getCurrent()[0][0]
 			url = "http://" + url[-1]
-			self.session.open(SimplePlayer, [(Title, url)], showPlaylist=False, ltype='tnaflix')
+			self.session.open(SimplePlayer, [(Title, url)], showPlaylist=False, ltype='empflix')

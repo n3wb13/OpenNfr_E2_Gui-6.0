@@ -10,7 +10,7 @@ def mega3x(self, data):
 		sJavascript = get_packedjava[0]
 		sUnpacked = unpack(sJavascript)
 		if sUnpacked:
-			links = re.findall('file:.*?file:"(http.*?.mp4)".*?image', sUnpacked, re.S)
+			links = re.findall('file:.*"(http.*?.mp4)".*?image', sUnpacked, re.S)
 			if links:
 				url = links[0]
 	if url:

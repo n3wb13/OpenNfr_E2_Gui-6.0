@@ -316,4 +316,5 @@ class vpornFilmScreen(MPScreen, ThumbsHelper):
 		if videoPage:
 			self.keyLocked = False
 			Title = self['liste'].getCurrent()[0][0]
-			self.session.open(SimplePlayer, [(Title, videoPage[-1])], showPlaylist=False, ltype='vporn')
+			url = videoPage[-1].replace('https://','http://')
+			self.session.open(SimplePlayer, [(Title, url)], showPlaylist=False, ltype='vporn')

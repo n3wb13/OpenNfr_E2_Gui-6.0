@@ -316,7 +316,12 @@ class pornhubPlayListScreen(MPScreen, ThumbsHelper):
 		twAgentGetPage(url, agent=phAgent, cookieJar=ck).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
-		self.getLastPage(data, 'class="pagination3">(.*?)</div>')
+		countprofile = re.findall('class="showingInfo">Showing up to (\d+) playlists.</div>', data, re.S)
+		if countprofile:
+			self.lastpage = int(round((float(countprofile[0].replace(',','')) / 30) + 0.5))
+			self['page'].setText(str(self.page) + ' / ' + str(self.lastpage))
+		else:
+			self.getLastPage(data, 'class="pagination3">(.*?)</div>')
 		preparse = re.search('class="sectionWrapper(.*?)class="pagination3"', data, re.S)
 		if not preparse:
 			preparse = re.search('class="sectionWrapper(.*?)id="profileInformation"', data, re.S)

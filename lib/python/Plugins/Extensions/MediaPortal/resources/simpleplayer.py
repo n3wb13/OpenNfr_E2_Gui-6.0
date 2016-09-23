@@ -1601,8 +1601,24 @@ class SimplePlayer(Screen, M3U8Player, CoverSearchHelper, SimpleSeekHelper, Simp
 	def runPlugin(self, plugin):
 		plugin(session=self.session)
 
+	def addUserAgentToPlaylist(self):
+		try:
+			if config.plugins.serviceapp.servicemp3.replace.value:
+				self.playListTmp = []
+				j = 0
+				for i in self.playList:
+					tmpTitle = str(self.playList[j][0])
+					tmpUrl = str(self.playList[j][1]) + "#User-Agent=" + mp_globals.player_agent
+					tmpPic = str(self.playList[j][2])
+					self.playListTmp.append((tmpTitle, tmpUrl, tmpPic))
+					j += 1
+				self.playList = self.playListTmp
+		except:
+			pass
+
 	def setPlayerAgent(self):
 		if not mp_globals.player_agent: return
+		self.addUserAgentToPlaylist()
 		try:
 			config.mediaplayer.useAlternateUserAgent.value = True
 			config.mediaplayer.alternateUserAgent.value = mp_globals.player_agent

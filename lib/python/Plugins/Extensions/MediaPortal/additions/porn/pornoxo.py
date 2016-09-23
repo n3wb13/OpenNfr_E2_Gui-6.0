@@ -83,7 +83,7 @@ class pornoxoGenreScreen(MPScreen):
 		if Cats:
 			for (Url, Title) in Cats:
 				Url = "http://www.pornoxo.com" + Url
-				self.genreliste.append((Title, Url))
+				self.genreliste.append((Title.title(), Url))
 			self.genreliste.sort()
 			self.genreliste.insert(0, ("Longest", "http://www.pornoxo.com/videos/longest/", None))
 			self.genreliste.insert(0, ("Best Recent", "http://www.pornoxo.com/videos/best-recent/", None))
@@ -169,7 +169,7 @@ class pornoxoFilmScreen(MPScreen, ThumbsHelper):
 
 	def loadData(self, data):
 		self.getLastPage(data, 'class="pagination"(.*?)</div>')
-		Movies = re.findall('class="videospot".*?<a\shref="(.*?)".*?src="(.*?\.jpg)"\salt="(.*?)"', data, re.S)
+		Movies = re.findall('id="videoItem.*?<a\shref="(.*?)".*?<img\s{1,2}class="rotate"\s{1,2}src="(.*?)"\salt="(.*?)"', data, re.S)
 		if Movies:
 			for (Url, Image, Title) in Movies:
 				self.filmliste.append((Title, Url, Image))
