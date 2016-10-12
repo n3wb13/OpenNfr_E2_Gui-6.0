@@ -42,7 +42,7 @@ from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPag
 from Plugins.Extensions.MediaPortal.resources.youtubeplayer import YoutubePlayer
 
 try:
-	import cfscrape
+	from Plugins.Extensions.MediaPortal.resources import cfscrape
 except:
 	cfscrapeModule = False
 else:
@@ -234,7 +234,8 @@ class hdfilmeParsing(MPScreen, ThumbsHelper):
 		else:
 			self.keyLocked = False
 		self.ml.setList(map(self._defaultlistleft, self.streamList))
-		self.th_ThumbsQuery(self.streamList, 0, 1, 2, None, None, self.page, self.lastpage)
+		self.ml.moveToIndex(0)
+		self.th_ThumbsQuery(self.streamList, 0, 1, 2, None, None, self.page, self.lastpage, agent=hf_agent, cookies=hf_ck, req=True)
 		self.showInfos()
 
 	def showInfos(self):
@@ -243,7 +244,7 @@ class hdfilmeParsing(MPScreen, ThumbsHelper):
 			return
 		title = self['liste'].getCurrent()[0][0]
 		self.coverurl = self['liste'].getCurrent()[0][2]
-		CoverHelper(self['coverArt']).getCover(self.coverurl)
+		CoverHelper(self['coverArt']).getCover(self.coverurl, agent=hf_agent, cookieJar=hf_cookies, req=True)
 		self['name'].setText(title)
 
 	def keyOK(self):
@@ -374,7 +375,7 @@ class hdfilmeStreams(MPScreen):
 		else:
 			self.keyLocked = False
 		self.ml.setList(map(self._defaultlisthoster, self.streamList))
-		CoverHelper(self['coverArt']).getCover(self.cover)
+		CoverHelper(self['coverArt']).getCover(self.cover, agent=hf_agent, cookieJar=hf_cookies)
 
 	def keyOK(self):
 		exist = self['liste'].getCurrent()

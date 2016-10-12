@@ -94,11 +94,13 @@ class get_stream_link:
 	from hosters.google import google
 	from hosters.kodik import kodik, kodikData
 	from hosters.letwatch import letwatch
+	from hosters.mailru import mailru
 	from hosters.mega3x import mega3x
 	from hosters.moviecloud import moviecloud
 	from hosters.movshare import movshare, movshare_code1, movshare_base36decode, movshare_xml
 	from hosters.mp4upload import mp4upload
 	from hosters.mrfile import mrfile
+	from hosters.okru import okru
 	from hosters.powerwatch import powerwatch, powerwatchGetPage, powerwatch_postData
 	from hosters.powvideo import powvideo
 	from hosters.promptfile import promptfile, promptfilePost
@@ -120,8 +122,6 @@ class get_stream_link:
 	from hosters.yourupload import yourupload
 	from hosters.youwatch import youwatch, youwatchLink
 	from hosters.zettahost import zettahost
-	from hosters.okru import okru
-	from hosters.mailru import mailru
 
 	def __init__(self, session):
 		self._callback = None
@@ -654,11 +654,14 @@ class get_stream_link:
 					self.prz = 1
 					self.callPremium(link)
 				else:
-					data = self.grabpage(link)
-					if data == "error":
-						message = self.session.open(MessageBoxExt, _("Some mandatory Python modules are missing!"), MessageBoxExt.TYPE_ERROR)
+					if mp_globals.isDreamOS:
+						twAgentGetPage(link).addCallback(self.vivo, link).addErrback(self.errorload)
 					else:
-						self.vivo(data, link)
+						data = self.grabpage(link)
+						if data == "error":
+							message = self.session.open(MessageBoxExt, _("Some mandatory Python modules are missing!"), MessageBoxExt.TYPE_ERROR)
+						else:
+							self.vivo(data, link)
 
 			elif re.search('bestreams\.net/', data, re.S):
 				link = data

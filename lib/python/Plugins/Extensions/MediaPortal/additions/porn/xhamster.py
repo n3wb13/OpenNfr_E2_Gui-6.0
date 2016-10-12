@@ -1,4 +1,41 @@
 ﻿# -*- coding: utf-8 -*-
+###############################################################################################
+#
+#    MediaPortal for Dreambox OS
+#
+#    Coded by MediaPortal Team (c) 2013-2016
+#
+#  This plugin is open source but it is NOT free software.
+#
+#  This plugin may only be distributed to and executed on hardware which
+#  is licensed by Dream Property GmbH. This includes commercial distribution.
+#  In other words:
+#  It's NOT allowed to distribute any parts of this plugin or its source code in ANY way
+#  to hardware which is NOT licensed by Dream Property GmbH.
+#  It's NOT allowed to execute this plugin and its source code or even parts of it in ANY way
+#  on hardware which is NOT licensed by Dream Property GmbH.
+#
+#  This applies to the source code as a whole as well as to parts of it, unless
+#  explicitely stated otherwise.
+#
+#  If you want to use or modify the code or parts of it,
+#  you have to keep OUR license and inform us about the modifications, but it may NOT be
+#  commercially distributed other than under the conditions noted above.
+#
+#  As an exception regarding execution on hardware, you are permitted to execute this plugin on VU+ hardware
+#  which is licensed by satco europe GmbH, if the VTi image is used on that hardware.
+#
+#  As an exception regarding modifcations, you are NOT permitted to remove
+#  any copy protections implemented in this plugin or change them for means of disabling
+#  or working around the copy protections, unless the change has been explicitly permitted
+#  by the original authors. Also decompiling and modification of the closed source
+#  parts is NOT permitted.
+#
+#  Advertising with this plugin is NOT allowed.
+#  For other uses, permission from the authors is necessary.
+#
+###############################################################################################
+
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.choiceboxext import ChoiceBoxExt
@@ -40,16 +77,20 @@ class xhamsterGenreScreen(MPScreen):
 	def layoutFinished(self):
 		self.keyLocked = True
 		url = "http://xhamster.com/channels.php"
-		getPage(url, headers={'Cookie': 'videoFilters=%7B%22channels%22%3A%22%3B0%22%7D', 'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.genreData).addErrback(self.dataError)
+		getPage(url).addCallback(self.genreData).addErrback(self.dataError)
 
 	def genreData(self, data):
-		Cats = re.findall('<a\s*href="(http://xhamster.com/channels/.*?)1.html">(.*?)<', data, re.S|re.I)
+		Cats = re.findall('<a\s\shref="(http[s]?://xhamster.com/[channels\/|categories\/|tags\/].*?)(?:-1.html|)">(.*?)<', data, re.S)
 		if Cats:
 			for (Url, Title) in Cats:
 				Title = Title.strip(' ')
 				self.genreliste.append((Title, Url))
 		self.genreliste.sort()
-		self.genreliste.insert(0, ("Newest", 'http://xhamster.com/new/'))
+		self.genreliste.insert(0, ("Top Rated (All Time)", 'https://xhamster.com/rankings/alltime-top-videos'))
+		self.genreliste.insert(0, ("Top Rated (Monthly)", 'https://xhamster.com/rankings/monthly-top-videos'))
+		self.genreliste.insert(0, ("Top Rated (Weekly)", 'https://xhamster.com/rankings/weekly-top-videos'))
+		self.genreliste.insert(0, ("Top Rated (Today)", 'https://xhamster.com/rankings/daily-top-videos'))
+		self.genreliste.insert(0, ("Newest", 'https://xhamster.com/new/'))
 		self.genreliste.insert(0, ("--- Search ---", "callSuchen"))
 		self.ml.setList(map(self._defaultlistcenter, self.genreliste))
 		self.ml.moveToIndex(0)
@@ -133,7 +174,14 @@ class xhamsterFilmScreen(MPScreen, ThumbsHelper):
 		if re.match(".*?Search", self.Name):
 			url = "http://xhamster.com/search.php?new=&q=%s&qcat=video&page=%s" % (self.Link, str(self.page))
 		else:
-			url = "%s%s.html" % (self.Link, str(self.page))
+			if re.match('.*?\/channels\/', self.Link):
+				url = "%s-%s.html" % (self.Link, str(self.page))
+			elif re.match('.*?\/rankings\/', self.Link):
+				url = "%s-%s.html" % (self.Link, str(self.page))
+			elif re.match('.*?\/new\/', self.Link):
+				url = "%s%s.html" % (self.Link, str(self.page))
+			else:
+				url = "%s/%s" % (self.Link, str(self.page))
 		searchcookie = 'search_video=' + quote(str(self.search_video).replace(' ', '')).replace('%27', '%22')
 		getPage(url, headers={'Cookie': searchcookie, 'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.pageData).addErrback(self.dataError)
 
@@ -188,8 +236,8 @@ class xhamsterFilmScreen(MPScreen, ThumbsHelper):
 	def keyFilter(self):
 		if self.keyLocked or not re.match(".*?Search", self.Name):
 			return
-		rangelist = [['Duration Any', ''], ['Duration 0-10', '0-10'], ['Duration 10-40', '10-40'], ['Duration 40+', '40+'], 
-					['Quality Any', 0], ['Quality HD', 1], 
+		rangelist = [['Duration Any', ''], ['Duration 0-10', '0-10'], ['Duration 10-40', '10-40'], ['Duration 40+', '40+'],
+					['Quality Any', 0], ['Quality HD', 1],
 					]
 		self.session.openWithCallback(self.keyFilterAction, ChoiceBoxExt, title=_('Select Action'), list = rangelist)
 

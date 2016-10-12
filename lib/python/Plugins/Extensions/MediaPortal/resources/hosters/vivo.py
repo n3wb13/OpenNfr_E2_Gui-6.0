@@ -6,9 +6,13 @@ def vivo(self, data, url):
 	p1 = re.search('type="hidden" name="hash".*?value="(.*?)"', data)
 	p2 = re.search('type="hidden" name="timestamp".*?value="(.*?)"', data)
 	if p1 and p2:
-		post = {'hash': p1.group(1), 'timestamp': p2.group(1)}
-		data = self.grabpage(url, method='POST', postdata=post)
-		self.vivoPostData(data)
+		if mp_globals.isDreamOS:
+			post = urllib.urlencode({'hash': p1.group(1), 'timestamp': p2.group(1)})
+			twAgentGetPage(url, method='POST', postdata=post, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.vivoPostData).addErrback(self.errorload)
+		else:
+			post = {'hash': p1.group(1), 'timestamp': p2.group(1)}
+			data = self.grabpage(url, method='POST', postdata=post)
+			self.vivoPostData(data)
 	else:
 		self.stream_not_found()
 

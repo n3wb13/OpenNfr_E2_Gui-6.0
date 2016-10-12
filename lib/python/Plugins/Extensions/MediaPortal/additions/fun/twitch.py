@@ -2,7 +2,7 @@
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
 
-headers = {'Accept': 'application/vnd.twitchtv.v2+json'}
+headers = {'Accept': 'application/vnd.twitchtv.v2+json', 'Client-ID': '6r2dhbo9ek6mm1gab2snj0navo4sgqy'}
 limit = 10
 
 class twitchGames(MPScreen):

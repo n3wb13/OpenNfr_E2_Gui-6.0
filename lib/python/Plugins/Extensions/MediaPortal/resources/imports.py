@@ -341,6 +341,6 @@ def decodeHtml2(txt):
 	return txt
 
 def stripAllTags(html):
-	cleanr =re.compile('<.*?>')
-	cleantext = re.sub(cleanr,'', html)
+	cleanr = re.compile('<.*?>')
+	cleantext = re.sub(cleanr,'', html.replace('\n',''))
 	return cleantext

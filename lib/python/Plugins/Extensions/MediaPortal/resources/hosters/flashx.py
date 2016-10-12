@@ -11,13 +11,13 @@ def flashx(self, data, id):
 	p6 = re.search('type="hidden" name="hash" value="(.+?)"', data)
 	if p1 and p3 and p4 and p6:
 		info = urlencode({'op': p1.group(1),
-						'usr_login': '',
+						'usr_login': 'download1',
 						'id': p3.group(1),
 						'fname': p4.group(1),
 						'referer':  '',
 						'hash': p6.group(1),
 						'imhuman': 'Proceed+to+video'})
-		url = re.findall('src="(http://www.flashx.tv/coding.js[^"]+)"', data)
+		url = re.findall('SRC="(http://www.flashx.tv/coding.js.*?)"', data, re.I)
 		if url:
 			twAgentGetPage(url[0], agent=None, headers=std_headers).addCallback(self.flashxCheckUrl, id, info).addErrback(self.errorload)
 			return
@@ -34,7 +34,7 @@ def flashxCalllater(self, *args, **kwargs):
 def flashxdata(self, data):
 	get_packedjava = re.findall("<script type=.text.javascript.>\n{0,1}(eval.function.*?)</script>", data, re.S)
 	if get_packedjava:
-		sJavascript = get_packedjava[0]
+		sJavascript = get_packedjava[1]
 		sUnpacked = unpack(sJavascript)
 		if sUnpacked:
 			best = 0

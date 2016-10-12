@@ -38,9 +38,10 @@
 
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
+from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage
 
 try:
-	import cfscrape
+	from Plugins.Extensions.MediaPortal.resources import cfscrape
 except:
 	cfscrapeModule = False
 else:
@@ -60,6 +61,14 @@ BASE_URL = "http://serienstream.to"
 ss_cookies = CookieJar()
 ss_ck = {}
 ss_agent = ''
+
+def ss_grabpage(pageurl):
+	if requestsModule:
+		s = requests.session()
+		url = urlparse.urlparse(pageurl)
+		headers = {'User-Agent': ss_agent}
+		page = s.get(url.geturl(), cookies=ss_cookies, headers=headers)
+		return page.content
 
 class ssMain(MPScreen):
 
@@ -192,10 +201,14 @@ class ssSerien(MPScreen, SearchHelper):
 
 	def loadPage(self):
 		url = BASE_URL + "/serien"
-		getPage(url, agent=ss_agent, cookies=ss_ck).addCallback(self.parseData).addErrback(self.dataError)
+		if mp_globals.isDreamOS:
+			twAgentGetPage(url, agent=ss_agent, cookieJar=ss_cookies).addCallback(self.parseData).addErrback(self.dataError)
+		else:
+			data = ss_grabpage(url)
+			self.parseData(data)
 
 	def parseData(self, data):
-		serien = re.findall('<li>.*?<a href="http://serienstream.to/serie/stream/(.*?)".*?title=".*?Stream anschauen">(.*?)</a>.*?</li>', data, re.S)
+		serien = re.findall('<li>.*?<a href="/serie/stream/(.*?)".*?title=".*?Stream anschauen">(.*?)</a>.*?</li>', data, re.S)
 		if serien:
 			for (id, serie) in serien:
 				url = BASE_URL + "/serie/stream/%s" % id
@@ -219,13 +232,17 @@ class ssSerien(MPScreen, SearchHelper):
 
 	def getCover(self):
 		url = self['liste'].getCurrent()[0][1]
-		getPage(url, agent=ss_agent, cookies=ss_ck).addCallback(self.setCoverUrl).addErrback(self.dataError)
+		if mp_globals.isDreamOS:
+			twAgentGetPage(url, agent=ss_agent, cookieJar=ss_cookies).addCallback(self.setCoverUrl).addErrback(self.dataError)
+		else:
+			data = ss_grabpage(url)
+			self.setCoverUrl(data)
 
 	def setCoverUrl(self, data):
-		cover = re.findall('<div class=".*?picture">.*?<img src="(http://serienstream.to/public/img/cover/.*?)"', data, re.S)
+		cover = re.findall('<div class=".*?picture">.*?<img src="(http[s]?://serienstream.to/public/img/cover/.*?)"', data, re.S)
 		if cover:
-			self.cover = cover[0]
-			CoverHelper(self['coverArt']).getCover(self.cover, agent=ss_agent, cookieJar=ss_cookies)
+			self.cover = cover[0].replace('https://','http://')
+			CoverHelper(self['coverArt']).getCover(self.cover, agent=ss_agent, cookieJar=ss_cookies, req=True)
 
 	def keyOK(self):
 		exist = self['liste'].getCurrent()
@@ -289,28 +306,25 @@ class ssNeueEpisoden(MPScreen):
 	def loadPage(self):
 		self.streamList = []
 		url = BASE_URL
-		getPage(url, agent=ss_agent, cookies=ss_ck).addCallback(self.parseData).addErrback(self.dataError)
+		if mp_globals.isDreamOS:
+			twAgentGetPage(url, agent=ss_agent, cookieJar=ss_cookies).addCallback(self.parseData).addErrback(self.dataError)
+		else:
+			data = ss_grabpage(url)
+			self.parseData(data)
 
 	def parseData(self, data):
-		neue = re.findall('<td><a\shref="(/serie/stream/.*?)">(.*?)</a>.{0,1}</td>', data)
+		neue = re.findall('<div class="col-md-11">.*?<a href="(.*?)">.*?<span class="listTag bigListTag blue2">(.*?)</span>.*?<span class="listTag bigListTag blue1">St.(.*?)</span>.*?<span class="listTag bigListTag grey">Ep.(.*?)</span>', data, re.S)
 		if neue:
-			for url, episodenName in neue:
-				if re.search('S\d+\sE\d+', episodenName):
-					title = re.sub('S\d+\sE\d+.*?', '', episodenName)
-					get = re.findall('S(\d+)\sE(\d+)', episodenName)
-					if get:
-						(staffel, episode) = get[0]
-						if int(staffel) < 10:
-							staffel = "S0"+str(staffel)
-						else:
-							staffel = "S"+str(staffel)
-						if int(episode) < 10:
-							episode = "E0"+str(episode)
-						else:
-							episode = "E"+str(episode)
-						title = "%s - %s%s" % (title, staffel, episode)
+			for url, title, staffel, episode in neue:
+				if int(staffel) < 10:
+					staffel = "S0"+str(staffel)
 				else:
-					title = episodenName
+					staffel = "S"+str(staffel)
+				if int(episode) < 10:
+					episode = "E0"+str(episode)
+				else:
+					episode = "E"+str(episode)
+				title = "%s - %s%s" % (title, staffel, episode)
 				url = BASE_URL + url
 				self.streamList.append((title, url))
 		if len(self.streamList) == 0:
@@ -338,13 +352,17 @@ class ssNeueEpisoden(MPScreen):
 
 	def getCover(self):
 		url = self['liste'].getCurrent()[0][1]
-		getPage(url, agent=ss_agent, cookies=ss_ck).addCallback(self.setCoverUrl).addErrback(self.dataError)
+		if mp_globals.isDreamOS:
+			twAgentGetPage(url, agent=ss_agent, cookieJar=ss_cookies).addCallback(self.setCoverUrl).addErrback(self.dataError)
+		else:
+			data = ss_grabpage(url)
+			self.setCoverUrl(data)
 
 	def setCoverUrl(self, data):
-		cover = re.findall('<div class=".*?picture">.*?<img src="(http://serienstream.to/public/img/cover/.*?)"', data, re.S)
+		cover = re.findall('<div class=".*?picture">.*?<img src="(http[s]?://serienstream.to/public/img/cover/.*?)"', data, re.S)
 		if cover:
-			self.cover = cover[0]
-			CoverHelper(self['coverArt']).getCover(self.cover, agent=ss_agent, cookieJar=ss_cookies)
+			self.cover = cover[0].replace('https://','http://')
+			CoverHelper(self['coverArt']).getCover(self.cover, agent=ss_agent, cookieJar=ss_cookies, req=True)
 
 	def reloadList(self):
 		self.keyLocked = True
@@ -419,13 +437,17 @@ class ssWatchlist(MPScreen):
 
 	def getCover(self):
 		url = self['liste'].getCurrent()[0][1]
-		getPage(url, agent=ss_agent, cookies=ss_ck).addCallback(self.setCoverUrl).addErrback(self.dataError)
+		if mp_globals.isDreamOS:
+			twAgentGetPage(url, agent=ss_agent, cookieJar=ss_cookies).addCallback(self.setCoverUrl).addErrback(self.dataError)
+		else:
+			data = ss_grabpage(url)
+			self.setCoverUrl(data)
 
 	def setCoverUrl(self, data):
-		cover = re.findall('<div class=".*?picture">.*?<img src="(http://serienstream.to/public/img/cover/.*?)"', data, re.S)
+		cover = re.findall('<div class=".*?picture">.*?<img src="(http[s]?://serienstream.to/public/img/cover/.*?)"', data, re.S)
 		if cover:
-			self.cover = cover[0]
-			CoverHelper(self['coverArt']).getCover(self.cover, agent=ss_agent, cookieJar=ss_cookies)
+			self.cover = cover[0].replace('https://','http://')
+			CoverHelper(self['coverArt']).getCover(self.cover, agent=ss_agent, cookieJar=ss_cookies, req=True)
 
 	def keyOK(self):
 		exist = self['liste'].getCurrent()
@@ -489,15 +511,20 @@ class ssStaffeln(MPScreen):
 		self.onLayoutFinish.append(self.loadPage)
 
 	def loadPage(self):
-		getPage(self.Url, agent=ss_agent, cookies=ss_ck).addCallback(self.parseData).addErrback(self.dataError)
+		if mp_globals.isDreamOS:
+			twAgentGetPage(self.Url, agent=ss_agent, cookieJar=ss_cookies).addCallback(self.parseData).addErrback(self.dataError)
+		else:
+			data = ss_grabpage(self.Url)
+			self.parseData(data)
 
 	def parseData(self, data):
-		parse = re.search('class="hosterSiteDirectNav">(.*?)</div>', data, re.S)
-		staffeln = re.findall('<a\s.*?href="(/serie/stream/.*?/staffel-(\d+))"', parse.group(1), re.S)
-		if staffeln:
-			for url, staffel in staffeln:
-				url = BASE_URL + url
-				self.streamList.append((_("Season")+" "+staffel, url, staffel))
+		parse = re.findall('<div class="hosterSiteDirectNav" id="stream">(.*?)<div class="cf"></div>', data, re.S)
+		if parse:
+			staffeln = re.findall('<a\s.*?href="(/serie/stream/.*?/staffel-(\d+))"', parse[0], re.S)
+			if staffeln:
+				for url, staffel in staffeln:
+					url = BASE_URL + url
+					self.streamList.append((_("Season")+" "+staffel, url, staffel))
 		if len(self.streamList) == 0:
 			self.streamList.append((_('No seasons found!'), None))
 		self.ml.setList(map(self._defaultlistcenter, self.streamList))
@@ -509,7 +536,7 @@ class ssStaffeln(MPScreen):
 		if self.keyLocked or exist == None:
 			return
 		title = self['liste'].getCurrent()[0][0]
-		CoverHelper(self['coverArt']).getCover(self.cover, agent=ss_agent, cookieJar=ss_cookies)
+		CoverHelper(self['coverArt']).getCover(self.cover, agent=ss_agent, cookieJar=ss_cookies, req=True)
 		self['name'].setText(self.Title)
 
 	def keyOK(self):
@@ -560,7 +587,11 @@ class ssEpisoden(MPScreen):
 
 	def loadPage(self):
 		self.streamList = []
-		getPage(self.Url, agent=ss_agent, cookies=ss_ck).addCallback(self.parseData).addErrback(self.dataError)
+		if mp_globals.isDreamOS:
+			twAgentGetPage(self.Url, agent=ss_agent, cookieJar=ss_cookies).addCallback(self.parseData).addErrback(self.dataError)
+		else:
+			data = ss_grabpage(self.Url)
+			self.parseData(data)
 
 	def parseData(self, data):
 		self.watched_liste = []
@@ -609,7 +640,7 @@ class ssEpisoden(MPScreen):
 		else:
 			self.keyLocked = False
 		self.ml.setList(map(self._defaultlistleftmarked, self.streamList))
-		CoverHelper(self['coverArt']).getCover(self.cover, agent=ss_agent, cookieJar=ss_cookies)
+		CoverHelper(self['coverArt']).getCover(self.cover, agent=ss_agent, cookieJar=ss_cookies, req=True)
 
 	def keyOK(self):
 		exist = self['liste'].getCurrent()
@@ -658,10 +689,14 @@ class ssStreams(MPScreen):
 		self.onLayoutFinish.append(self.loadPage)
 
 	def loadPage(self):
-		getPage(self.serienUrl, agent=ss_agent, cookies=ss_ck).addCallback(self.parseData).addErrback(self.dataError)
+		if mp_globals.isDreamOS:
+			twAgentGetPage(self.serienUrl, agent=ss_agent, cookieJar=ss_cookies).addCallback(self.parseData).addErrback(self.dataError)
+		else:
+			data = ss_grabpage(self.serienUrl)
+			self.parseData(data)
 
 	def parseData(self, data):
-		streams = re.findall('episodeLink\d+"\sdata-lang-key="(.*?)">.*?"(.*?)".*?class="icon\s(.*?)"', data, re.S)
+		streams = re.findall('episodeLink.*?data-lang-key="(.*?)".*?<a href="(.*?)" target="_blank">.*?<i class="icon\s(.*?)"', data, re.S)
 		if streams:
 			for (language, url, hoster) in streams:
 				if isSupportedHoster(hoster, True):
@@ -671,13 +706,13 @@ class ssStreams(MPScreen):
 						Flag = "EN"
 					else:
 						Flag = "DEUS"
-					self.streamList.append((hoster, url, False, Flag))
+					self.streamList.append((hoster, url.replace('https://','http://'), False, Flag))
 		if len(self.streamList) == 0:
 			self.streamList.append((_('No supported streams found!'), None, False, ""))
 		else:
 			self.keyLocked = False
 		self.ml.setList(map(self._defaultlistleftmarked, self.streamList))
-		CoverHelper(self['coverArt']).getCover(self.cover, agent=ss_agent, cookieJar=ss_cookies)
+		CoverHelper(self['coverArt']).getCover(self.cover, agent=ss_agent, cookieJar=ss_cookies, req=True)
 
 	def keyOK(self):
 		exist = self['liste'].getCurrent()

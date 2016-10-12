@@ -155,8 +155,8 @@ config.mediaportal.epg_deepstandby = ConfigSelection(default = "skip", choices =
 		])
 
 # Allgemein
-config.mediaportal.version = NoSave(ConfigText(default="761"))
-config.mediaportal.versiontext = NoSave(ConfigText(default="7.6.1"))
+config.mediaportal.version = NoSave(ConfigText(default="764"))
+config.mediaportal.versiontext = NoSave(ConfigText(default="7.6.4"))
 config.mediaportal.autoupdate = ConfigYesNo(default = True)
 config.mediaportal.pincode = ConfigPIN(default = 0000)
 config.mediaportal.showporn = ConfigYesNo(default = False)
@@ -719,7 +719,10 @@ class MPSetup(Screen, CheckPremiumize, ConfigListScreenExt):
 			self.keySave()
 
 	def premium(self):
-		self.session.open(realdebrid_oauth2, None, calltype='user')
+		if config.mediaportal.realdebrid_use.value:
+			self.session.open(realdebrid_oauth2, None, calltype='user')
+		else:
+			self.session.open(MessageBoxExt, _("Real-Debrid.com is not activated."), MessageBoxExt.TYPE_ERROR)
 		self.premiumize()
 
 	def cb_checkPathes(self):

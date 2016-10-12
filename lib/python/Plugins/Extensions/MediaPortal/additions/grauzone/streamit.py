@@ -5,12 +5,11 @@ from Plugins.Extensions.MediaPortal.resources.keyboardext import VirtualKeyBoard
 import Queue
 import threading
 from Plugins.Extensions.MediaPortal.resources.youtubeplayer import YoutubePlayer
-from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage
 from Plugins.Extensions.MediaPortal.resources.menuhelper import MenuHelper
 from Components.ProgressBar import ProgressBar
 
 try:
-	import cfscrape
+	from Plugins.Extensions.MediaPortal.resources import cfscrape
 except:
 	cfscrapeModule = False
 else:
@@ -37,20 +36,21 @@ else:
 	IMDbPresent = False
 	TMDbPresent = False
 
-IS_Version = "STREAMIT v2.10"
-IS_siteEncoding = 'utf-8'
 BASE_URL = "http://streamit.ws"
-search_headers = {
-	'Accept':'*/*',
-	'Accept-Language':'de,en-US;q=0.7,en;q=0.3',
-	'Referer':"http://streamit.ws/",
-	'Content-Type':'application/x-www-form-urlencoded',
-	'X-Requested-With':'XMLHttpRequest',
-	}
-
 sit_cookies = CookieJar()
 sit_ck = {}
 sit_agent = ''
+
+def sit_grabpage(pageurl, method='GET', postdata={}):
+	if requestsModule:
+		s = requests.session()
+		url = urlparse.urlparse(pageurl)
+		headers = {'User-Agent': sit_agent}
+		if method == 'GET':
+			page = s.get(url.geturl(), cookies=sit_cookies, headers=headers)
+		elif method == 'POST':
+			page = s.post(url.geturl(), data=postdata, cookies=sit_cookies, headers=headers)
+		return page.content
 
 class showstreamitGenre(MenuHelper):
 
@@ -72,7 +72,7 @@ class showstreamitGenre(MenuHelper):
 		self.m_path = m_path
 		MenuHelper.__init__(self, session, 0, None, BASE_URL, "", self._defaultlistcenter, cookieJar=sit_cookies)
 
-		self['title'] = Label(IS_Version)
+		self['title'] = Label("STREAMIT")
 		self['ContentTitle'] = Label("Genres")
 		self.param_search = ''
 		self.search_token = None
@@ -140,7 +140,7 @@ class showstreamitGenre(MenuHelper):
 
 	def mh_callGenreListScreen(self):
 		if re.search('Suche...', self.mh_genreTitle):
-			self.session.openWithCallback(self.cb_Search, VirtualKeyBoardExt, title = (_("Enter search criteria")), text = self.param_search, is_dialog=True, auto_text_init=True,  suggest_func=self.getSuggestions)
+			self.session.openWithCallback(self.cb_Search, VirtualKeyBoardExt, title = (_("Enter search criteria")), text = self.param_search, is_dialog=True, auto_text_init=True)
 		else:
 			genreurl = self.mh_baseUrl+self.mh_genreUrl[self.mh_menuLevel]
 			if "/genre-" in genreurl:
@@ -154,25 +154,6 @@ class showstreamitGenre(MenuHelper):
 			genreName = 'Videosuche: ' + self.param_search
 			genreLink = self.mh_baseUrl+self.mh_genreUrl[self.mh_menuLevel] % urllib.quote_plus(self.param_search)
 			self.session.open(streamitFilmListeScreen, genreLink, genreName)
-
-	def getSuggestions(self, text, max_res):
-		url = "http://streamit.ws/livesearch.php"
-		data = urlencode({'val':text})
-		d = twAgentGetPage(url, method="POST", postdata=data, cookieJar=sit_cookies, agent=sit_agent, headers=search_headers, timeout=5)
-		d.addCallback(self.gotSuggestions, max_res)
-		d.addErrback(self.gotSuggestions, max_res, True)
-		return d
-
-	def gotSuggestions(self, suggestions, max_res, err=False):
-		list = []
-		if not err and suggestions:
-			for m in re.finditer('<a href=.+?title="(.+?)">', suggestions):
-				list.append(decodeHtml(m.group(1)))
-				max_res -= 1
-				if not max_res: break
-		elif err:
-			printl(str(suggestions),self,'E')
-		return list
 
 class streamitFilmListeScreen(MPScreen, ThumbsHelper):
 
@@ -247,7 +228,7 @@ class streamitFilmListeScreen(MPScreen, ThumbsHelper):
 
 		self.sortFuncs = None
 		self.sortOrderStrGenre = ""
-		self['title'] = Label(IS_Version)
+		self['title'] = Label("STREAMIT")
 
 		self['Page'] = Label(_("Page:"))
 		self['F1'] = Label(_("Text-"))
@@ -327,7 +308,8 @@ class streamitFilmListeScreen(MPScreen, ThumbsHelper):
 		while not self.filmQ.empty():
 			url = self.filmQ.get_nowait()
 		if not self.seriesTag.startswith('Epi'):
-			twAgentGetPage(url, cookieJar=sit_cookies, agent=sit_agent).addCallback(self.loadPageData).addErrback(self.dataError)
+			data = sit_grabpage(url)
+			self.loadPageData(data)
 		else:
 			self.loadPageData(self.seasonData)
 
@@ -377,7 +359,7 @@ class streamitFilmListeScreen(MPScreen, ThumbsHelper):
 				m = re.search('seriesName="(.*?)"', data)
 				if m:
 					seriesName = m.group(1)
-					for m in re.finditer('<a.*?href="#(.*?)" >(.*?)</a>', data):
+					for m in re.finditer('<a.*?href="#(.*?)"\s{0,1}>(.*?)</a>', data):
 						episode, title = m.groups()
 						self.filmListe.append((decodeHtml(title), episode, self.seriesImg, imdb, decodeHtml(seriesName), ''))
 
@@ -449,7 +431,7 @@ class streamitFilmListeScreen(MPScreen, ThumbsHelper):
 		streamPic = self['liste'].getCurrent()[0][2]
 		streamUrl = self['liste'].getCurrent()[0][1]
 		self.updateP = 1
-		CoverHelper(self['coverArt'], self.showCoverExit).getCover(streamPic, agent=sit_agent, cookieJar=sit_cookies)
+		CoverHelper(self['coverArt'], self.showCoverExit).getCover(streamPic, agent=sit_agent, cookieJar=sit_cookies, req=True)
 		if not self.seriesTag:
 			rate = self['liste'].getCurrent()[0][4]
 			hd = self['liste'].getCurrent()[0][5]
@@ -491,7 +473,7 @@ class streamitFilmListeScreen(MPScreen, ThumbsHelper):
 		elif self.seriesTag.startswith('Epi'):
 			imdb = self['liste'].getCurrent()[0][3]
 			seriesName = self['liste'].getCurrent()[0][4]
-			postData = urlencode({'IMDB':imdb, 'val':streamLink})
+			postData = {'IMDB':imdb, 'val':streamLink}
 			link = BASE_URL + '/lade_episode.php'
 			staffel, episode = re.search('(\d+)e(\d+)', streamLink).groups()
 			streamName = "%s - S%02dE%02d - %s" % (seriesName, int(staffel), int(episode), re.sub('\d+\s', '', streamName, 1))
@@ -636,7 +618,7 @@ class streamitStreams(MPScreen):
 			"cancel"	: self.keyCancel
 		}, -1)
 
-		self['title'] = Label(IS_Version)
+		self['title'] = Label("STREAMIT")
 		self['ContentTitle'] = Label(_("Stream Selection"))
 
 		self['name'] = Label(filmName)
@@ -654,10 +636,12 @@ class streamitStreams(MPScreen):
 		self.streamListe.append((_('Please wait...'),"","",""))
 		self.ml.setList(map(self.streamitStreamListEntry, self.streamListe))
 		seriesStreams = self.postData != None
-		twAgentGetPage(self.filmUrl, cookieJar=sit_cookies, agent=sit_agent).addCallback(lambda x: self.parseData(x, seriesStreams)).addErrback(self.dataError)
+		data = sit_grabpage(self.filmUrl)
+		self.parseData(data, seriesStreams)
 
 	def getSeriesStreams(self):
-		twAgentGetPage(self.postUrl, method='POST', postdata=self.postData, cookieJar=sit_cookies, agent=sit_agent, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseStreams).addErrback(self.dataError)
+		data = sit_grabpage(self.postUrl, method='POST', postdata=self.postData)
+		self.parseStreams(data)
 
 	def parseStreams(self, data):
 		self.streamListe = []
@@ -709,7 +693,7 @@ class streamitStreams(MPScreen):
 			desc += "Keine weiteren Info's !"
 
 		self['handlung'].setText(decodeHtml(desc))
-		CoverHelper(self['coverArt']).getCover(self.imageUrl, agent=sit_agent, cookieJar=sit_cookies)
+		CoverHelper(self['coverArt']).getCover(self.imageUrl, agent=sit_agent, cookieJar=sit_cookies, req=True)
 
 		if not seriesStreams:
 			self.parseStreams(data)
@@ -746,7 +730,8 @@ class streamitStreams(MPScreen):
 		if self.keyLocked:
 			return
 		streamLink = self['liste'].getCurrent()[0][1]
-		twAgentGetPage(streamLink, cookieJar=sit_cookies, agent=sit_agent).addCallback(self.getUrl).addErrback(self.dataError)
+		data = sit_grabpage(streamLink)
+		self.getUrl(data)
 
 	def getUrl(self,data):
 		try:

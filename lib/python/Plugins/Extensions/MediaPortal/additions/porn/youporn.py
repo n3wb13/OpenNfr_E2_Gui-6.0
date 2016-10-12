@@ -342,7 +342,7 @@ class youpornChannelScreen(MPScreen, ThumbsHelper):
 		twAgentGetPage(url, agent=ypAgent, cookieJar=ck).addCallback(self.genreData).addErrback(self.dataError)
 
 	def genreData(self, data):
-		self.getLastPage(data, 'id="pagination">(.*?)</ul>', '.*>\s+(\d+)\s+<')
+		self.getLastPage(data, 'id="pagination">(.*?)</ul>', '.*>(\d+)<')
 		Cats = re.findall('channel-box-image.*?<img\ssrc="(.*?)".*?channel-box-title">.*?href="(.*?)">(.*?)</', data, re.S)
 		if Cats:
 			for (Image, Url, Title) in Cats:
@@ -422,18 +422,18 @@ class youpornFilmScreen(MPScreen, ThumbsHelper):
 		twAgentGetPage(url, agent=ypAgent, cookieJar=ck).addCallback(self.loadData).addErrback(self.dataError)
 
 	def loadData(self, data):
-		self.getLastPage(data, 'id="pagination">(.*?)</ul>', '.*>\s+(\d+)\s+<')
-		parse = re.search('My Favorited Videos(.*?)ADVERTISEMENT', data, re.S)
+		self.getLastPage(data, 'id="pagination">(.*?)</ul>', '.*>(\d+)<')
+		parse = re.search('My Favorited Videos(.*?)class=\'ad-bottom-text', data, re.S)
 		if not parse:
-			parse = re.search('eight-column\'>Videos from(.*?)ADVERTISEMENT', data, re.S)
+			parse = re.search('eight-column\sheading4\'>Videos from(.*?)class=\'ad-bottom-text', data, re.S)
 			if not parse:
 				parse = re.search('class=\'ad-bottom-text\'>(.*?)class=\'footer', data, re.S)
 				if not parse:
 					parse = re.search('class=\'container\'>(.*?)search-suggestions', data, re.S)
 		if parse:
-			Movies = re.findall('class=\'video-box.*?<a\shref="(.*?)".*?<img\ssrc=".*?"\salt=\'(.*?)\'.*?data-(thumbnail|echo)="(.*?)".*?class=\'video-box-percentage\sup\'>(.*?)</span>.*?class="video-box-duration">(.*?)</span>', parse.group(1), re.S)
+			Movies = re.findall('class=\'video-box.*?<a\shref="(.*?)".*?<img\ssrc=".*?"\salt=\'(.*?)\'.*?data-(?:thumbnail|echo)="(.*?)".*?class=\'video-box-percentage\sup\'>(.*?)</span>.*?class="video-box-duration">(.*?)</span>', parse.group(1), re.S)
 			if Movies:
-				for (Url, Title, dummy, Image, Rating, Runtime) in Movies:
+				for (Url, Title, Image, Rating, Runtime) in Movies:
 					Url = Url.replace("&amp;","&")
 					self.filmliste.append((decodeHtml(Title), Url, Image, Runtime.strip(), Rating.strip()))
 		if len(self.filmliste) == 0:

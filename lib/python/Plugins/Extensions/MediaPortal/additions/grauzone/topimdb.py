@@ -65,16 +65,14 @@ class timdbGenreScreen(MPScreen):
 		self.start = (self.page * 50) - 49
 
 		url = "http://www.imdb.de/search/title?groups=top_1000&sort=user_rating,desc&start=%s" % str(self.start)
-		print url
 		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded', 'User-agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0', 'Accept-Language':'de-de,de;q=0.8,en-us;q=0.5,en;q=0.3'}).addCallback(self.parseData).addErrback(self.dataError)
 
 	def parseData(self, data):
-		movies = re.findall('<td class="number">(.*?)</td>.*?<img src="(.*?)".*?<a href="/title/.*?">(.*?)</a>.*?<span class="year_type">(.*?)</span><br>.*?<div class="rating rating-list".*?title="Users rated this (.*?\/)', data, re.S)
+		movies = re.findall('class="lister-item.*?<img\salt="(.*?)".*?loadlate="(.*?\.jpg)".*?class="lister-item-index.*?>(.*?)\.</span>.*?class="lister-item-year.*?>\((\d+)\)</span.*?title="Users rated this (.*?\/10)', data, re.S)
 		if movies:
-			for place,image,title,year,rates in movies:
-				rates = "%s10" % rates
-				image_raw = image.split('@@')
-				image = "%s@@._V1_SX214_.jpg" % image_raw[0]
+			for title,image,place,year,rates in movies:
+				image_raw = image.split('._V1_')
+				image = "%s._V1_SX214_.jpg" % image_raw[0]
 				self.filmliste.append((place, decodeHtml(title), year, rates, image))
 				self.ml.setList(map(self.timdbEntry, self.filmliste))
 			self.showInfos()
@@ -89,7 +87,6 @@ class timdbGenreScreen(MPScreen):
 		if self.keyLocked:
 			return
 		self.searchTitle = self['liste'].getCurrent()[0][1]
-		print self.searchTitle
 
 	def kinoxSearch(self):
 		self.searchTitle = self['liste'].getCurrent()[0][1]

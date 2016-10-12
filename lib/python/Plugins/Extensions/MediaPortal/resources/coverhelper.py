@@ -15,6 +15,7 @@ from cookielib import CookieJar
 glob_icon_num = 0
 glob_last_cover = [None, None]
 cookies = CookieJar()
+
 class CoverHelper:
 
 	COVER_PIC_PATH = "/tmp/.Icon%d.jpg"
@@ -46,7 +47,7 @@ class CoverHelper:
 		else:
 			return data
 
-	def getCover(self, url, download_cb=None, agent=None, cookieJar=None):
+	def getCover(self, url, download_cb=None, agent=None, cookieJar=None, req=False):
 		global glob_icon_num
 		global glob_last_cover
 		global cookies
@@ -62,11 +63,29 @@ class CoverHelper:
 					glob_last_cover[0] = url
 					glob_last_cover[1] = None
 					self.downloadPath = self.COVER_PIC_PATH % glob_icon_num
-					d = self.downloadPage(url, self.downloadPath, agent=agent)
-					d.addCallback(self.showCover)
-					if download_cb:
-						d.addCallback(self.cb_getCover, download_cb)
-					d.addErrback(self.dataErrorP)
+					if req:
+						try:
+							import requests
+							headers = {'User-Agent': agent}
+							response = requests.get(url, stream=True, cookies=cookies, headers=headers)
+							with open(self.downloadPath, 'wb') as out_file:
+								shutil.copyfileobj(response.raw, out_file)
+							self.showCover(self.downloadPath)
+							if download_cb:
+								self.cb_getCover(self.downloadPath, download_cb)
+						except:
+							printl("Fallback cover download",self,'A')
+							d = self.downloadPage(url, self.downloadPath, agent=agent)
+							d.addCallback(self.showCover)
+							if download_cb:
+								d.addCallback(self.cb_getCover, download_cb)
+							d.addErrback(self.dataErrorP)
+					else:
+						d = self.downloadPage(url, self.downloadPath, agent=agent)
+						d.addCallback(self.showCover)
+						if download_cb:
+							d.addCallback(self.cb_getCover, download_cb)
+						d.addErrback(self.dataErrorP)
 			elif url.startswith('file://'):
 				self.showCoverFile(url[7:])
 				if download_cb:

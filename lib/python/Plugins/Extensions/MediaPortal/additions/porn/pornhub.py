@@ -101,14 +101,14 @@ class pornhubGenreScreen(MPScreen):
 		getPage(url, agent=phAgent).addCallback(self.Login2).addErrback(self.dataError)
 
 	def Login2(self, data):
-		parse = re.findall('name="redirect"\svalue="(.*?)".*?login_key"\svalue="(.*?)".*?login_hash"\svalue="(.*?)"', data, re.S)
+		parse = re.findall('name="redirect"\svalue="(.*?)".*?id="token"\svalue="(.*?)"', data, re.S)
 		if parse:
-			loginUrl = "http://www.pornhub.com/front/login_json"
+			loginUrl = "http://www.pornhub.com/front/authenticate"
 			loginData = {
 				'redirect' : str(parse[0][0]),
-				'login_key' : str(parse[0][1]),
-				'login_hash' : str(parse[0][2]),
+				'token' : str(parse[0][1]),
 				'remember_me' : '1',
+				'from' : 'pc_login_modal_:index',
 				'username' : self.username,
 				'password' : self.password
 				}
@@ -868,6 +868,7 @@ class pornhubFilmScreen(MPScreen, ThumbsHelper):
 			"prevBouquet" : self.keyPageDown,
 			"red" : self.keySubscribe,
 			"green" : self.keyPageNumber,
+			"yellow" : self.keyRelated,
 			"blue" : self.keyFavourite
 		}, -1)
 
@@ -877,9 +878,10 @@ class pornhubFilmScreen(MPScreen, ThumbsHelper):
 
 		self['Page'] = Label(_("Page:"))
 		self.keyLocked = True
+		self.lock = False
 		self.page = 1
 		self.lastpage = 999
-		self.count = 0
+		self.count = None
 		self.reload = False
 		self.favourited = ""
 		self.suburl = ""
@@ -929,7 +931,11 @@ class pornhubFilmScreen(MPScreen, ThumbsHelper):
 					if self.lastpage == 1:
 						self['page'].setText('1 / 1')
 					else:
-						self.getLastPage(data, 'class="pagination3">(.*?)</div>')
+						if self.Name == "Related":
+							self.lastpage = 6
+							self['page'].setText(str(self.page) + ' / ' + str(self.lastpage))
+						else:
+							self.getLastPage(data, 'class="pagination3">(.*?)</div>')
 		parse = re.search('class="nf-videos(.*?)class="pagination3">', data, re.S)
 		if not parse:
 			parse = re.search('class="videos\srow-5-thumbs(.*?)id="cmtWrapper">', data, re.S)
@@ -938,7 +944,10 @@ class pornhubFilmScreen(MPScreen, ThumbsHelper):
 				if not parse:
 					parse = re.search('class="videos\srecommendedContainerLoseOne(.*?)class="pagination3">', data, re.S)
 					if not parse:
-						parse = re.search('class="profileVids">(.*)', data, re.S)
+						parse = re.search('class="profileVids">(.*?)class="profileContentRight', data, re.S)
+						if not parse:
+							parse = re.search('id="lrelateRecommendedItems"(.*?)</ul>', data, re.S)
+
 		if parse:
 			Movies = re.findall('class="videoblock.*?<a\shref="(.*?)".*?title="(.*?)".*?class="duration">(.*?)</var>.*?data-mediumthumb="(.*?)".*?<span\sclass="views"><var>(.*?)<.*?<var\sclass="added">(.*?)</var>', parse.group(1), re.S)
 		if Movies:
@@ -986,6 +995,10 @@ class pornhubFilmScreen(MPScreen, ThumbsHelper):
 		if phLoggedIn:
 			self.url = self['liste'].getCurrent()[0][1]
 			if self.url:
+				self.lock = True
+				self['F1'].setText('')
+				self['F3'].setText('')
+				self['F4'].setText('')
 				twAgentGetPage(self.url, agent=phAgent, cookieJar=ck).addCallback(self.showInfos2).addErrback(self.dataError)
 
 	def showInfos2(self, data):
@@ -1036,6 +1049,11 @@ class pornhubFilmScreen(MPScreen, ThumbsHelper):
 		else:
 			favmsg = ""
 			self['F4'].setText("")
+		if not self.id == '':
+			self['F3'].setText(_("Show Related"))
+		else:
+			self['F3'].setText("")
+		self.lock = False
 		self['handlung'].setText("Runtime: %s\nViews: %s\nAdded: %s%s%s" % (runtime, views, added, submsg, favmsg))
 
 	def keyOK(self):
@@ -1047,6 +1065,8 @@ class pornhubFilmScreen(MPScreen, ThumbsHelper):
 
 	def keyFavourite(self):
 		if self.keyLocked:
+			return
+		if self.lock:
 			return
 		if phLoggedIn:
 			FavUrl = "http://www.pornhub.com/video/favourite"
@@ -1068,8 +1088,21 @@ class pornhubFilmScreen(MPScreen, ThumbsHelper):
 			else:
 				self.showInfos()
 
+	def keyRelated(self):
+		if self.keyLocked:
+			return
+		if self.lock:
+			return
+		if self.id == '':
+			return
+		if phLoggedIn:
+			RelatedUrl = "http://www.pornhub.com/video/relateds?ajax=1&id=%s&num_per_page=10&page=" % self.id
+			self.session.open(pornhubFilmScreen, RelatedUrl, "Related")
+
 	def keySubscribe(self):
 		if self.keyLocked:
+			return
+		if self.lock:
 			return
 		if phLoggedIn:
 			if self.subscribed == "1":
