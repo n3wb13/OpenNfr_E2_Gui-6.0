@@ -92,10 +92,6 @@ if [ "$(grep config.crash.enabledebug /etc/enigma2/settings)" == "config.crash.e
 		LD_PRELOAD=$LIBS @bindir@/enigma2 &> /home/root/logs/Enigma2-$(date +%d-%m-%Y_%H-%M-%S).log
 	fi
 else
-	# in case $TERM is "linux" the serial output is activated - discard debug output
-	if [ "$TERM" = linux ]; then
-		LD_PRELOAD=$LIBS @bindir@/enigma2 2> /dev/null
-	else
 		LD_PRELOAD=$LIBS @bindir@/enigma2
 	fi
 fi
