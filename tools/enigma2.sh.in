@@ -94,7 +94,6 @@ if [ "$(grep config.crash.enabledebug /etc/enigma2/settings)" == "config.crash.e
 else
 		LD_PRELOAD=$LIBS @bindir@/enigma2
 	fi
-fi
 
 # enigma2 exit codes:
 #
