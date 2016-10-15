@@ -65,11 +65,14 @@ BASE_URL = 'http://hdfilme.tv'
 
 def hf_grabpage(pageurl):
 	if requestsModule:
-		s = requests.session()
-		url = urlparse.urlparse(pageurl)
-		headers = {'User-Agent': hf_agent}
-		page = s.get(url.geturl(), cookies=hf_cookies, headers=headers)
-		return page.content
+		try:
+			s = requests.session()
+			url = urlparse.urlparse(pageurl)
+			headers = {'User-Agent': hf_agent}
+			page = s.get(url.geturl(), cookies=hf_cookies, headers=headers)
+			return page.content
+		except:
+			pass
 
 class hdfilmeMain(MPScreen):
 

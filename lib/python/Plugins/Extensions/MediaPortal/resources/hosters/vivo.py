@@ -6,7 +6,7 @@ def vivo(self, data, url):
 	p1 = re.search('type="hidden" name="hash".*?value="(.*?)"', data)
 	p2 = re.search('type="hidden" name="timestamp".*?value="(.*?)"', data)
 	if p1 and p2:
-		if mp_globals.isDreamOS:
+		if mp_globals.isDreamOS or not mp_globals.requests:
 			post = urllib.urlencode({'hash': p1.group(1), 'timestamp': p2.group(1)})
 			twAgentGetPage(url, method='POST', postdata=post, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.vivoPostData).addErrback(self.errorload)
 		else:

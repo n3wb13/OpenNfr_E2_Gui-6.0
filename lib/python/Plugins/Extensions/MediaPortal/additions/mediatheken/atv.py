@@ -84,10 +84,9 @@ class atvGenreScreen(MPScreen, ThumbsHelper):
 		if parse:
 			raw = re.findall('href="(.*?)">.*?src="(.*?)"\salt="(.*?)"', parse.group(), re.S)
 			if raw:
-				for ( Content, Image, Title) in raw:
-					print Title
-					if Title != "ATV Aktuell Österreich Trend":
-						self.filmliste.append((decodeHtml(Title), Content, Image))
+				for (Url, Image, Title) in raw:
+					Image = Image.replace('&amp;','&')
+					self.filmliste.append((decodeHtml(Title), Url, Image))
 				self.ml.setList(map(self._defaultlistcenter, self.filmliste))
 				self.keyLocked = False
 				self.th_ThumbsQuery(self.filmliste, 0, 1, 2, None, None, 1, 1, mode=1)
@@ -155,9 +154,9 @@ class atvListScreen(MPScreen, ThumbsHelper):
 			if handlung:
 				self.handlung = handlung.group(1)
 		if parse:
-			raw = re.findall('<li class="teaser">.*?href="(.*?)".*?teaser_image_file(/|\%252F)(.*?jpg).*?class="title">(.*?)<', parse.group(), re.S)
+			raw = re.findall('<li class="teaser">.*?href="(.*?)".*?teaser_image_file(?:/|\%252F)(.*?jpg).*?class="title">(.*?)<', parse.group(), re.S)
 			if raw:
-				for (Url, x, Image, Title) in raw:
+				for (Url, Image, Title) in raw:
 					Image = 'http://atv.at/static/assets/cms/media_items/teaser_image_file/%s' % Image
 					self.filmliste.append((decodeHtml(Title), Url, Image))
 		nextpage = re.search('data-jsb="url=(.*?)" style=.*?Weitere Folgen', data, re.S)
@@ -184,6 +183,7 @@ class atvListScreen(MPScreen, ThumbsHelper):
 		if self.keyLocked:
 			return
 		Link = self['liste'].getCurrent()[0][1]
+		self.keyLocked = True
 		getPage(Link).addCallback(self.getStreamLink).addErrback(self.dataError)
 
 	def getStreamLink(self, data):
@@ -192,11 +192,16 @@ class atvListScreen(MPScreen, ThumbsHelper):
 		part = re.search('jsb_video/VideoPlaylist(.*?)/detail_content', data, re.S)
 		if part:
 			raw = re.findall('quot;(rtsp:\\\/\\\/109.68.230.208:1935\\\/vod\\\/_definst_\\\/.*?.mp4)', part.group(1), re.S)
+			if not raw:
+				raw = re.findall('quot;(http:\\\/\\\/(?:blocked.|)multiscreen.atv.cdn.tvnext.tv\\\/\d+\\\/\d+\\\/SD\\\/hbbtv\\\/\d+(?:_\d|).mp4)', part.group(1), re.S)
+				if not raw:
+					raw = re.findall('quot;(http:\\\/\\\/(?:blocked.|)multiscreen.atv.cdn.tvnext.tv\\\/\d+\\\/\d+\\\/SD\\\/\d+(?:_\d|).m3u8)', part.group(1), re.S)
 			if raw:
 				for Link in raw:
-					Link = Link.replace('\/','/')
+					Link = Link.replace('\/','/').replace('blocked.','')
 					Streampart = "Teil %s" % str(len(Linkliste)+1)
 					Linkliste.append((Streampart, Link))
+		self.keyLocked = False
 		if len(Linkliste) == 1:
 			self.session.open(SimplePlayer, [(Name, Linkliste[0][1])], showPlaylist=False, ltype='atv')
 		elif len(Linkliste) >= 1:

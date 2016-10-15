@@ -63,7 +63,7 @@ class CoverHelper:
 					glob_last_cover[0] = url
 					glob_last_cover[1] = None
 					self.downloadPath = self.COVER_PIC_PATH % glob_icon_num
-					if req:
+					if req and mp_globals.requests:
 						try:
 							import requests
 							headers = {'User-Agent': agent}

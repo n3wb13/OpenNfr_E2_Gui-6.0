@@ -100,7 +100,7 @@ class TunnelingAgent(Agent):
 		self._proxyConf = proxyConf
 		self._contextFactory = contextFactory
 
-	if __TW_VER__ >= (15, 0, 0):
+	if __TW_VER__ >= [15, 0, 0]:
 		def _getEndpoint(self, uri):
 			return TunnelingTCP4ClientEndpoint(
 				self._reactor, uri.host, uri.port, self._proxyConf,
@@ -339,7 +339,7 @@ class TwAgent(object):
 		def _cancel(_):
 			d_print('_cancel()')
 			#txresponse._transport._producer.loseConnection()
-			if __TW_VER__ >= (11, 1, 0):
+			if __TW_VER__ >= [11, 1, 0]:
 				txresponse._transport._producer.abortConnection()
 			else:
 				txresponse._transport._producer.loseConnection()

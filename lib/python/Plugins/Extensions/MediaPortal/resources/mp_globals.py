@@ -28,6 +28,7 @@ sizefactor = 1
 hls_proxy_port = 0
 ThumbViewTextForeground = '#00ffffff'
 bsp = None
+requests = False
 
 std_headers = {
 	'User-Agent': 'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.6) Gecko/20100627 Firefox/3.6.6',

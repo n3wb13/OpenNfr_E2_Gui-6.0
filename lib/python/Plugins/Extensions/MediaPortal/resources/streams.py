@@ -136,14 +136,17 @@ class get_stream_link:
 
 	def grabpage(self, pageurl, method='GET', postdata={}):
 		if requestsModule:
-			import urlparse
-			s = requests.session()
-			url = urlparse.urlparse(pageurl)
-			if method == 'GET':
-				page = s.get(url.geturl())
-			elif method == 'POST':
-				page = s.post(url.geturl(), data=postdata)
-			return page.content
+			try:
+				import urlparse
+				s = requests.session()
+				url = urlparse.urlparse(pageurl)
+				if method == 'GET':
+					page = s.get(url.geturl())
+				elif method == 'POST':
+					page = s.post(url.geturl(), data=postdata)
+				return page.content
+			except:
+				return "error"
 		else:
 			return "error"
 

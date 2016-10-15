@@ -38,8 +38,30 @@
 
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
+from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage
 
-BASEURL = 'http://filmpalast.to'
+BASEURL = 'https://filmpalast.to'
+
+try:
+	import requests
+except:
+	requestsModule = False
+else:
+	requestsModule = True
+
+def fp_grabpage(pageurl, method='GET', postdata={}, headers={}):
+	if requestsModule:
+		try:
+			import urlparse
+			s = requests.session()
+			url = urlparse.urlparse(pageurl)
+			if method == 'GET':
+				page = s.get(url.geturl())
+			elif method == 'POST':
+				page = s.post(url.geturl(), data=postdata, headers=headers)
+			return page.content
+		except:
+			pass
 
 class filmPalastMain(MPScreen):
 
@@ -169,7 +191,11 @@ class filmPalastSerieParsing(MPScreen, ThumbsHelper):
 
 	def loadPage(self):
 		self.streamList = []
-		getPage(self.url).addCallback(self.parseData).addErrback(self.dataError)
+		if not mp_globals.requests:
+			twAgentGetPage(self.url).addCallback(self.parseData).addErrback(self.dataError)
+		else:
+			data = fp_grabpage(self.url)
+			self.parseData(data)
 
 	def parseData(self, data):
 		raw = re.findall('<section id="serien">(.*?)</section>', data, re.S)
@@ -191,7 +217,7 @@ class filmPalastSerieParsing(MPScreen, ThumbsHelper):
 		self['name'].setText(filmName)
 		url = self['liste'].getCurrent()[0][1]
 		coverUrl = url.replace('%smovies/view/' % BASEURL, '%s/files/movies/450/' % BASEURL) + '.jpg'
-		CoverHelper(self['coverArt']).getCover(coverUrl)
+		CoverHelper(self['coverArt']).getCover(coverUrl, req=True)
 
 	def keyOK(self):
 		exist = self['liste'].getCurrent()
@@ -240,7 +266,11 @@ class filmPalastEpisodenParsing(MPScreen, ThumbsHelper):
 
 	def loadPage(self):
 		self.streamList = []
-		getPage(self.url).addCallback(self.parseData).addErrback(self.dataError)
+		if not mp_globals.requests:
+			twAgentGetPage(self.url).addCallback(self.parseData).addErrback(self.dataError)
+		else:
+			data = fp_grabpage(self.url)
+			self.parseData(data)
 
 	def parseData(self, data):
 		episoden = re.findall('<a id="staffId_" href="(%s/movies/view/.*?)" class="getStaffelStream".*?</i>(.*?)&' % BASEURL, data, re.S)
@@ -261,7 +291,7 @@ class filmPalastEpisodenParsing(MPScreen, ThumbsHelper):
 		filmName = self['liste'].getCurrent()[0][0]
 		self['name'].setText(filmName)
 		coverUrl = self['liste'].getCurrent()[0][2]
-		CoverHelper(self['coverArt']).getCover(coverUrl)
+		CoverHelper(self['coverArt']).getCover(coverUrl, req=True)
 
 	def keyOK(self):
 		exist = self['liste'].getCurrent()
@@ -318,7 +348,11 @@ class filmPalastParsing(MPScreen, ThumbsHelper):
 	def loadPage(self):
 		self.streamList = []
 		url = self.url+str(self.page)
-		getPage(url).addCallback(self.parseData).addErrback(self.dataError)
+		if not mp_globals.requests:
+			twAgentGetPage(url).addCallback(self.parseData).addErrback(self.dataError)
+		else:
+			data = fp_grabpage(url)
+			self.parseData(data)
 
 	def parseData(self, data):
 		self.getLastPage(data, 'id="paging">(.*?)</div>')
@@ -339,7 +373,7 @@ class filmPalastParsing(MPScreen, ThumbsHelper):
 		filmName = self['liste'].getCurrent()[0][0]
 		self['name'].setText(filmName)
 		coverUrl = self['liste'].getCurrent()[0][2]
-		CoverHelper(self['coverArt']).getCover(coverUrl)
+		CoverHelper(self['coverArt']).getCover(coverUrl, req=True)
 
 	def keyOK(self):
 		exist = self['liste'].getCurrent()
@@ -385,7 +419,11 @@ class filmPalastStreams(MPScreen):
 
 	def loadPage(self):
 		self.streamList = []
-		getPage(self.url).addCallback(self.parseData).addErrback(self.dataError)
+		if not mp_globals.requests:
+			twAgentGetPage(self.url).addCallback(self.parseData).addErrback(self.dataError)
+		else:
+			data = fp_grabpage(self.url)
+			self.parseData(data)
 
 	def parseData(self, data):
 		self.streamList = []
@@ -395,9 +433,9 @@ class filmPalastStreams(MPScreen):
 					if isSupportedHoster(Hoster, True):
 						self.streamList.append((Hoster, UrlID))
 		if len(self.streamList) == 0:
-			self.streamList.append((_('No supported streams found!', ''), None))
+			self.streamList.append((_('No supported streams found!'), None))
 		self.ml.setList(map(self._defaultlisthoster, self.streamList))
-		CoverHelper(self['coverArt']).getCover(self.cover)
+		CoverHelper(self['coverArt']).getCover(self.cover, req=True)
 		self.keyLocked = False
 
 	def keyOK(self):
@@ -408,7 +446,11 @@ class filmPalastStreams(MPScreen):
 		if urlId:
 			url = "%s/stream/%s/1" % (BASEURL, urlId)
 			IDdata = {'streamID': urlId}
-			getPage(url, method='POST', postdata=urlencode(IDdata), headers={'Accept':'*/*', 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest'}).addCallback(self.get_stream).addErrback(self.dataError)
+			if not mp_globals.requests:
+				twAgentGetPage(url, method='POST', postdata=urlencode(IDdata), headers={'Accept':'*/*', 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest'}).addCallback(self.get_stream).addErrback(self.dataError)
+			else:
+				data = fp_grabpage(url, method='POST', postdata=IDdata, headers={'Accept':'*/*', 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest'})
+				self.get_stream(data)
 
 	def get_stream(self, data):
 		streams = re.search('"url":"(.*?)"', data, re.S)

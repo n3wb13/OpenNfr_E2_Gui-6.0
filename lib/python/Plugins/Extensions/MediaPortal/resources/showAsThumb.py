@@ -704,7 +704,7 @@ class ShowThumbscreen(MPScreen):
 		if not image:
 			return ('no_cover')
 		else:
-			if self.req:
+			if self.req and mp_globals.requests:
 				try:
 					import requests
 					requests.cookies.cookiejar_from_dict(thumb_ck, cookiejar=thumb_cookies)

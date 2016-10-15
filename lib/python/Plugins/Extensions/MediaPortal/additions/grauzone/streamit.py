@@ -43,14 +43,17 @@ sit_agent = ''
 
 def sit_grabpage(pageurl, method='GET', postdata={}):
 	if requestsModule:
-		s = requests.session()
-		url = urlparse.urlparse(pageurl)
-		headers = {'User-Agent': sit_agent}
-		if method == 'GET':
-			page = s.get(url.geturl(), cookies=sit_cookies, headers=headers)
-		elif method == 'POST':
-			page = s.post(url.geturl(), data=postdata, cookies=sit_cookies, headers=headers)
-		return page.content
+		try:
+			s = requests.session()
+			url = urlparse.urlparse(pageurl)
+			headers = {'User-Agent': sit_agent}
+			if method == 'GET':
+				page = s.get(url.geturl(), cookies=sit_cookies, headers=headers)
+			elif method == 'POST':
+				page = s.post(url.geturl(), data=postdata, cookies=sit_cookies, headers=headers)
+			return page.content
+		except:
+			pass
 
 class showstreamitGenre(MenuHelper):
 

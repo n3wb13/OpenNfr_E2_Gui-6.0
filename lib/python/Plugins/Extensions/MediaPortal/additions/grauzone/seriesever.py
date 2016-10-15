@@ -546,10 +546,33 @@ class showStreams(MPScreen):
 		try:
 			data = json.loads(data)
 			code = data['part']['code'].replace("!BeF","R").replace("@jkp","Ax")
-			import base64
-			stream_url = base64.b64decode(code)
-			get_stream_link(self.session).check_link(stream_url, self.got_link)
+			if 'http' in code:
+				print code
+				url = re.findall('src="(.*?)"', code)
+				if url:
+					print url
+					if 'openload' in url[0]:
+						get_stream_link(self.session).check_link(str(url[0]), self.got_link)
+					elif 'everplay.watchpass.net' in url[0]:
+						getPage(str(url[0]), agent=glob_agent, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseStream).addErrback(self.dataError)
+					else:
+						self.session.open(MessageBoxExt, _("Stream not found, try another Stream Hoster."), MessageBoxExt.TYPE_INFO, timeout=5)
+				else:
+					self.session.open(MessageBoxExt, _("Stream not found, try another Stream Hoster."), MessageBoxExt.TYPE_INFO, timeout=5)
+			else:
+				import base64
+				stream_url = base64.b64decode(code)
+				print stream_url
+				get_stream_link(self.session).check_link(stream_url, self.got_link)
 		except:
+			self.session.open(MessageBoxExt, _("Stream not found, try another Stream Hoster."), MessageBoxExt.TYPE_INFO, timeout=5)
+
+	def parseStream(self, data):
+		print data
+		stream_url = re.findall('file:\s"(.*?)"', data)
+		if stream_url:
+			self.got_link(stream_url[0])
+		else:
 			self.session.open(MessageBoxExt, _("Stream not found, try another Stream Hoster."), MessageBoxExt.TYPE_INFO, timeout=5)
 
 	def got_link(self, stream_url):

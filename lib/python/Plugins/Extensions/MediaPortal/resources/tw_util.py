@@ -1,13 +1,34 @@
 
 from twisted import __version__
-__TW_VER__ = tuple([int(x) for x in __version__.split('.')])
+tmp = tuple([x for x in __version__.split('.')])
+__TW_VER__ = []
+for x in tmp:
+	__TW_VER__.append(int(''.join([i for i in x if i.isdigit()])))
+del tmp
 
-if __TW_VER__ > (13, 0, 0):
+import mp_globals
+import sys
+try:
+	from enigma import eMediaDatabase
+	mp_globals.isDreamOS = True
+except:
+	mp_globals.isDreamOS = False
+if __TW_VER__ >= [14, 0, 0]:
+	if mp_globals.isDreamOS:
+		mp_globals.requests = False
+	elif sys.version_info[:3] >= (2,7,9):
+		mp_globals.requests = False
+	else:
+		mp_globals.requests = True
+else:
+	mp_globals.requests = True
+
+if __TW_VER__ > [13, 0, 0]:
 	from twisted.web import client
 	from twisted.internet import endpoints
 	from twisted.web.iweb import IBodyProducer
 
-elif __TW_VER__ >= (11, 1, 0):
+elif __TW_VER__ >= [11, 1, 0]:
 	import tx
 	from tx import client
 	from tx import endpoints
@@ -36,10 +57,10 @@ except ImportError:
 		return result.encode("charmap")
 
 try:
-    # available since twisted 14.0
-    from twisted.internet._sslverify import ClientTLSOptions
+	# available since twisted 14.0
+	from twisted.internet._sslverify import ClientTLSOptions
 except ImportError:
-    ClientTLSOptions = None
+	ClientTLSOptions = None
 
 from Components.config import config
 

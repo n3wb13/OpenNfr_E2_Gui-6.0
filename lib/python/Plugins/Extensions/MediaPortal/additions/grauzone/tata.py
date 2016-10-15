@@ -63,11 +63,14 @@ BASE_URL = 'http://www.tata.to'
 
 def tat_grabpage(pageurl):
 	if requestsModule:
-		s = requests.session()
-		url = urlparse.urlparse(pageurl)
-		headers = {'User-Agent': tat_agent}
-		page = s.get(url.geturl(), cookies=tat_cookies, headers=headers)
-		return page.content
+		try:
+			s = requests.session()
+			url = urlparse.urlparse(pageurl)
+			headers = {'User-Agent': tat_agent}
+			page = s.get(url.geturl(), cookies=tat_cookies, headers=headers)
+			return page.content
+		except:
+			pass
 
 class tataMain(MPScreen):
 
@@ -251,9 +254,9 @@ class tataParsing(MPScreen):
 		url = self['liste'].getCurrent()[0][1]
 		cover = self['liste'].getCurrent()[0][2]
 		data = tat_grabpage(url)
-		stream = re.findall('class="video-blk".*?data-url="(.*?)"', data, re.S)
+		stream = re.findall('class="video-blk".*?data-url=(?:\'\[|)"(.*?)"', data, re.S)
 		if stream:
-			url = stream[0].replace('https://','http://')
+			url = stream[0].replace('\/','/').replace('https://','http://')
 			self.session.open(SimplePlayer, [(title, url, cover)], showPlaylist=False, ltype='tata', cover=True)
 		else:
 			self.session.open(MessageBoxExt, _("Sorry, can't extract a stream url."), MessageBoxExt.TYPE_INFO, timeout=5)

@@ -64,11 +64,14 @@ ss_agent = ''
 
 def ss_grabpage(pageurl):
 	if requestsModule:
-		s = requests.session()
-		url = urlparse.urlparse(pageurl)
-		headers = {'User-Agent': ss_agent}
-		page = s.get(url.geturl(), cookies=ss_cookies, headers=headers)
-		return page.content
+		try:
+			s = requests.session()
+			url = urlparse.urlparse(pageurl)
+			headers = {'User-Agent': ss_agent}
+			page = s.get(url.geturl(), cookies=ss_cookies, headers=headers)
+			return page.content
+		except:
+			pass
 
 class ssMain(MPScreen):
 
@@ -201,7 +204,7 @@ class ssSerien(MPScreen, SearchHelper):
 
 	def loadPage(self):
 		url = BASE_URL + "/serien"
-		if mp_globals.isDreamOS:
+		if not mp_globals.requests:
 			twAgentGetPage(url, agent=ss_agent, cookieJar=ss_cookies).addCallback(self.parseData).addErrback(self.dataError)
 		else:
 			data = ss_grabpage(url)
@@ -232,7 +235,7 @@ class ssSerien(MPScreen, SearchHelper):
 
 	def getCover(self):
 		url = self['liste'].getCurrent()[0][1]
-		if mp_globals.isDreamOS:
+		if not mp_globals.requests:
 			twAgentGetPage(url, agent=ss_agent, cookieJar=ss_cookies).addCallback(self.setCoverUrl).addErrback(self.dataError)
 		else:
 			data = ss_grabpage(url)
@@ -306,7 +309,7 @@ class ssNeueEpisoden(MPScreen):
 	def loadPage(self):
 		self.streamList = []
 		url = BASE_URL
-		if mp_globals.isDreamOS:
+		if not mp_globals.requests:
 			twAgentGetPage(url, agent=ss_agent, cookieJar=ss_cookies).addCallback(self.parseData).addErrback(self.dataError)
 		else:
 			data = ss_grabpage(url)
@@ -352,7 +355,7 @@ class ssNeueEpisoden(MPScreen):
 
 	def getCover(self):
 		url = self['liste'].getCurrent()[0][1]
-		if mp_globals.isDreamOS:
+		if not mp_globals.requests:
 			twAgentGetPage(url, agent=ss_agent, cookieJar=ss_cookies).addCallback(self.setCoverUrl).addErrback(self.dataError)
 		else:
 			data = ss_grabpage(url)
@@ -437,7 +440,7 @@ class ssWatchlist(MPScreen):
 
 	def getCover(self):
 		url = self['liste'].getCurrent()[0][1]
-		if mp_globals.isDreamOS:
+		if not mp_globals.requests:
 			twAgentGetPage(url, agent=ss_agent, cookieJar=ss_cookies).addCallback(self.setCoverUrl).addErrback(self.dataError)
 		else:
 			data = ss_grabpage(url)
@@ -511,7 +514,7 @@ class ssStaffeln(MPScreen):
 		self.onLayoutFinish.append(self.loadPage)
 
 	def loadPage(self):
-		if mp_globals.isDreamOS:
+		if not mp_globals.requests:
 			twAgentGetPage(self.Url, agent=ss_agent, cookieJar=ss_cookies).addCallback(self.parseData).addErrback(self.dataError)
 		else:
 			data = ss_grabpage(self.Url)
@@ -587,7 +590,7 @@ class ssEpisoden(MPScreen):
 
 	def loadPage(self):
 		self.streamList = []
-		if mp_globals.isDreamOS:
+		if not mp_globals.requests:
 			twAgentGetPage(self.Url, agent=ss_agent, cookieJar=ss_cookies).addCallback(self.parseData).addErrback(self.dataError)
 		else:
 			data = ss_grabpage(self.Url)
@@ -689,7 +692,7 @@ class ssStreams(MPScreen):
 		self.onLayoutFinish.append(self.loadPage)
 
 	def loadPage(self):
-		if mp_globals.isDreamOS:
+		if not mp_globals.requests:
 			twAgentGetPage(self.serienUrl, agent=ss_agent, cookieJar=ss_cookies).addCallback(self.parseData).addErrback(self.dataError)
 		else:
 			data = ss_grabpage(self.serienUrl)
