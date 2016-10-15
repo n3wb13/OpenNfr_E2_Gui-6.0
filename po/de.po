@@ -12405,14 +12405,20 @@ msgstr "Aus-Taste"
 msgid "Power long"
 msgstr "Aus-Taste lang"
 
-msgid "F1/LAN long"
-msgstr "F1/LAN lang"
+msgid "F1 long"
+msgstr "F1 lang"
 
 msgid "F2 long"
 msgstr "F2 lang"
 
 msgid "F3 long"
 msgstr "F3 lang"
+
+msgid "F11/Context long"
+msgstr "F11/Context lang"
+
+msgid "Search/WEB long"
+msgstr "Suche/WEB lang"
 
 msgid "LED Display Setup"
 msgstr "LED Boxdisplay Einstellungen"
@@ -13092,3 +13098,108 @@ msgstr "Wähle das CI Protokoll für CI Normal oder CIPlus Module."
 
 msgid "Your Hardware can detect ci mode self or work only in legacy mode."
 msgstr "Hardware erkennt das CI Protokoll selber oder Hardware arbeitet nur im Legacy Mode."
+
+msgid "NFR4XBoot is still installed!\nNow removing NFR4XBoot and reboot the box. After reboot FlashLocal is available.\nYour installed images are not deleted and available after re-installing NFR4XBoot again."
+msgstr "NFR4XBoot ist installiert!\nNFR4XBoot wird jetzt deinstalliert und die Box neu gestartet. Nach dem Neustart FlashLocal nochmals ausführen.\nDie installierten Images bleiben erhalten und stehen nach erneuter Installation von NFR4XBoot wieder zur Verfügung."
+
+msgid "Ready to install packagegroup-base-samba ?"
+msgstr "Bereit zum Installieren der Pakete - base-samba ?"
+
+msgid "Place:"
+msgstr "Ort:"
+
+msgid "File name:"
+msgstr "Dateiname:"
+
+msgid "You can select with yellow the OnlineFlash Image\n or select Recovery to create a USB Disk Image for clean Install."
+msgstr "Mit Gelb den OnlineFlash Bereich auswählen\n oder wähle Recovery um ein USB Disk Image zur Installation zu erstellen." 
+
+msgid "page up"
+msgstr "Seite hoch"
+
+msgid "page down"
+msgstr "Seite runter"
+
+msgid "Select your skin and press OK to activate the selected skin."
+msgstr "Wähle einen Skin und drücke OK um den Skin zu aktivieren."
+
+msgid "MultiBoot Selector"
+msgstr "MultiBoot Auswahl"
+
+msgid "Selected Image:\t\t%s"
+msgstr "Ausgewähltes Image:\t%s"
+
+msgid "Select Image: %s"
+msgstr "Wähle Image: %s"
+
+msgid "Select Bootoption: %s"
+msgstr "Wähle Bootoption: %s"
+
+msgid "Do you want to reboot now with selected image?"
+msgstr "Möchtest du das ausgewählte Image jetzt neu starten?"
+
+msgid "Current Bootsettings: %s (%s)%s"
+msgstr "Aktuelle Booteinstellungen: %s (%s)%s"
+
+msgid "Select Image: STARTUP_1"
+msgstr "Wähle Image: STARTUP_1"
+
+msgid "no image found"
+msgstr "Kein Image gefunden"
+
+msgid "Your box needs Bootloaderversion(s)\n\n%s\n\nto make compatible with Bootoptions!"
+msgstr "Ihre Box braucht Bootloaderversion\n\n%s\n\num Bootoptionen nutzen zu können!"
+
+msgid "File not found - rename failed!"
+msgstr "Datei nicht gefunden - umbenennen fehlgeschlagen!"
+
+msgid "Name already exists - rename failed!"
+msgstr "Name existiert bereits - umbenennen fehlgeschlagen!"
+
+msgid "2160p60 without PiP (Standard)"
+msgstr "2160p60 ohne PiP (Standard)"
+
+msgid "2160p50 with PiP (Experimental)"
+msgstr "2160p50 mit PiP (Experimentel)"
+
+msgid " (unknown mode)"
+msgstr " (unbekannter Modus)"
+
+msgid "Unable to read image number"
+msgstr "Image Nummer nicht lesbar"
+
+msgid "Select Bootoption: not supported - see info"
+msgstr "Bootoption auswählen: nicht unterstützt - siehe Info"
+
+msgid "File '/boot/%s' copy to '/boot/STARTUP' failed!"
+msgstr "Datei '/boot/%s' kopieren nach '/boot/STARTUP' fehlgeschlagen!"
+
+msgid "Next boot will start from Image 1."
+msgstr "Beim nächsten Start wird von Image 1. gebootet"
+
+msgid "Can not repair file %s"
+msgstr "Konnte Datei %s nicht reparieren"
+
+msgid "Caution, next boot is starts with these settings!"
+msgstr "Achtung, beim nächsten Start wird mit diesen Einstellungen gebootet!"
+
+msgid "Alternative Image 1 partition for boot repair not found."
+msgstr "Alternative Image 1 Partition für Boot-Reparatur nicht gefunden."
+
+msgid "Wrong Bootsettings detected!"
+msgstr "Falsche Booteinstellungen erkannt!"
+
+msgid "Do you want to reboot now?"
+msgstr "Wollen Sie jetzt neu starten?"
+
+msgid "Can not write file %s"
+msgstr "Konnte Datei %s nicht schreiben"
+
+msgid "Write error!"
+msgstr "Schreibfehler!"
+
+msgid "Error in file %s"
+msgstr "Fehler in Datei %s"
+
+msgid "Command line error!"
+msgstr "Kommandozeilen Fehler!"
