@@ -1,4 +1,4 @@
-from boxbranding import getBoxType, getMachineBrand, getMachineName
+from boxbranding import getBoxType, getMachineBrand, getMachineName, getBrandOEM
 from os import path as os_path, system, remove, unlink, rename, chmod, access, X_OK
 from shutil import move
 import time
@@ -35,6 +35,12 @@ from Plugins.Extensions.Infopanel.Softcamedit import vEditor
 from Plugins.Extensions.Infopanel.nfsedit import NFS_EDIT
 from os import path, listdir
 import commands
+
+if getBrandOEM in ('ceryon', 'broadmedia', 'ini', 'tripledot' ,'gigablue', 'entwopia', 'formuler' ,'fulan', 'vuplus'):
+	basegroup = "packagegroup-base"
+else:
+	basegroup = "task-base"
+
 
 class NetworkAdapterSelection(Screen,HelpableScreen):
 	def __init__(self, session):
