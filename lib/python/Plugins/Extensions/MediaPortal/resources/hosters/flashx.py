@@ -4,6 +4,9 @@ from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.packer import unpack, detect
 from Plugins.Extensions.MediaPortal.resources.messageboxext import MessageBoxExt
 
+fxagent = "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0"
+cookies = CookieJar()
+
 def flashx(self, data, id):
 	p1 = re.search('type="hidden" name="op" value="(.+?)"', data)
 	p3 = re.search('type="hidden" name="id" value="(.+?)"', data)
@@ -16,17 +19,17 @@ def flashx(self, data, id):
 						'fname': p4.group(1),
 						'referer':  '',
 						'hash': p6.group(1),
-						'imhuman': 'Proceed+to+video'})
-		url = re.findall('SRC="(http://www.flashx.tv/coding.js.*?)"', data, re.I)
+						'imhuman': 'Proceed to this video'})
+		url = re.findall('"([^"]+counter\.cgi[^"]+)"', data, re.S)
 		if url:
-			twAgentGetPage(url[0], agent=None, headers=std_headers).addCallback(self.flashxCheckUrl, id, info).addErrback(self.errorload)
+			twAgentGetPage(url[0], agent=fxagent, headers=std_headers, cookieJar=cookies).addCallback(self.flashxCheckUrl, id, info).addErrback(self.errorload)
 			return
 	self.stream_not_found()
 
 def flashxCheckUrl(self, data, id, info):
-	link = 'http://www.flashx.tv/dl?%s' % id
-	reactor.callLater(6, self.flashxCalllater, link, method='POST', postdata=info, agent=std_headers['User-Agent'], headers={'Content-Type': 'application/x-www-form-urlencoded'})
-	message = self.session.open(MessageBoxExt, _("Stream starts in 6 sec."), MessageBoxExt.TYPE_INFO, timeout=6)
+	link = 'http://www.flashx.tv/dl'
+	reactor.callLater(7, self.flashxCalllater, link, method='POST', postdata=info, agent=fxagent, cookieJar=cookies, headers={'Content-Type': 'application/x-www-form-urlencoded'})
+	message = self.session.open(MessageBoxExt, _("Stream starts in 7 sec."), MessageBoxExt.TYPE_INFO, timeout=7)
 
 def flashxCalllater(self, *args, **kwargs):
 	twAgentGetPage(*args, **kwargs).addCallback(self.flashxdata).addErrback(self.errorload)

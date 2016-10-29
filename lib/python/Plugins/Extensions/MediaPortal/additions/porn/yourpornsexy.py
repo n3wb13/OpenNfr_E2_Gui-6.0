@@ -81,11 +81,11 @@ class YourPornSexyGenreScreen(MPScreen):
 		getPage(url, agent=myagent).addCallback(self.genreData).addErrback(self.dataError)
 
 	def genreData(self, data):
-		parse = re.search('<span>All Albums</span>(.*?)bottom', data, re.S)
-		Cats = re.findall('<a\shref="(/videos/.*?)" title="(.*?)" target="_blank">', parse.group(1), re.S)
+		parse = re.search('<span>Popular HashTags</span>(.*?)bottom', data, re.S)
+		Cats = re.findall('<a\shref=[\'|"](/blog/.*?)[\'|"].*?<span>#(.*?)</span>', parse.group(1), re.S)
 		if Cats:
 			for (Url, Title) in Cats:
-				Url = "http://yourporn.sexy" + Url.replace('/0/','/%s/')
+				Url = "http://yourporn.sexy" + Url.replace('/0.html','/%s.html')
 				Title = Title.lower().title()
 				self.genreliste.append((Title, Url))
 			self.genreliste.sort()
@@ -258,17 +258,17 @@ class YourPornSexyFilmScreen(MPScreen, ThumbsHelper):
 			preparse = re.search('</head>(.*?)<span>Other Results</span>', data, re.S)
 			if preparse:
 				prep = preparse.group(1)
-		Movies = re.findall('itemprop="url"\shref="(.*?)"\stitle="(.*?)".*?itemprop="thumbnail".*?\ssrc="(.*?)".*?class="vid_views"><span>(\d+)</span>.*?class="vid_duration transition"><span>(.*?)</span>', prep, re.S)
+		Movies = re.findall('post_share_div.*?<a\shref=[\'|"](.*?)[\'|"]\stitle=[\'|"](.*?)[\'|"].*?vid_thumb.*?\ssrc=[\'|"](.*?)[\'|"].*?post_time.*?>(.*?)[<strong|</div>].*?(\d+)\sviews', data, re.S)
 		if Movies:
-			for (Url, Title, Image, Views, Runtime) in Movies:
+			for (Url, Title, Image, Added, Views) in Movies:
 				Url = "http://yourporn.sexy" + Url
-				self.filmliste.append((decodeHtml(Title), Url, Image, Views, Runtime, "-"))
+				self.filmliste.append((decodeHtml(Title), Url, Image, Views, "-", Added))
 		else:
-			Movies = re.findall('post_share_div.*?<a\shref=[\'|"](.*?)[\'|"]\stitle=[\'|"](.*?)[\'|"].*?vid_thumb.*?\ssrc=[\'|"](.*?)[\'|"].*?post_time.*?>(.*?)[<strong|</div>].*?(\d+)\sviews', data, re.S)
+			Movies = re.findall("vid_container.*?<img.*?\ssrc='(.*?)'.*?a\shref='(.*?)'\stitle='(.*?)'.*?ptspan'>(.*?)<strong>.*?(\d+)\sviews", prep, re.S)
 			if Movies:
-				for (Url, Title, Image, Added, Views) in Movies:
+				for (Image, Url, Title, Added, Views) in Movies:
 					Url = "http://yourporn.sexy" + Url
-					self.filmliste.append((decodeHtml(Title), Url, Image, Views, "-", Added))
+					self.filmliste.append((decodeHtml(Title), Url, Image, Views, "-", Added.strip()))
 		if len(self.filmliste) == 0:
 			self.filmliste.append((_('No videos found!'), '', None, '', '', ''))
 		self.ml.setList(map(self._defaultlistleft, self.filmliste))

@@ -611,7 +611,8 @@ class ssEpisoden(MPScreen):
 						self.watched_liste.append("%s" % (line[0]))
 				self.updates_read.close()
 		parse = re.search('class="pageTitle">(.*?)id="footer">', data, re.S)
-		episoden = re.findall('Folge\s(\d+).*?class="seasonEpisodeTitle">.*?href="(.*?)".*?<strong>(.*?)</strong>.*?<span>(.*?)</span>', parse.group(1), re.S)
+		if parse:
+			episoden = re.findall('Folge\s(\d+).*?class="seasonEpisodeTitle">.*?href="(.*?)".*?<strong>(.*?)</strong>.*?<span>(.*?)</span>', parse.group(1), re.S)
 		if episoden:
 			for episode, url, title_de, title_en in episoden:
 				if int(self.Staffel) < 10:
@@ -651,6 +652,7 @@ class ssEpisoden(MPScreen):
 			return
 		episodenName = self['liste'].getCurrent()[0][0]
 		url = self['liste'].getCurrent()[0][1]
+		self.addGlobalWatchtlist([self.Title+' '+episodenName, self.cover, "ssStreams", self.Title, episodenName, url, self.cover])
 		self.session.openWithCallback(self.reloadList, ssStreams, self.Title, episodenName, url, self.cover)
 
 	def reloadList(self):

@@ -1,4 +1,41 @@
 ﻿# -*- coding: utf-8 -*-
+###############################################################################################
+#
+#    MediaPortal for Dreambox OS
+#
+#    Coded by MediaPortal Team (c) 2013-2016
+#
+#  This plugin is open source but it is NOT free software.
+#
+#  This plugin may only be distributed to and executed on hardware which
+#  is licensed by Dream Property GmbH. This includes commercial distribution.
+#  In other words:
+#  It's NOT allowed to distribute any parts of this plugin or its source code in ANY way
+#  to hardware which is NOT licensed by Dream Property GmbH.
+#  It's NOT allowed to execute this plugin and its source code or even parts of it in ANY way
+#  on hardware which is NOT licensed by Dream Property GmbH.
+#
+#  This applies to the source code as a whole as well as to parts of it, unless
+#  explicitely stated otherwise.
+#
+#  If you want to use or modify the code or parts of it,
+#  you have to keep OUR license and inform us about the modifications, but it may NOT be
+#  commercially distributed other than under the conditions noted above.
+#
+#  As an exception regarding execution on hardware, you are permitted to execute this plugin on VU+ hardware
+#  which is licensed by satco europe GmbH, if the VTi image is used on that hardware.
+#
+#  As an exception regarding modifcations, you are NOT permitted to remove
+#  any copy protections implemented in this plugin or change them for means of disabling
+#  or working around the copy protections, unless the change has been explicitly permitted
+#  by the original authors. Also decompiling and modification of the closed source
+#  parts is NOT permitted.
+#
+#  Advertising with this plugin is NOT allowed.
+#  For other uses, permission from the authors is necessary.
+#
+###############################################################################################
+
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
 
@@ -37,16 +74,28 @@ class bildFirstScreen(MPScreen):
 		self.genreliste.append(("News", "/video/clip/news/news-15477962.bild.html"))
 		self.genreliste.append(("Politik", "/video/clip/politik/politik-15714862.bild.html"))
 		self.genreliste.append(("Unterhaltung", "/video/clip/unterhaltung/unterhaltung-15478026.bild.html"))
-		self.genreliste.append(("Fussball", "/video/clip/fussball/fussball-15716788.bild.html"))
 		self.genreliste.append(("Sport", "/video/clip/sport/sport-15717150.bild.html"))
 		self.genreliste.append(("Auto", "/video/clip/auto/auto-15711140.bild.html"))
 		self.genreliste.append(("Lifestyle", "/video/clip/lifestyle/lifestyle-15716870.bild.html"))
-		self.genreliste.append(("Bild-Boxx", "/video/clip/bild-boxx/bild-boxx-34731956.bild.html"))
-		self.genreliste.append(("Lustige Tiervideos", "/video/clip/tiervideos/tiervideos-25998606.bild.html"))
+		self.genreliste.append(("Futtern", "/video/clip/futtern/futtern-47049016.bild.html"))
 		self.genreliste.append(("Viral", "/video/clip/virale-videos/virale-videos-36659638.bild.html"))
-		self.genreliste.append(("Knops Kult Liga", "/video/clip/knops-kult-liga/knops-kult-liga-15718778.bild.html"))
+		self.genreliste.append(("Digital", "/video/clip/digital/digital-15884812.bild.html"))
+		self.genreliste.append(("Games", "/video/clip/spiele/spiele-15885178.bild.html"))
+		self.genreliste.append(("Bild-Boxx", "/video/clip/bild-boxx/bild-boxx-34731956.bild.html"))
+		self.genreliste.append(("Bild-Reporter", "/video/clip/bild-reporter/bild-reporter-36659552.bild.html"))
+		self.genreliste.append(("Bild-Daily", "/video/clip/bild-daily/bild-daily-41607010.bild.html"))
+		self.genreliste.append(("Lustige Tiervideos", "/video/clip/tiervideos/tiervideos-25998606.bild.html"))
+		self.genreliste.append(("Motorsport", "/video/clip/motorsport/motorsport-15883290.bild.html"))
+		self.genreliste.append(("Boxen", "/video/clip/boxen/boxen-15883202.bild.html"))
+		self.genreliste.append(("Fussball", "/video/clip/fussball/fussball-15716788.bild.html"))
 		self.genreliste.append(("Bundesliga", "/video/clip/bundesliga-bei-bild/bundesliga-bei-bild-33009168.bild.html"))
+		self.genreliste.append(("2. Bundesliga", "/video/clip/2-bundesliga/zweite-liga-tore-highlights-starteite-31149208.bild.html"))
+		self.genreliste.append(("Top Ligen", "/video/clip/premier-league/ligue-1-serie-a-primera-division-47933904.bild.html"))
+		self.genreliste.append(("Knops Kult Liga", "/video/clip/knops-kult-liga/knops-kult-liga-15718778.bild.html"))
+		self.genreliste.append(("Voice of Bundesliga", "/video/clip/voice-of-bundesliga/voice-of-bundesliga-41468026.bild.html"))
 		self.genreliste.append(("Leser-Reporter", "/video/clip/leserreporter/leser-reporter-15714330.bild.html"))
+		self.genreliste.append(("Herr Gerstenberg", "/video/clip/word/word-39692016.bild.html"))
+		self.genreliste.append(("Erotik", "/video/clip/erotik/erotik-15716836.bild.html"))
 		self.ml.setList(map(self._defaultlistcenter, self.genreliste))
 
 	def getTriesEntry(self):
@@ -77,32 +126,24 @@ class bildSecondScreen(MPScreen, ThumbsHelper):
 			self.skin = f.read()
 			f.close()
 		MPScreen.__init__(self, session)
-		ThumbsHelper.__init__(self)
 
 		self["actions"] = ActionMap(["MP_Actions"], {
 			"0" : self.closeAll,
-			"5" : self.keyShowThumb,
 			"ok" : self.keyOK,
 			"cancel" : self.keyCancel,
 			"up" : self.keyUp,
 			"down" : self.keyDown,
 			"right" : self.keyRight,
-			"left" : self.keyLeft,
-			"nextBouquet" : self.keyPageUp,
-			"prevBouquet" : self.keyPageDown
+			"left" : self.keyLeft
 		}, -1)
 
 		self['title'] = Label("Bild.de")
 		self['ContentTitle'] = Label("Genre: %s" % self.name)
 		self['name'] = Label(_("Please wait..."))
 
-		self['Page'] = Label(_("Page:"))
-
 		self.keyLocked = True
 		self.ml = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
 		self['liste'] = self.ml
-		self.page = 0
-		self.lastpage = 0
 		self.onLayoutFinish.append(self.loadPage)
 
 	def loadPage(self):
@@ -110,51 +151,24 @@ class bildSecondScreen(MPScreen, ThumbsHelper):
 		getPage(self.link).addCallback(self.parseData).addErrback(self.dataError)
 
 	def parseData(self, data):
-		self.getLastPage(data, '<div class="pag">(.*?)</div>')
-		if self.getLastPage:
-			self['page'].setText("%s / %s" % (str(self.page+1), str(self.lastpage)))
-
-		raw = re.search('(Aktuellste|Neueste|Alle)\sVideos</h2>(.*)</section></div></div>', data, re.S).groups()
-		if raw:
-			seasons = re.findall('class="active">.*?data-ajax-href="(.*?)page=.*?,(.*?)"', raw[1], re.S)
-			if seasons:
-				vid_id1 = seasons[0][0]
-				vid_id2 = seasons[0][1]
-				nexturl = baseurl + vid_id1 + "page=" + str(self.page) + "," + vid_id2
-				getPage(nexturl).addCallback(self.parseData2).addErrback(self.dataError)
-
-	def parseData2(self, data):
-		categorys =  re.findall('class="hentry.*?<a\shref="([^#].*?)".*?src="(.*?)".*?class="kicker">(.*?)<.*?class="headline">(.*?)</h3>', data, re.S)
-		for (Url, Image, Title, handlung) in categorys:
+		videos =  re.findall('itemprop="video".*?data-ajax-href="(.*?)".*?itemprop="name"\scontent="(.*?)"/>.*?itemprop="description"\scontent="(.*?)"/>.*?itemprop="thumbnailUrl"\scontent="(.*?)"/>', data, re.S)
+		for (Url, Title, handlung, Image) in videos:
 			if not re.match('.*?bild-plus', Url):
-				self.filmliste.append((decodeHtml(Title + " - " + stripAllTags(handlung.replace('</span><span>',' '))), Url, Image))
+				self.filmliste.append((decodeHtml(Title), Url, Image, handlung))
 		if len(self.filmliste) == 0:
 			self.filmliste.append((_("No videos found!"),"",""))
 		self.ml.setList(map(self._defaultlistleft, self.filmliste))
 		self.ml.moveToIndex(0)
 		self.keyLocked = False
-		self.th_ThumbsQuery(self.filmliste, 0, 1, 2, None, None, self.page+1, self.lastpage, mode=1, pagefix=-1)
 		self.showInfos()
 
 	def showInfos(self):
 		title = self['liste'].getCurrent()[0][0]
 		coverUrl = self['liste'].getCurrent()[0][2]
+		Handlung = self['liste'].getCurrent()[0][3]
+		self['handlung'].setText(decodeHtml(Handlung))
 		self['name'].setText(title)
 		CoverHelper(self['coverArt']).getCover(coverUrl)
-
-	def keyPageDown(self):
-		if self.keyLocked:
-			return
-		if not self.page < 1:
-			self.page -= 1
-			self.loadPage()
-
-	def keyPageUp(self):
-		if self.keyLocked:
-			return
-		if self.page+1 < self.lastpage:
-			self.page += 1
-			self.loadPage()
 
 	def keyOK(self):
 		if self.keyLocked:
@@ -169,13 +183,8 @@ class bildSecondScreen(MPScreen, ThumbsHelper):
 			getPage(getxml).addCallback(self.playVideo).addErrback(self.dataError)
 
 	def playVideo(self, data):
-		streamlink = re.search('"src":"(.*?)"', data, re.S)
+		streamlink = re.search('"src":"(http://videos-.*?\.mp4)","type":"video/mp4"', data, re.S)
 		if streamlink:
 			title = self['liste'].getCurrent()[0][0]
-			if re.match('.*?\/ondemand\/', streamlink.group(1)):
-				host = streamlink.group(1).split('ondemand/')[0]
-				playpath = streamlink.group(1).split('ondemand/')[1]
-				final = "%sondemand/ playpath=mp4:%s swfVfy=1" % (host, playpath)
-			else:
-				final = streamlink.group(1)
-			self.session.open(SimplePlayer, [(title, final)], showPlaylist=False, ltype='Bild.de')
+			final = streamlink.group(1)
+			self.session.open(SimplePlayer, [(title, final)], showPlaylist=False, ltype='bild')

@@ -33,6 +33,7 @@ class netzKinoGenreScreen(MPScreen):
 	def layoutFinished(self):
 		self.genreliste.append(('Neu bei Netzkino', 'neu'))
 		self.genreliste.append(('HD-Kino', 'hdkino'))
+		self.genreliste.append(('Animekino', 'animekino'))
 		self.genreliste.append(('Actionkino', 'actionkino'))
 		self.genreliste.append(('Dramakino', 'dramakino'))
 		self.genreliste.append(('Thrillerkino', 'thrillerkino'))
@@ -43,7 +44,7 @@ class netzKinoGenreScreen(MPScreen):
 		self.genreliste.append(('Spaßkino', 'spasskino'))
 		self.genreliste.append(('Asiakino', 'asiakino'))
 		self.genreliste.append(('Horrorkino', 'horrorkino'))
-		self.genreliste.append(('Familienkino', 'familienkino'))
+		self.genreliste.append(('Kinderkino', 'kinderkino'))
 		self.genreliste.append(('Prickelkino', 'prickelkino'))
 		self.genreliste.append(('Kino ab 18', 'kinoab18'))
 		self.ml.setList(map(self._defaultlistcenter, self.genreliste))

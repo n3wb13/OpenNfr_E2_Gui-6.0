@@ -78,28 +78,13 @@ class xxxArtGenreScreen(MPScreen):
 		getPage(url).addCallback(self.parseData).addErrback(self.dataError)
 
 	def parseData(self, data):
-		parse = re.search('/> Category(.*?)/> Top videos', data, re.S)
+		parse = re.search('data-toggle="dropdown">Category(.*?)class="wide-nav-link">Top videos', data, re.S)
 		if parse:
-			raw = re.findall('(\t|)<li\sclass="(.*?)"><a\shref="(.*?)1-date.html"\sclass=".*?">(.*?)</a>', parse.group(1), re.S)
+			raw = re.findall('<li\sclass=".*?"><a\shref="(.*?)1-date.html"\sclass=".*?">(.*?)</a>', parse.group(1), re.S)
 			if raw:
-				Subtitle = None
-				for (Submarker, Type, Url, Title) in raw:
-					if Type == "dropdown-submenu":
-						Subtitle = Title
-						next
-						continue
-					if Subtitle:
-						if Submarker == "\t":
-							if Subtitle != "Movies" and Subtitle != "Clips":
-								self.filmliste.append((Subtitle +"-"+Title, Url))
-						else:
-							Subtitle = None
-							self.filmliste.append((Title, Url))
-					else:
-						self.filmliste.append((Title, Url))
+				for (Url, Title) in raw:
+					self.filmliste.append((Title, Url))
 		self.filmliste.sort()
-		self.filmliste.insert(0, ("Movies", None))
-		self.filmliste.insert(0, ("Clips", None))
 		self.filmliste.insert(0, ("New Videos", "http://xxx-art.biz/newvideos.html?&page="))
 		self.filmliste.insert(0, ("Top Videos", "http://xxx-art.biz/topvideos.html?&page="))
 		self.filmliste.insert(0, ("--- Search ---", "callSuchen"))
@@ -109,7 +94,7 @@ class xxxArtGenreScreen(MPScreen):
 
 	def SuchenCallback(self, callback = None, entry = None):
 		if callback is not None and len(callback):
-			self.suchString = callback.replace(' ', '-')
+			self.suchString = callback.replace(' ', '+')
 			Link = 'http://xxx-art.biz/search.php?keywords=%s&page=' % (self.suchString)
 			Name = self['liste'].getCurrent()[0][0]
 			self.session.open(xxxArtListScreen, Link, Name)
@@ -120,77 +105,9 @@ class xxxArtGenreScreen(MPScreen):
 		Name = self['liste'].getCurrent()[0][0]
 		if Name == "--- Search ---":
 			self.suchen()
-		elif Name == "Clips" or Name == "Movies":
-			self.session.open(xxxArtSubGenreScreen, Name)
 		else:
 			Link = self['liste'].getCurrent()[0][1]
 			self.session.open(xxxArtListScreen, Link, Name)
-
-class xxxArtSubGenreScreen(MPScreen):
-
-	def __init__(self, session, Name):
-		self.Name = Name
-		self.plugin_path = mp_globals.pluginPath
-		self.skin_path =  mp_globals.pluginPath + mp_globals.skinsPath
-
-		path = "%s/%s/defaultGenreScreen.xml" % (self.skin_path, config.mediaportal.skin.value)
-		if not fileExists(path):
-			path = self.skin_path + mp_globals.skinFallback + "/defaultGenreScreen.xml"
-
-		with open(path, "r") as f:
-			self.skin = f.read()
-			f.close()
-		MPScreen.__init__(self, session)
-
-		self["actions"]  = ActionMap(["MP_Actions"], {
-			"ok"	: self.keyOK,
-			"0" : self.closeAll,
-			"cancel": self.keyCancel,
-			"up" : self.keyUp,
-			"down" : self.keyDown,
-			"right" : self.keyRight,
-			"left" : self.keyLeft
-		}, -1)
-
-		self['title'] = Label("XXX-Art")
-		self['ContentTitle'] = Label("Genre: " + self.Name)
-		self['name'] = Label(_("Please wait..."))
-
-		self.keyLocked = True
-
-		self.ml = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
-		self['liste'] = self.ml
-
-		self.onLayoutFinish.append(self.loadPage)
-
-	def loadPage(self):
-		self.filmliste = []
-		url = "http://xxx-art.biz/"
-		getPage(url).addCallback(self.parseData).addErrback(self.dataError)
-
-	def parseData(self, data):
-		parse = re.search('class="dropdown-submenu">%s</a>(.*?)</ul>' % self.Name, data, re.S)
-		raw = re.findall('<li\sclass=".*?"><a\shref="(.*?)1-date.html"\sclass=".*?">(.*?)</a>', parse.group(1), re.S)
-		if raw:
-			for (Url, Title) in raw:
-				self.filmliste.append((Title, Url))
-			self.filmliste.sort()
-		if len(self.filmliste) == 0:
-			self.filmliste.append((_('No movies found!'), ''))
-		self.ml.setList(map(self._defaultlistcenter, self.filmliste))
-		self.keyLocked = False
-		self.showInfos()
-
-	def showInfos(self):
-		name = self['liste'].getCurrent()[0][0]
-		self['name'].setText(decodeHtml(name))
-
-	def keyOK(self):
-		if self.keyLocked:
-			return
-		Name = self['liste'].getCurrent()[0][0]
-		Link = self['liste'].getCurrent()[0][1]
-		self.session.open(xxxArtListScreen, Link, Name)
 
 class xxxArtListScreen(MPScreen, ThumbsHelper):
 

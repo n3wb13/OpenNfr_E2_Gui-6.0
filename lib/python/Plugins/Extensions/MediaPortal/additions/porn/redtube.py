@@ -151,6 +151,8 @@ class redtubeFilmScreen(MPScreen, ThumbsHelper):
 		Movies = re.findall('"video-duration"\sonclick="window.location.href\s=\'(.*?)\'">(.*?)<.*?data-src="(.*?)".*?alt="(.*?)"\s/>.*?views">(.*?)</span>', data, re.S)
 		if Movies:
 			for (Url, Runtime, Image, Title, Views) in Movies:
+				if Image.startswith('//'):
+					Image = 'http:' + Image
 				Views = Views.replace(',','').replace(' views','')
 				self.filmliste.append((decodeHtml(Title), Url, Image, Runtime, Views))
 		if len(self.filmliste) == 0:

@@ -930,24 +930,18 @@ class SimplePlayer(Screen, M3U8Player, CoverSearchHelper, SimpleSeekHelper, Simp
 				})
 
 	def __evAudioDecodeError(self):
-		if not config.mediaportal.sp_show_errors.value:
-			return
 		from enigma import iServiceInformation
 		currPlay = self.session.nav.getCurrentService()
 		sTagAudioCodec = currPlay.info().getInfoString(iServiceInformation.sTagAudioCodec)
 		self.session.open(MessageBoxExt, _("This STB can't decode %s streams!") % sTagAudioCodec, type = MessageBoxExt.TYPE_INFO,timeout = 10 )
 
 	def __evVideoDecodeError(self):
-		if not config.mediaportal.sp_show_errors.value:
-			return
 		from enigma import iServiceInformation
 		currPlay = self.session.nav.getCurrentService()
 		sTagVideoCodec = currPlay.info().getInfoString(iServiceInformation.sTagVideoCodec)
 		self.session.open(MessageBoxExt, _("This STB can't decode %s streams!") % sTagVideoCodec, type = MessageBoxExt.TYPE_INFO,timeout = 10 )
 
 	def __evPluginError(self):
-		if not config.mediaportal.sp_show_errors.value:
-			return
 		from enigma import iServiceInformation
 		currPlay = self.session.nav.getCurrentService()
 		message = currPlay.info().getInfoString(iServiceInformation.sUser+12)
@@ -956,8 +950,6 @@ class SimplePlayer(Screen, M3U8Player, CoverSearchHelper, SimpleSeekHelper, Simp
 	def __evStreamingSrcError(self):
 		if isinstance(self, SimplePlayerResume):
 			self.eofResumeFlag = True
-		if not config.mediaportal.sp_show_errors.value:
-			return
 		from enigma import iServiceInformation
 		currPlay = self.session.nav.getCurrentService()
 		message = currPlay.info().getInfoString(iServiceInformation.sUser+12)
@@ -1008,10 +1000,7 @@ class SimplePlayer(Screen, M3U8Player, CoverSearchHelper, SimpleSeekHelper, Simp
 				self.playlistQ.put(self.pl_status)
 				self.pl_event.genEvent()
 
-		if config.mediaportal.sp_show_errors.value:
-			self.session.openWithCallback(self.dataError2, MessageBoxExt, str(error), MessageBoxExt.TYPE_INFO, timeout=10)
-		else:
-			self.dataError2(error)
+		self.session.openWithCallback(self.dataError2, MessageBoxExt, str(error), MessageBoxExt.TYPE_INFO, timeout=10)
 
 	def dataError2(self, res):
 		self.keyPlayNextLocked = False
@@ -1672,7 +1661,6 @@ class SimpleConfig(Screen, ConfigListScreenExt):
 		self.list.append(getConfigListEntry(_('Behavior on movie end:'), config.mediaportal.sp_on_movie_eof))
 		self.list.append(getConfigListEntry(_('Seekbar sensibility:'), config.mediaportal.sp_seekbar_sensibility))
 		self.list.append(getConfigListEntry(_('Infobar cover always off:'), config.mediaportal.sp_infobar_cover_off))
-		self.list.append(getConfigListEntry(_('Show errors:'), config.mediaportal.sp_show_errors))
 		self.list.append(getConfigListEntry(_('Use SP number seek:'), config.mediaportal.sp_use_number_seek))
 		if MediaInfoPresent:
 			self.list.append(getConfigListEntry(_('MediaInfo on key:'), config.mediaportal.sp_mi_key))

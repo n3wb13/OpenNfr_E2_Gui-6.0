@@ -272,7 +272,7 @@ class MPScreen(Screen):
 	def addGlobalWatchtlist(self, list):
 		self.wlgl_path = config.mediaportal.watchlistpath.value+"mp_global_watchlist"
 		with open(self.wlgl_path,"a") as writeGlwl:
-			writeGlwl.write('"%s"\n' % ",".join(list))
+			writeGlwl.write('"%s"\n' % "||".join(list))
 
 ####### defaults
 	def _defaultlistleft(self, entry):

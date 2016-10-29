@@ -94,6 +94,7 @@ class get_stream_link:
 	from hosters.google import google
 	from hosters.kodik import kodik, kodikData
 	from hosters.letwatch import letwatch
+	from hosters.nowvideo import nowvideo
 	from hosters.mailru import mailru
 	from hosters.mega3x import mega3x
 	from hosters.moviecloud import moviecloud
@@ -101,6 +102,7 @@ class get_stream_link:
 	from hosters.mp4upload import mp4upload
 	from hosters.mrfile import mrfile
 	from hosters.okru import okru
+	from hosters.openload import openloadApi
 	from hosters.powerwatch import powerwatch, powerwatchGetPage, powerwatch_postData
 	from hosters.powvideo import powvideo
 	from hosters.promptfile import promptfile, promptfilePost
@@ -114,14 +116,16 @@ class get_stream_link:
 	from hosters.vidbull import vidbull
 	from hosters.vidspot import vidspot
 	from hosters.vidwoot import vidwoot
-	from hosters.vivo import vivo, vivoPostData
+	from hosters.vivo import vivo
 	from hosters.vkme import vkme, vkmeHash, vkmeHashGet, vkmeHashData, vkPrivat, vkPrivatData
 	from hosters.vidto import vidto
 	from hosters.vidzi import vidzi
 	from hosters.vodlocker import vodlocker, vodlockerGetPage, vodlockerData
+	from hosters.watchers import watchers
 	from hosters.yourupload import yourupload
 	from hosters.youwatch import youwatch, youwatchLink
 	from hosters.zettahost import zettahost
+	from.hosters.zstream import zstream
 
 	def __init__(self, session):
 		self._callback = None
@@ -416,7 +420,7 @@ class get_stream_link:
 					if ID:
 						data = 'http://embed.nowvideo.sx/embed/?v=%s' % ID.group(3)
 						link = data
-					getPage(link).addCallback(self.movshare, link, "nowvideo").addErrback(self.errorload)
+					getPage(link).addCallback(self.nowvideo).addErrback(self.errorload)
 
 			elif re.search('videoweed.es', data, re.S):
 				link = data
@@ -657,7 +661,7 @@ class get_stream_link:
 					self.prz = 1
 					self.callPremium(link)
 				else:
-					if mp_globals.isDreamOS:
+					if mp_globals.isDreamOS or not mp_globals.requests:
 						twAgentGetPage(link).addCallback(self.vivo, link).addErrback(self.errorload)
 					else:
 						data = self.grabpage(link)
@@ -757,7 +761,8 @@ class get_stream_link:
 					self.prz = 1
 					self.callPremium(link)
 				else:
-					self.only_premium()
+					link = "https://api.openload.co/1/streaming/get?file=" + id.group(1)
+					getPage(link).addCallback(self.openloadApi).addErrback(self.errorload)
 
 			elif re.search('thevideo\.me', data, re.S):
 				if re.search('thevideo\.me/embed-', data, re.S):
@@ -782,7 +787,8 @@ class get_stream_link:
 						link = "http://www.exashare.com/embed-%s-620x330.html" % id[0]
 				getPage(link).addCallback(self.exashare).addErrback(self.errorload)
 
-			elif re.search('letwatch\.us', data, re.S):
+			elif re.search('letwatch\.us|letwatch\.to', data, re.S):
+				data = data.replace('letwatch.to','letwatch.us')
 				if re.search('letwatch\.us/embed-', data, re.S):
 					link = data
 				else:
@@ -832,6 +838,14 @@ class get_stream_link:
 				url = "http://ok.ru/dk?cmd=videoPlayerMetadata&mid="+str(id)
 				spezialagent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:46.0) Gecko/20100101 Firefox/46.0"
 				getPage(url, agent=spezialagent).addCallback(self.okru).addErrback(self.errorload)
+
+			elif re.search('zstream\.to', data, re.S):
+				link = data
+				getPage(link).addCallback(self.zstream).addErrback(self.errorload)
+
+			elif re.search('watchers\.to', data, re.S):
+				link = data
+				getPage(link).addCallback(self.watchers).addErrback(self.errorload)
 
 			elif re.search('mail\.ru', data, re.S):
 				# https://my.mail.ru/mail/kaki.haki/video/_myvideo/296.html

@@ -85,3 +85,5 @@
 <hoster>vidzi</hoster><regex>vidzi.tv</regex>
 <hoster>ok.ru</hoster><regex>ok.ru</regex>
 <hoster>mail.ru</hoster><regex>mail.ru</regex>
+<hoster>zstream</hoster><regex>zstream.to</regex>
+<hoster>watchers</hoster><regex>watchers.to</regex>

@@ -69,27 +69,27 @@ class vpornGenreScreen(MPScreen):
 
 	def layoutFinished(self):
 		self.keyLocked = True
-		url = "http://www.vporn.com/cat/straight"
+		url = "http://www.vporn.com"
 		getPage(url, cookies=ck).addCallback(self.genreData).addErrback(self.dataError)
 
 	def genreData(self, data):
-		parse = re.search('<ul\sclass="categories">(.*?)</ul>', data, re.S)
-		Cats = re.findall('<li\s{0,1}><a\shref="/cat/(.*?)">(.*?)</a></li>', parse.group(1), re.S)
+		parse = re.search('<div\sclass="catslist(.*?)</div>', data, re.S)
+		Cats = re.findall('<li\s{0,1}><a\shref="/cat/(.*?)">.*?>(.*?)</a></li>', parse.group(1), re.S)
 		if Cats:
 			for (Url, Title) in Cats:
 				Url = "http://www.vporn.com/cat/" + Url
 				Title = Title.title()
-				self.genreliste.append((Title, Url))
+				self.genreliste.append((Title, Url, None, False))
 			self.genreliste.sort()
-			self.genreliste.insert(0, ("Longest", "http://www.vporn.com/longest/", None))
-			self.genreliste.insert(0, ("Most Votes", "http://www.vporn.com/votes/", None))
-			self.genreliste.insert(0, ("Most Comments", "http://www.vporn.com/comments/", None))
-			self.genreliste.insert(0, ("Most Favorited", "http://www.vporn.com/favorites/", None))
-			self.genreliste.insert(0, ("Most Viewed", "http://www.vporn.com/views/", None))
-			self.genreliste.insert(0, ("Top Rated", "http://www.vporn.com/rating/", None))
-			self.genreliste.insert(0, ("Newest", "http://www.vporn.com/newest/", None))
+			self.genreliste.insert(0, ("Longest", "http://www.vporn.com/longest/", None, True))
+			self.genreliste.insert(0, ("Most Votes", "http://www.vporn.com/votes/", None, True))
+			self.genreliste.insert(0, ("Most Comments", "http://www.vporn.com/comments/", None, True))
+			self.genreliste.insert(0, ("Most Favorited", "http://www.vporn.com/favorites/", None, True))
+			self.genreliste.insert(0, ("Most Viewed", "http://www.vporn.com/views/", None, True))
+			self.genreliste.insert(0, ("Top Rated", "http://www.vporn.com/rating/", None, True))
+			self.genreliste.insert(0, ("Newest", "http://www.vporn.com/newest/", None, True))
 
-		self.genreliste.insert(0, ("--- Search ---", "callSuchen", None))
+		self.genreliste.insert(0, ("--- Search ---", "callSuchen", None, False))
 		self.ml.setList(map(self._defaultlistcenter, self.genreliste))
 		self.ml.moveToIndex(0)
 		self.keyLocked = False
@@ -102,14 +102,15 @@ class vpornGenreScreen(MPScreen):
 			self.suchen()
 		else:
 			Link = self['liste'].getCurrent()[0][1]
-			self.session.open(vpornFilmScreen, Link, Name, self.hd, self.date)
+			Main = self['liste'].getCurrent()[0][3]
+			self.session.open(vpornFilmScreen, Link, Name, self.hd, self.date, Main)
 
 	def SuchenCallback(self, callback = None, entry = None):
 		if callback is not None and len(callback):
 			self.suchString = callback.replace(' ', '+')
 			Name = "--- Search ---"
 			Link = '%s' % (self.suchString)
-			self.session.open(vpornFilmScreen, Link, Name, self.hd, self.date)
+			self.session.open(vpornFilmScreen, Link, Name, self.hd, self.date, False)
 
 	def keySetup(self):
 		if mp_globals.isDreamOS:
@@ -193,9 +194,10 @@ class vpornSetupScreen(Screen, ConfigListScreenExt):
 
 class vpornFilmScreen(MPScreen, ThumbsHelper):
 
-	def __init__(self, session, Link, Name, HD, Date):
+	def __init__(self, session, Link, Name, HD, Date, Main):
 		self.Link = Link
 		self.Name = Name
+		self.Main = Main
 		if HD == "HD":
 			self.hd = "hd/"
 		else:
@@ -259,17 +261,24 @@ class vpornFilmScreen(MPScreen, ThumbsHelper):
 		if re.match(".*?Search", self.Name):
 			url = "http://www.vporn.com/search/?q=%s&page=%s&time=%s" % (self.Link, str(self.page), self.date)
 		else:
-			url = "%s%s/%s%s%s" % (self.Link, self.sort ,self.date, self.hd, str(self.page))
+			if self.Main:
+				sort = ""
+			else:
+				sort = self.sort
+			if self.page == 1:
+				url = "%s%s/%s%s" % (self.Link, sort , self.date, self.hd)
+			else:
+				url = "%s%s/%s%s%s" % (self.Link, sort , self.date, self.hd, str(self.page))
 		getPage(url, cookies=ck).addCallback(self.loadData).addErrback(self.dataError)
 
 	def loadData(self, data):
 		self.getLastPage(data, 'class="pager">(.*?)</div>')
-		Movies = re.findall('thumbsArr\[.*?<a\shref="(.*?)"\sclass="thumb"><img\ssrc="(.*?)"\salt="(.*?)["|&].*?class="time">(.*?)</span>.*?class="ileft">(.*?)\sviews', data, re.S)
+		Movies = re.findall('thumbsArr\[.*?<a\shref="(.*?)"\sclass="thumb"><img\ssrc="(.*?)"\salt="(.*?)".*?class="time">(.*?)</span>.*?class="ileft">(.*?)\sviews', data, re.S)
 		if Movies:
 			for (Url, Image, Title, Runtime, Views) in Movies:
 				Runtime = stripAllTags(Runtime).strip()
 				Views = Views.replace(",","")
-				self.filmliste.append((decodeHtml(Title), Url, Image, Runtime, Views))
+				self.filmliste.append((decodeHtml(Title).strip(), Url, Image, Runtime, Views))
 		if len(self.filmliste) == 0:
 			self.filmliste.append((_("No videos found!"), None, None, None, None))
 		self.ml.setList(map(self._defaultlistleft, self.filmliste))

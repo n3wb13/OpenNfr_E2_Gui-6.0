@@ -41,7 +41,7 @@ from Plugins.Extensions.MediaPortal.resources.imports import *
 from Components.ProgressBar import ProgressBar
 from datetime import datetime, timedelta
 
-glob_agent = "'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0'"
+glob_agent = getUserAgent()
 base_apiurl = "http://video4k.to/request"
 
 def postData(filter, type, page):

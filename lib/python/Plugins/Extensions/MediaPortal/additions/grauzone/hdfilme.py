@@ -257,6 +257,7 @@ class hdfilmeParsing(MPScreen, ThumbsHelper):
 		title = self['liste'].getCurrent()[0][0]
 		url = self['liste'].getCurrent()[0][1]
 		cover = self['liste'].getCurrent()[0][2]
+		self.addGlobalWatchtlist([title, cover, "hdfilmeStreams", title, url, cover])
 		self.session.open(hdfilmeStreams, title, url, cover)
 
 class hdfilmeStreams(MPScreen):

@@ -155,8 +155,8 @@ config.mediaportal.epg_deepstandby = ConfigSelection(default = "skip", choices =
 		])
 
 # Allgemein
-config.mediaportal.version = NoSave(ConfigText(default="766"))
-config.mediaportal.versiontext = NoSave(ConfigText(default="7.6.6"))
+config.mediaportal.version = NoSave(ConfigText(default="767"))
+config.mediaportal.versiontext = NoSave(ConfigText(default="7.6.7"))
 config.mediaportal.autoupdate = ConfigYesNo(default = True)
 config.mediaportal.pincode = ConfigPIN(default = 0000)
 config.mediaportal.showporn = ConfigYesNo(default = False)
@@ -251,7 +251,6 @@ config.mediaportal.sp_on_movie_stop = ConfigSelection(default = "ask", choices =
 config.mediaportal.sp_on_movie_eof = ConfigSelection(default = "ask", choices = [("ask", _("Ask user")), ("quit", _("Return to previous service")), ("pause", _("Pause movie at end"))])
 config.mediaportal.sp_seekbar_sensibility = ConfigInteger(default = 10, limits = (1,50))
 config.mediaportal.sp_infobar_cover_off = ConfigYesNo(default = False)
-config.mediaportal.sp_show_errors = ConfigYesNo(default = False)
 config.mediaportal.sp_use_number_seek = ConfigYesNo(default = True)
 config.mediaportal.sp_pl_number = ConfigInteger(default = 1, limits = (1,99))
 config.mediaportal.sp_mi_key = ConfigSelection(default = "instantRecord", choices = [("displayHelp", _("HELP")),("showMovies", _("PVR/VIDEO")),("instantRecord", _("RECORD"))])
@@ -1372,11 +1371,11 @@ class MPList(Screen, HelpableScreen):
 						status = [item for item in mp_globals.status if item[0] == x.get("modfile")]
 						if status:
 							if config.mediaportal.version.value < status[0][1]:
+								if status[0][1] == "9999":
+									self.session.open(MessageBoxExt, _("This Plugin has been marked as \"not working\" by the developers.\n\nCurrent developer status of this Plugin is:\n\"%s\"\n\nIf someone else is willing to provide a fix for this Plugin then please get in contact with us.") % status[0][2], MessageBoxExt.TYPE_INFO)
+								else:
+									self.session.open(MessageBoxExt, _("This Plugin has been marked as \"not working\" by the developers.\n\nCurrent developer status of this Plugin is:\n\"%s\"") % status[0][2], MessageBoxExt.TYPE_INFO)
 								if not config.mediaportal.debugMode.value == "High":
-									if status[0][1] == "9999":
-										self.session.open(MessageBoxExt, _("This Plugin has been marked as \"not working\" by the developers.\n\nCurrent developer status of this Plugin is:\n\"%s\"\n\nIf someone else is willing to provide a fix for this Plugin then please get in contact with us.") % status[0][2], MessageBoxExt.TYPE_INFO)
-									else:
-										self.session.open(MessageBoxExt, _("This Plugin has been marked as \"not working\" by the developers.\n\nCurrent developer status of this Plugin is:\n\"%s\"") % status[0][2], MessageBoxExt.TYPE_INFO)
 									return
 						param = ""
 						param1 = x.get("param1")
@@ -2193,11 +2192,11 @@ class MPWall(Screen, HelpableScreen):
 						status = [item for item in mp_globals.status if item[0] == x.get("modfile")]
 						if status:
 							if config.mediaportal.version.value < status[0][1]:
+								if status[0][1] == "9999":
+									self.session.open(MessageBoxExt, _("This Plugin has been marked as \"not working\" by the developers.\n\nCurrent developer status of this Plugin is:\n\"%s\"\n\nIf someone else is willing to provide a fix for this Plugin then please get in contact with us.") % status[0][2], MessageBoxExt.TYPE_INFO)
+								else:
+									self.session.open(MessageBoxExt, _("This Plugin has been marked as \"not working\" by the developers.\n\nCurrent developer status of this Plugin is:\n\"%s\"") % status[0][2], MessageBoxExt.TYPE_INFO)
 								if not config.mediaportal.debugMode.value == "High":
-									if status[0][1] == "9999":
-										self.session.open(MessageBoxExt, _("This Plugin has been marked as \"not working\" by the developers.\n\nCurrent developer status of this Plugin is:\n\"%s\"\n\nIf someone else is willing to provide a fix for this Plugin then please get in contact with us.") % status[0][2], MessageBoxExt.TYPE_INFO)
-									else:
-										self.session.open(MessageBoxExt, _("This Plugin has been marked as \"not working\" by the developers.\n\nCurrent developer status of this Plugin is:\n\"%s\"") % status[0][2], MessageBoxExt.TYPE_INFO)
 									return
 						param = ""
 						param1 = x.get("param1")
@@ -2962,11 +2961,11 @@ class MPWall2(Screen, HelpableScreen):
 						status = [item for item in mp_globals.status if item[0] == x.get("modfile")]
 						if status:
 							if config.mediaportal.version.value < status[0][1]:
+								if status[0][1] == "9999":
+									self.session.open(MessageBoxExt, _("This Plugin has been marked as \"not working\" by the developers.\n\nCurrent developer status of this Plugin is:\n\"%s\"\n\nIf someone else is willing to provide a fix for this Plugin then please get in contact with us.") % status[0][2], MessageBoxExt.TYPE_INFO)
+								else:
+									self.session.open(MessageBoxExt, _("This Plugin has been marked as \"not working\" by the developers.\n\nCurrent developer status of this Plugin is:\n\"%s\"") % status[0][2], MessageBoxExt.TYPE_INFO)
 								if not config.mediaportal.debugMode.value == "High":
-									if status[0][1] == "9999":
-										self.session.open(MessageBoxExt, _("This Plugin has been marked as \"not working\" by the developers.\n\nCurrent developer status of this Plugin is:\n\"%s\"\n\nIf someone else is willing to provide a fix for this Plugin then please get in contact with us.") % status[0][2], MessageBoxExt.TYPE_INFO)
-									else:
-										self.session.open(MessageBoxExt, _("This Plugin has been marked as \"not working\" by the developers.\n\nCurrent developer status of this Plugin is:\n\"%s\"") % status[0][2], MessageBoxExt.TYPE_INFO)
 									return
 						param = ""
 						param1 = x.get("param1")
@@ -3574,7 +3573,7 @@ class globalWatchlist(MPScreen):
 			readGlwl.close()
 
 			for lst in re.findall('"(.*?)"', glWldata):
-				list = lst.split(',')
+				list = lst.split('||')
 				self.streamList.append((list[0], list[1], list))
 			self.keyLocked = False
 		except:

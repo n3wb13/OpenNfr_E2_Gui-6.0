@@ -40,7 +40,7 @@ from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage
 
-BASEURL = 'https://filmpalast.to'
+BASEURL = 'http://filmpalast.to'
 
 try:
 	import requests
@@ -101,6 +101,7 @@ class filmPalastMain(MPScreen):
 		self.keyLocked = True
 		self.streamList.append(("--- Search ---", "callSuchen"))
 		self.streamList.append(("Neueste Filme", "/movies/new/page/"))
+		self.streamList.append(("Neueste Episoden", "/serien/view/page/"))
 		self.streamList.append(("Serien", "/serien/view/"))
 		self.streamList.append(("Abenteuer", "/search/genre/Abenteuer/"))
 		self.streamList.append(("Action", "/search/genre/Action/"))
@@ -362,10 +363,11 @@ class filmPalastParsing(MPScreen, ThumbsHelper):
 				Image = "http://www.filmpalast.to" + Image
 				self.streamList.append((decodeHtml(Title), Url, Image))
 		if len(self.streamList) == 0:
-			self.streamList.append((_('No movies found!'), '', ''))
+			self.streamList.append((_('No movies found!'), None, None))
+		else:
+			self.keyLocked = False
 		self.ml.setList(map(self._defaultlistleft, self.streamList))
 		self.ml.moveToIndex(0)
-		self.keyLocked = False
 		self.th_ThumbsQuery(self.streamList, 0, 1, 2, None, None, self.page, self.lastpage)
 		self.showInfos()
 
@@ -382,7 +384,10 @@ class filmPalastParsing(MPScreen, ThumbsHelper):
 		stream_name = self['liste'].getCurrent()[0][0]
 		url = self['liste'].getCurrent()[0][1]
 		cover = self['liste'].getCurrent()[0][2]
-		self.session.open(filmPalastStreams, stream_name, url, cover)
+		if self.genre == "Neueste Episoden":
+			self.session.open(filmPalastEpisodenParsing, stream_name, url)
+		else:
+			self.session.open(filmPalastStreams, stream_name, url, cover)
 
 class filmPalastStreams(MPScreen):
 

@@ -333,7 +333,10 @@ class youtubeUrl(object):
   def callBack(self, url):
 	if url.startswith('http') and not '.m3u8' in url:
 		self.error = '[YoutubeURL] Playback error:'
-		return self.tw_agent_hlp.getRedirectedUrl(url, True).addCallback(self.getRedirect, url).addErrback(self.dataError)
+		try:
+			return self.tw_agent_hlp.getRedirectedUrl(url, True).addCallback(self.getRedirect, url).addErrback(self.dataError)
+		except:
+			self.__callBack(url)
 	else:
 		self.__callBack(url)
 

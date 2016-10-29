@@ -44,7 +44,7 @@ class tube8GenreScreen(MPScreen):
 		getPage(self.url).addCallback(self.genreData).addErrback(self.dataError)
 
 	def genreData(self, data):
-		parse = re.search('id="categories-wrapper"(.*?)</div>', data,re.S)
+		parse = re.search('class="categories-menu(.*?)</div>', data,re.S)
 		Cats = re.findall('href="(.*?)">(.*?)</a>', parse.group(1), re.S)
 		if Cats:
 			for (Url, Title) in Cats:

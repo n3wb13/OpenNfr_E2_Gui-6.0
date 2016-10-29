@@ -42,18 +42,9 @@ from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPag
 
 myagent = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:40.0) Gecko/20100101 Firefox/40.0'
 
-class empflixGenreScreen(MPScreen):
+class moviefapGenreScreen(MPScreen):
 
-	def __init__(self, session, mode):
-		self.mode = mode
-
-		if self.mode == "empflix":
-			self.portal = "Empflix.com"
-			self.baseurl = "https://www.empflix.com"
-		if self.mode == "moviefap":
-			self.portal = "MovieFap.com"
-			self.baseurl = "http://www.moviefap.com"
-
+	def __init__(self, session):
 		self.plugin_path = mp_globals.pluginPath
 		self.skin_path = mp_globals.pluginPath + mp_globals.skinsPath
 		path = "%s/%s/defaultGenreScreen.xml" % (self.skin_path, config.mediaportal.skin.value)
@@ -75,7 +66,7 @@ class empflixGenreScreen(MPScreen):
 			"left" : self.keyLeft
 		}, -1)
 
-		self['title'] = Label(self.portal)
+		self['title'] = Label("MovieFap.com")
 		self['ContentTitle'] = Label("Genre:")
 		self.keyLocked = True
 		self.suchString = ''
@@ -87,33 +78,22 @@ class empflixGenreScreen(MPScreen):
 		self.onLayoutFinish.append(self.layoutFinished)
 
 	def layoutFinished(self):
-		url = self.baseurl
-		if self.mode == "moviefap":
-			url = url + "/browse/"
+		url = "http://www.moviefap.com/browse/"
 		twAgentGetPage(url, agent=myagent).addCallback(self.genreData).addErrback(self.dataError)
 
 	def genreData(self, data):
-		if self.mode == "moviefap":
-			parse = re.search('Categories</h1></div>(.*?)</div', data, re.S)
-		else:
-			parse = re.search('List\sof\stags(.*?)>Channels</', data, re.S)
+		parse = re.search('Categories</h1></div>(.*?)</div', data, re.S)
 		Cats = re.findall('<li>\s*<a\shref="(?:.*?empflix.com|.*?moviefap.com|)(.*?)(?:1.html|)".*?>(.*?)(?:<i>|</a></li>)', parse.group(1), re.S)
 		if Cats:
 
 			for (Url, Title) in Cats:
 				if not Title == "All":
-					Url = self.baseurl + Url
-					if self.mode == "moviefap":
-						Url = Url + "mr/"
+					Url = "http://www.moviefap.com" + Url + "mr/"
 					self.genreliste.append((decodeHtml(Title), Url))
 			self.genreliste.sort()
-			if self.mode == "moviefap":
-				split = "/"
-			else:
-				split = ".php"
-			self.genreliste.insert(0, ("Being Watched", '%s/browse%s?category=bw&page=' % (self.baseurl, split)))
-			self.genreliste.insert(0, ("Top Rated", '%s/browse%s?category=tr&page=' % (self.baseurl, split)))
-			self.genreliste.insert(0, ("Most Recent", '%s/browse%s?category=mr&page=' % (self.baseurl, split)))
+			self.genreliste.insert(0, ("Being Watched", 'http://www.moviefap.com/browse/?category=bw&page='))
+			self.genreliste.insert(0, ("Top Rated", 'http://www.moviefap.com/browse/?category=tr&page='))
+			self.genreliste.insert(0, ("Most Recent", 'http://www.moviefap.com/browse/?category=mr&page='))
 			self.genreliste.insert(0, ("--- Search ---", "callSuchen"))
 			self.ml.setList(map(self._defaultlistcenter, self.genreliste))
 			self.ml.moveToIndex(0)
@@ -127,21 +107,19 @@ class empflixGenreScreen(MPScreen):
 			self.suchen()
 		else:
 			Link = self['liste'].getCurrent()[0][1]
-			self.session.open(empflixFilmScreen, Link, Name, self.portal, self.baseurl)
+			self.session.open(moviefapFilmScreen, Link, Name)
 
 	def SuchenCallback(self, callback = None, entry = None):
 		if callback is not None and len(callback):
 			self.suchString = callback.replace(' ', '+')
 			Link = '%s' % (self.suchString)
 			Name = "--- Search ---"
-			self.session.open(empflixFilmScreen, Link, Name, self.portal, self.baseurl)
+			self.session.open(moviefapFilmScreen, Link, Name)
 
-class empflixFilmScreen(MPScreen, ThumbsHelper):
+class moviefapFilmScreen(MPScreen, ThumbsHelper):
 
-	def __init__(self, session, Link, Name, portal, baseurl):
+	def __init__(self, session, Link, Name):
 		self.Link = Link
-		self.portal = portal
-		self.baseurl = baseurl
 		self.Name = Name
 		self.plugin_path = mp_globals.pluginPath
 		self.skin_path = mp_globals.pluginPath + mp_globals.skinsPath
@@ -169,7 +147,7 @@ class empflixFilmScreen(MPScreen, ThumbsHelper):
 			"green" : self.keyPageNumber
 		}, -1)
 
-		self['title'] = Label(self.portal)
+		self['title'] = Label("MovieFap.com")
 		self['ContentTitle'] = Label("Genre: %s" % self.Name)
 		self['F2'] = Label(_("Page"))
 
@@ -189,36 +167,17 @@ class empflixFilmScreen(MPScreen, ThumbsHelper):
 		self['name'].setText(_('Please wait...'))
 		self.filmliste = []
 		if re.match(".*?Search", self.Name):
-			if re.match(".*?moviefap", self.baseurl):
-				url = "%s/search/%s/relevance/%s" % (self.baseurl, self.Link, str(self.page))
-			else:
-				url = "%s/search.php?what=%s&page=%s" % (self.baseurl, self.Link, str(self.page))
+			url = "http://www.moviefap.com/search/%s/relevance/%s" % (self.Link, str(self.page))
 		else:
-			pager = ""
-			if re.match(".*?empflix", self.baseurl):
-				pager = ".html"
-			url = "%s%s%s" % (self.Link, str(self.page), pager)
+			url = "%s%s" % (self.Link, str(self.page))
 		twAgentGetPage(url).addCallback(self.loadData).addErrback(self.dataError)
 
 	def loadData(self, data):
-		if re.match(".*?moviefap", self.baseurl):
-			self.getLastPage(data, 'class="pagination">(.*?)</div>')
-			Movies = re.findall('class="video.*?<a\s{1,2}href="(.*?)"\stitle="(.*?)".*?img\ssrc="(.*?)".*?videoleft">(.*?)<', data, re.S)
-		else:
-			self.getLastPage(data, 'class="newPagination">(.*?)</div>')
-			Movies = re.findall('class="video\s.*?<a\s{1,2}href="(.*?)"\sclass=".*?class="duringTime">(.*?)</span>.*?<img\ssrc="(.*?)"\sonMouseOver=.*?title="(.*?)"\salt=', data, re.S)
+		self.getLastPage(data, 'class="pagination">(.*?)</div>')
+		Movies = re.findall('class="video.*?<a\s{1,2}href="(.*?)"\stitle="(.*?)".*?img\ssrc="(.*?)".*?videoleft">(.*?)<', data, re.S)
 		if Movies:
-			if re.match(".*?moviefap", self.baseurl):
-				for (Url, Title, Image, Runtime) in Movies:
-					self.filmliste.append((decodeHtml(Title), Url, Image, Runtime))
-			else:
-				for (Url, Runtime, Image, Title) in Movies:
-					if Url[:2] == "//":
-						Url = "http:" + Url
-					else:
-						Url = self.baseurl + Url
-					Image = "http:" + Image
-					self.filmliste.append((decodeHtml(Title), Url, Image, Runtime))
+			for (Url, Title, Image, Runtime) in Movies:
+				self.filmliste.append((decodeHtml(Title), Url, Image, Runtime))
 		if len(self.filmliste) == 0:
 			self.filmliste.append((_('No videos found!'), '', None, ''))
 		self.ml.setList(map(self._defaultlistleft, self.filmliste))

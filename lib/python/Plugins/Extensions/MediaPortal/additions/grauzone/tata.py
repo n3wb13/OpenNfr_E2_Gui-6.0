@@ -170,7 +170,7 @@ class tataMain(MPScreen):
 	def SuchenCallback(self, callback = None, entry = None):
 		if callback is not None and len(callback):
 			self.suchString = callback.strip()
-			url = '%s/filme?suche=%s' % (BASE_URL, urllib.quote_plus(self.suchString))
+			url = self.suchString
 			genre = self['liste'].getCurrent()[0][0]
 			self.session.open(tataParsing, genre, url)
 
@@ -216,7 +216,10 @@ class tataParsing(MPScreen):
 
 	def loadPage(self):
 		self.streamList = []
-		url = self.url + str(self.page)
+		if re.match('.*?Search', self.genre):
+			url = BASE_URL + '/filme/%s?suche=%s&type=alle' % (str(self.page), self.url)
+		else:
+			url = self.url + str(self.page)
 		data = tat_grabpage(url)
 		self.parseData(data)
 
@@ -254,9 +257,11 @@ class tataParsing(MPScreen):
 		url = self['liste'].getCurrent()[0][1]
 		cover = self['liste'].getCurrent()[0][2]
 		data = tat_grabpage(url)
-		stream = re.findall('class="video-blk".*?data-url=(?:\'\[|)"(.*?)"', data, re.S)
+		ajax = re.findall('class="video-blk".*?data-url=["|\'](.*?)["|\']', data, re.S)
+		data = tat_grabpage(ajax[0].replace('https://','http://'))
+		stream = re.findall('link_mp4":"(.*?)"', data, re.S)
 		if stream:
-			url = stream[0].replace('\/','/').replace('https://','http://')
+			url = stream[0].replace('\/','/')
 			self.session.open(SimplePlayer, [(title, url, cover)], showPlaylist=False, ltype='tata', cover=True)
 		else:
 			self.session.open(MessageBoxExt, _("Sorry, can't extract a stream url."), MessageBoxExt.TYPE_INFO, timeout=5)

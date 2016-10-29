@@ -10,13 +10,9 @@ from Plugins.Extensions.MediaPortal.resources.menuhelper import MenuHelper
 from Plugins.Extensions.MediaPortal.resources.simple_lru_cache import SimpleLRUCache
 from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage, TwAgentHelper
 
-MFMP3_Version = "MyFreeMP3 v1.32"
-
-MFMP3_siteEncoding = 'utf-8'
-
 glob_cookies = None
 glob_historyLRUCache = SimpleLRUCache(100, config.mediaportal.watchlistpath.value + 'mp_mfmp3_history')
-BASE_URL = "http://www.my-free-mp3.com"
+BASE_URL = "http://www.my-free-mp3.org"
 TIME_OUT = 10
 config.mediaportal.mfmp3_precheck_mp3ids = ConfigYesNo(default = True)
 config.mediaportal.mfmp3_discard_mp3_duplicates = ConfigYesNo(default = True)
@@ -38,7 +34,7 @@ class show_MFMP3_Genre(MenuHelper):
 
 		MenuHelper.__init__(self, session, 0, None, BASE_URL, "", self._defaultlistleft, cookieJar=glob_cookies, skin_name=skin_name)
 
-		self['title'] = Label(MFMP3_Version)
+		self['title'] = Label("MyFreeMP3")
 		self['ContentTitle'] = Label(self.genre_title)
 		self.menu = menu_data
 		self.skipMenuParse = menu_data != None
@@ -56,7 +52,7 @@ class show_MFMP3_Genre(MenuHelper):
 		self['F4'] = Label("")
 		if genre_type[0] == 'albums':
 			self['handlung'] = Label()
-			
+
 		self.page = self.pages = 0
 		self.nextUrl = self.nextPage = None
 		self.yellowButtonTxt = None
@@ -310,7 +306,7 @@ class show_MFMP3_Genre(MenuHelper):
 			if m:
 				self.bio_text = decodeHtml(m.group(1).strip())
 				self.bio_text = re.sub('  \s+', '\n', self.bio_text)
-		
+
 	def checkForGenres(self, data):
 		if data and '<a href="#">Genres</a>' in data and self.__class__.ctr < 10:
 			m = re.search('<a href="#">Genres</a>(.*?)class="clear">', data)
@@ -674,17 +670,18 @@ class MFMP3_Player(SimplePlayer):
 		self.mfmp3_playIdx = 0
 		self._host = host
 		self._hash = hash
+		self.tw_agent_hlp = TwAgentHelper(followRedirect=True)
 
 	def getVideo(self):
 		self.mfmp3_playIdx = self.playIdx
 		url = self.playList[self.mfmp3_playIdx][1][3]
 		if url == '_skip_':
 			self.dataError(_('No MP3-Id found: Skip:\n') + self.playList[self.mfmp3_playIdx][1][0])
-		elif url.startswith('http://www.myfreemp3.eu') or url.startswith('http://unref.eu'):
+		elif url.startswith('http://www.my-free-mp3.org') or url.startswith('http://unref.eu'):
 			if url.startswith('http://unref.eu'):
 				twAgentGetPage(url, timeout=TIME_OUT).addCallback(self.getV3).addErrback(self.getV3, True)
 			else:
-				reactor.callLater(0,self.playMP3(url))
+				reactor.callLater(0,self.getMP3(url))
 		else:
 			data = 'artist=%s&track=%s' % (self.playList[self.mfmp3_playIdx][1][2], self.playList[self.mfmp3_playIdx][1][0])
 			twAgentGetPage(self._host+'/song/', method='POST', postdata=data, cookieJar=glob_cookies, timeout=TIME_OUT, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getV2).addErrback(self.getV2, True)
@@ -696,12 +693,12 @@ class MFMP3_Player(SimplePlayer):
 			if m:
 				dura, id = m and m.groups()
 				if id != '_':
-					link = 'http://www.myfreemp3.eu/play/%s_%s/' % (id, self._hash)
+					link = 'http://www.my-free-mp3.org/play/%s_%s/' % (id, self._hash)
 					entry = self.playList[self.mfmp3_playIdx]
-					if not entry[1][3].startswith('http://www.myfreemp3.eu'):
+					if not entry[1][3].startswith('http://www.my-free-mp3.org'):
 						entry = (entry[0], entry[1][:3]+(link,)+entry[1][4:])
 						self.playList[self.mfmp3_playIdx] = entry
-					reactor.callLater(0,self.playMP3(link))
+					reactor.callLater(0,self.getMP3(link))
 
 		if id == '_':
 			entry = self.playList[self.mfmp3_playIdx]
@@ -714,9 +711,12 @@ class MFMP3_Player(SimplePlayer):
 			m = re.search('window.open\("(.*?)"', data)
 			if m:
 				url = m.group(1)
-				return self.playMP3(url)
+				return self.getMP3(url)
 
 		self.dataError(_('No MP3-Stream found:\n') + self.playList[self.playIdx][1][0])
+
+	def getMP3(self, url):
+		self.tw_agent_hlp.getRedirectedUrl(url).addCallback(self.playMP3).addErrback(self.dataError)
 
 	def playMP3(self, url):
 		title = decodeHtml(self.playList[self.mfmp3_playIdx][1][0])
