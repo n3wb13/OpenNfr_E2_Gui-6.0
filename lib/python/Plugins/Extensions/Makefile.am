@@ -1,6 +1,6 @@
 installdir = $(pkglibdir)/python/Plugins/Extensions
 
-SUBDIRS = TuxboxPlugins CutListEditor PicturePlayer MediaScanner MediaPlayer SocketMMI DVDBurn Modem Infopanel MenuSort CustomSubservices bmediacenter MediaPortal MainMenu2 e2speedtest
+SUBDIRS = TuxboxPlugins CutListEditor PicturePlayer MediaScanner MediaPlayer SocketMMI DVDBurn Modem Infopanel MenuSort bmediacenter MediaPortal MainMenu2 e2speedtest
 
 if SPARK
 SUBDIRS +=  NFR4XBoot-sh4
