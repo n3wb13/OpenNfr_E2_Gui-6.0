@@ -195,7 +195,7 @@
 		<key id="KEY_SETUP" mapto="showSystemSetup" flags="mr" />
 		<key id="KEY_OPTION" mapto="showNetworkSetup" flags="mr" />
 		<key id="KEY_LAN" mapto="showNetworkSetup" flags="mr" />
-		<key id="KEY_F1" mapto="showNetworkSetup" flags="mr" />
+		<!--<key id="KEY_F1" mapto="showNetworkSetup" flags="mr" />-->
 		<key id="KEY_F5" mapto="showRFmod" flags="b" />
 		<key id="KEY_F5" mapto="toggleAspectRatio" flags="l" />
 	</map>
@@ -226,7 +226,8 @@
 		<key id="KEY_BOOKMARKS" mapto="showPluginBrowser" flags="mm" />
 		<key id="KEY_OPTION" mapto="showLanSetup" flags="m" />
 		<key id="KEY_VIDEO" mapto="showMovies" flags="m" />
-		<key id="KEY_SEARCH" mapto="showWWW" flags="m" />
+		<key id="KEY_SEARCH" mapto="showWWW" flags="b" />
+		<key id="KEY_SEARCH" mapto="search_long" flags="l" />
 		<key id="KEY_WWW" mapto="showWWW" flags="m" />
 		<key id="KEY_SETUP" mapto="showSetup" flags="m" />
 		<key id="KEY_DIRECTORY" mapto="showPluginBrowser" flags="mm" />
@@ -247,12 +248,6 @@
 
 	<map context="InfobarAudioSelectionActions">
 		<key id="KEY_AUDIO" mapto="audioSelection" flags="m" />
-	</map>
-
-	<map context="InfobarAspectSelectionActions">
-		<key id="KEY_GREEN" mapto="aspectSelection" flags="l" />
-		<key id="KEY_MODE" mapto="aspectSelection" flags="l" />
-		<key id="KEY_MODE" mapto="aspectSelection" flags="b" />
 	</map>
 
 	<map context="InfobarSubtitleSelectionActions">
@@ -947,6 +942,7 @@
 		<key id="KEY_LIST" mapto="playlist" flags="b" />
 		<key id="KEY_TIME" mapto="timeshift" flags="b" />
 		<key id="KEY_SEARCH" mapto="search" flags="b" />
+		<key id="KEY_SEARCH" mapto="search_long" flags="l" />
 		<key id="KEY_RESTART" mapto="slow" flags="b" />
 		<key id="KEY_BOOKMARKS" mapto="mark" flags="b" />
 		<key id="KEY_F1" mapto="f1" flags="b" />
@@ -955,7 +951,7 @@
 		<key id="KEY_F2" mapto="f2_long" flags="l" />
 		<key id="KEY_F3" mapto="f3" flags="b" />
 		<key id="KEY_F3" mapto="f3_long" flags="l" />
-		<key id="KEY_F11" mapto="f11" flags="b" /> 
+		<key id="KEY_F11" mapto="f11" flags="b" />
 		<key id="KEY_F11" mapto="f11_long" flags="l" />
 	</map>
 </keymap>
