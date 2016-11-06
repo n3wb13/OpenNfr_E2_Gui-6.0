@@ -1,15 +1,16 @@
 Sky Select HD
 Sky 3D
+Sky 1 HD
 Sky Arts HD
 Sky Atlantic HD
 Sky Atlantic +1 HD
-Sky Cinema Action HD
 Sky Cinema HD
 Sky Cinema +1 HD
 Sky Cinema +24 HD
-Sky Cinema Star Wars HD
+Sky Cinema Action HD
+Sky Cinema Harry Potter HD
+Sky Cinema Family HD
 13th Street HD
-AXN HD
 Fox HD
 MGM HD
 RTL Crime HD
@@ -32,7 +33,6 @@ Sky Sport Fanzone HD
 Sky Sport Austria HD
 Sport1+ HD
 Sport1 US HD
-Sport1 US HD1
 Sky Sport News HD
 Sky Sport News HD
 Sky Sport 1 HD
@@ -46,6 +46,7 @@ Sky Sport 8 HD
 Sky Sport 9 HD
 Sky Sport 10 HD
 Sky Sport 11 HD
+Sky Sport UHD
 Sky Sport Bundesliga 1 HD
 Sky Sport Bundesliga 2 HD
 Sky Sport Bundesliga 3 HD
@@ -56,37 +57,41 @@ Sky Sport Bundesliga 7 HD
 Sky Sport Bundesliga 8 HD
 Sky Sport Bundesliga 9 HD
 Sky Sport Bundesliga 10 HD
+Sky Sport Bundesliga UHD
 Eurosport360HD 1
 Eurosport360HD 2
 Eurosport360HD 3
 Eurosport360HD 4
-Eurosport360HD 4
+Eurosport360HD 5
 Eurosport360HD 6
 Eurosport360HD 7
 Eurosport360HD 8
 Eurosport360HD 9
-Sky Cinema Action
+BLUE MOVIE HD
+Sky 1
 Sky Atlantic
 Sky Cinema
 Sky Cinema +1
 Sky Cinema +24
+Sky Cinema Action
 Sky Cinema Comedy
 Sky Cinema Emotion
-Sky Cinema Hits
-Sky Krimi
+Sky Cinema Harry Potter
+Sky Cinema Family
 Sky Cinema Nostalgie
-Sky Cinema Star Wars
+Sky Krimi
 13th Street
 A&E
-AXN Action
 Fox Serie
 Heimatkanal
+kabel eins classics
 Kinowelt TV
 MGM
 RTL Crime
 RTL Passion
+RTL Living
 Romance TV
-Sat.1 emotions
+SAT.1 emotions
 Syfy
 TNT Serie
 TNT Film (TCM)
@@ -125,32 +130,81 @@ Sky Sport Bundesliga 7
 Sky Sport Bundesliga 8
 Sky Sport Bundesliga 9
 Sky Sport Bundesliga 10
-Eurosport360HD 1
-Eurosport360HD 2
-Eurosport360HD 3
-Eurosport360HD 4
-Eurosport360HD 4
-Eurosport360HD 6
-Eurosport360HD 7
-Eurosport360HD 8
-Eurosport360HD 9
+Beate-Uhse.TV
+Blue Movie
+Blue Movie 1
+Blue Movie 2
+Blue Movie 3
+Brazzers TV
+Brazzers TV CZ
+DORCEL XXX
+Hustler TV
+Hustler TV CZ
+PENTHOUSE
+PLAYBOY TV
+Sky Select 1
+Sky Select 2
+Sky Select 3
+Sky Select 4
+Sky Select 5
+Sky Select 6
+Sky Select 7
+Sky Select 8
+Sky Select 9
+Sky Select Event A
+Sky Select Event B
 ORF1 HD
 ORF2K HD
 ORF III HD
 ORF SPORT+ HD
 ATV HD
+PULS 4 HD Austria
 NICKELODEON HD
+ServusTV HD Oesterreich
 ORF1
 ORF2
 ORF2 K
 ORF III
 ORF SPORT+
+oe24.TV
 ATV
 ATV2
 PULS 4 Austria
 RiC
 Comedy Central/VIVA
 Nickelodeon
+HITRADIO OE3
+ORF2B HD
+ORF2S HD
+ORF2N HD
+ORF2St HD
+ORF2O HD
+ORF2T HD
+ORF2V HD
+ORF2W HD
+ORF2 B
+ORF2 S
+ORF2 N
+ORF2 St
+ORF2 O
+ORF2 T
+ORF2 V
+ORF2 W
+SCHWEIZ 5
+DMAX Austria
+Kabel 1 Austria
+kabel1 Doku austria
+N24 Austria
+Pro7 MAXX Austria
+ProSieben Austria
+RTL Austria
+RTL2 Austria
+SAT.1 A
+SAT.1 Gold Österreich
+ServusTV Oesterreich
+sixx Austria
+SUPER RTL A
+VOX Austria
 Das Erste HD
 ZDF HD
 kabel eins HD
@@ -166,13 +220,15 @@ SUPER RTL HD
 TELE 5 HD
 TLC HD
 VOX HD
+arte HD
 Disney Channel HD
 DMAX HD
 N24 HD
 n-tv HD
+tagesschau24 HD
 3sat HD
-BR Nord HD
-BR Süd HD
+BR Fernsehen Nord HD
+BR Fernsehen Süd HD
 hr-fernsehen HD
 MDR S-Anhalt HD
 NDR FS NDS HD
@@ -180,10 +236,13 @@ ONE HD
 PHOENIX HD
 rbb Berlin HD
 ServusTV HD Deutschland
+SR Fernsehen HD
 SWR BW HD
+SWR RP HD
 WDR HD Köln
 zdf_neo HD
 ZDFinfo HD
+ANIXE HD
 Das Erste
 ZDF
 kabel eins
@@ -192,7 +251,7 @@ RTLNITRO
 RTLplus
 RTL2
 ProSieben
-ProSieben MAXX
+Pro7 MAXX
 SAT.1
 SAT.1 Gold
 SIXX
@@ -201,6 +260,7 @@ TELE 5
 VOX
 Disney Channel
 ANIXE SD
+TOGGO plus
 DMAX
 kabel eins Doku
 N24
@@ -209,8 +269,8 @@ n-tv
 Welt der Wunder
 arte
 3sat
-Bayerisches FS Nord
-Bayerisches FS Süd
+BR Fernsehen Nord
+BR Fernsehen Süd
 Family TV
 hr-fernsehen
 MDR S-Anhalt
@@ -218,12 +278,14 @@ NDR FS SH
 ONE
 PHOENIX
 rbb Berlin
+rbb Brandenburg
 ServusTV Deutschland
 SR Fernsehen
 SWR Fernsehen BW
+SWR Fernsehen RP
 tagesschau24
 WDR Bonn
 zdf_neo
 ZDFinfo
-Eurosport Deutschland
+Eurosport 1 Deutschland
 SPORT1
