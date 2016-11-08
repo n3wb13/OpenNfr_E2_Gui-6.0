@@ -1,5 +1,5 @@
 ﻿from enigma import eListboxPythonMultiContent, gFont, eEnv
-from boxbranding import getBoxType, getMachineName, getMachineBrand, getBrandOEM
+from boxbranding import getBoxType, getMachineName, getMachineBrand, getBrandOEM, getMachineBuild
 from Components.Console import Console
 from Components.ActionMap import ActionMap
 from Components.Label import Label
@@ -24,8 +24,6 @@ from Screens.HarddiskSetup import HarddiskSelection, HarddiskFsckSelection, Hard
 from Screens.SkinSelector import LcdSkinSelector
 from Screens.LogManager import *
 from Plugins.Plugin import PluginDescriptor
-from Plugins.SystemPlugins.PositionerSetup.plugin import PositionerSetup, RotorNimSelection
-from Plugins.SystemPlugins.Satfinder.plugin import Satfinder
 from Plugins.SystemPlugins.NetworkBrowser.MountManager import AutoMountManager
 from Plugins.SystemPlugins.NetworkBrowser.NetworkBrowser import NetworkBrowser
 from Plugins.SystemPlugins.NetworkWizard.NetworkWizard import NetworkWizard
@@ -760,43 +758,51 @@ class QuickMenu(Screen):
 
 ######## TUNER TOOLS #######################
 	def PositionerMain(self):
-		nimList = nimmanager.getNimListOfType("DVB-S")
-		if len(nimList) == 0:
-			self.session.open(MessageBox, _("No positioner capable frontend found."), MessageBox.TYPE_ERROR)
+		if getBoxType() == '7300s':
+			self.session.open(MessageBox, _("No Positionerplugin found please Check it!"), MessageBox.TYPE_ERROR)	
 		else:
-			if len(NavigationInstance.instance.getRecordings()) > 0:
-				self.session.open(MessageBox, _("A recording is currently running. Please stop the recording before trying to configure the positioner."), MessageBox.TYPE_ERROR)
+			from Plugins.SystemPlugins.PositionerSetup.plugin import PositionerSetup, RotorNimSelection	
+			nimList = nimmanager.getNimListOfType("DVB-S")
+			if len(nimList) == 0:
+				self.session.open(MessageBox, _("No positioner capable frontend found."), MessageBox.TYPE_ERROR)
 			else:
-				usableNims = []
-				for x in nimList:
-					configured_rotor_sats = nimmanager.getRotorSatListForNim(x)
-					if len(configured_rotor_sats) != 0:
-						usableNims.append(x)
-				if len(usableNims) == 1:
-					self.session.open(PositionerSetup, usableNims[0])
-				elif len(usableNims) > 1:
-					self.session.open(RotorNimSelection)
+				if len(NavigationInstance.instance.getRecordings()) > 0:
+					self.session.open(MessageBox, _("A recording is currently running. Please stop the recording before trying to configure the positioner."), MessageBox.TYPE_ERROR)
 				else:
-					self.session.open(MessageBox, _("No tuner is configured for use with a diseqc positioner!"), MessageBox.TYPE_ERROR)
+					usableNims = []
+					for x in nimList:
+						configured_rotor_sats = nimmanager.getRotorSatListForNim(x)
+						if len(configured_rotor_sats) != 0:
+							usableNims.append(x)
+					if len(usableNims) == 1:
+						self.session.open(PositionerSetup, usableNims[0])
+					elif len(usableNims) > 1:
+						self.session.open(RotorNimSelection)
+					else:
+						self.session.open(MessageBox, _("No tuner is configured for use with a diseqc positioner!"), MessageBox.TYPE_ERROR)
 
 	def SatfinderMain(self):
-		nims = nimmanager.getNimListOfType("DVB-S")
-
-		nimList = []
-		for x in nims:
-			if not nimmanager.getNimConfig(x).configMode.value in ("loopthrough", "satposdepends", "nothing"):
-				nimList.append(x)
-
-		if len(nimList) == 0:
-			self.session.open(MessageBox, _("No satellite frontend found!!"), MessageBox.TYPE_ERROR)
+		if getBoxType() == '7300s':
+			self.session.open(MessageBox, _("No Positionerplugin found please Check it!"), MessageBox.TYPE_ERROR)
 		else:
-			if len(NavigationInstance.instance.getRecordings()) > 0:
-				self.session.open(MessageBox, _("A recording is currently running. Please stop the recording before trying to start the satfinder."), MessageBox.TYPE_ERROR)
+			from Plugins.SystemPlugins.Satfinder.plugin import Satfinder
+			nims = nimmanager.getNimListOfType("DVB-S")
+
+			nimList = []
+			for x in nims:
+				if not nimmanager.getNimConfig(x).configMode.value in ("loopthrough", "satposdepends", "nothing"):
+					nimList.append(x)
+
+			if len(nimList) == 0:
+				self.session.open(MessageBox, _("No satellite frontend found!!"), MessageBox.TYPE_ERROR)
 			else:
-				if len(nimList) == 1:
-					self.session.open(Satfinder)
-				elif len(nimList) > 1:
-					self.session.open(Satfinder)
+				if len(NavigationInstance.instance.getRecordings()) > 0:
+					self.session.open(MessageBox, _("A recording is currently running. Please stop the recording before trying to start the satfinder."), MessageBox.TYPE_ERROR)
+				else:
+					if len(nimList) == 1:
+						self.session.open(Satfinder)
+					elif len(nimList) > 1:
+						self.session.open(Satfinder)
 
 		
 ######## SOFTWARE MANAGER TOOLS #######################
@@ -930,8 +936,10 @@ class QuickMenuDevices(Screen):
 			if not parts:
 				continue
 			device = parts[3]
-			if not search('sd[a-z][1-9]',device):
+			if not search('sd[a-z][1-9]',device) and not search('mmcblk[0-9]p[1-9]',device):
 				continue
+			if getMachineBuild() in ('vusolo4k', 'hd51', 'hd52','sf4008') and search('mmcblk0p[1-9]',device):
+ 				continue
 			if device in list2:
 				continue
 			self.buildMy_rec(device)
@@ -965,25 +973,75 @@ class QuickMenuDevices(Screen):
 				device2 = device.replace('4', '')
 		except:
 			device2 = ''
+		try:
+			if device.find('p1') > 1:
+				device2 = device.replace('p1', '')
+		except:
+			device2 = ''
+		try:
+			if device.find('p2') > 1:
+				device2 = device.replace('p2', '')
+		except:
+			device2 = ''
+		try:
+			if device.find('p3') > 1:
+				device2 = device.replace('p3', '')
+		except:
+			device2 = ''
+		try:
+			if device.find('p4') > 1:
+				device2 = device.replace('p4', '')
+		except:
+			device2 = ''
+		try:
+			if device.find('p5') > 1:
+				device2 = device.replace('p5', '')
+		except:
+			device2 = ''
+		try:
+			if device.find('p6') > 1:
+				device2 = device.replace('p6', '')
+		except:
+			device2 = ''
+		try:
+			if device.find('p7') > 1:
+				device2 = device.replace('p7', '')
+		except:
+			device2 = ''
+		try:
+			if device.find('p8') > 1:
+				device2 = device.replace('p8', '')
+		except:
+			device2 = ''			
 		devicetype = path.realpath('/sys/block/' + device2 + '/device')
 		d2 = device
 		name = 'USB: '
 		mypixmap = '/usr/lib/enigma2/python/Plugins/Extensions/Infopanel/icons/dev_usbstick.png'
-		model = file('/sys/block/' + device2 + '/device/model').read()
+		if device2.startswith('mmcblk'):
+			model = file('/sys/block/' + device2 + '/device/name').read()
+			mypixmap = '/usr/lib/enigma2/python/Plugins/Extensions/Infopanel/icons/dev_mmc.png'
+			name = 'MMC: '
+		else:
+			model = file('/sys/block/' + device2 + '/device/model').read()
 		model = str(model).replace('\n', '')
 		des = ''
-		if devicetype.find('/devices/pci') != -1:
+		if devicetype.find('/devices/pci') != -1 or devicetype.find('ahci') != -1:
 			name = _("HARD DISK: ")
 			mypixmap = '/usr/lib/enigma2/python/Plugins/Extensions/Infopanel/icons/dev_hdd.png'
 		name = name + model
 
 		from Components.Console import Console
 		self.Console = Console()
-		self.Console.ePopen("sfdisk -l /dev/sd? | grep swap | awk '{print $(NF-9)}' >/tmp/devices.tmp")
+		self.Console.ePopen("sfdisk -l | grep swap | awk '{print $(NF-9)}' >/tmp/devices.tmp")
 		sleep(0.5)
-		f = open('/tmp/devices.tmp', 'r')
-		swapdevices = f.read()
-		f.close()
+		try:
+			f = open('/tmp/devices.tmp', 'r')
+			swapdevices = f.read()
+			f.close()
+		except:
+			swapdevices = ' '
+		if path.exists('/tmp/devices.tmp'):
+			remove('/tmp/devices.tmp')			
 		swapdevices = swapdevices.replace('\n','')
 		swapdevices = swapdevices.split('/')
 		f = open('/proc/mounts', 'r')
@@ -1013,7 +1071,9 @@ class QuickMenuDevices(Screen):
 			if line.find(device) != -1:
 				parts = line.strip().split()
 				size = int(parts[2])
-				if ((size / 1024) / 1024) > 1:
+				if (((float(size) / 1024) / 1024) / 1024) > 1:
+					des = _("Size: ") + str(round((((float(size) / 1024) / 1024) / 1024),2)) + _("TB")
+				elif ((size / 1024) / 1024) > 1:
 					des = _("Size: ") + str((size / 1024) / 1024) + _("GB")
 				else:
 					des = _("Size: ") + str(size / 1024) + _("MB")
@@ -1024,7 +1084,9 @@ class QuickMenuDevices(Screen):
 					size = int(size)
 				except:
 					size = 0
-				if (((size / 2) / 1024) / 1024) > 1:
+				if ((((float(size) / 2) / 1024) / 1024) / 1024) > 1:
+					des = _("Size: ") + str(round(((((float(size) / 2) / 1024) / 1024) / 1024),2)) + _("TB")
+				elif (((size / 2) / 1024) / 1024) > 1:
 					des = _("Size: ") + str(((size / 2) / 1024) / 1024) + _("GB")
 				else:
 					des = _("Size: ") + str((size / 2) / 1024) + _("MB")
@@ -1039,4 +1101,4 @@ class QuickMenuDevices(Screen):
 			des += '\t' + _("Mount: ") + d1 + '\n' + _("Device: ") + ' /dev/' + device + '\t' + _("Type: ") + dtype + rw
 			png = LoadPixmap(mypixmap)
 			res = (name, des, png)
-			self.devicelist.append(res)
+			self.devicelist.append(res) 
