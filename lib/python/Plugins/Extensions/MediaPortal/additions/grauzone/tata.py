@@ -3,7 +3,7 @@
 #
 #    MediaPortal for Dreambox OS
 #
-#    Coded by MediaPortal Team (c) 2013-2016
+#    Coded by MediaPortal Team (c) 2013-2017
 #
 #  This plugin is open source but it is NOT free software.
 #
@@ -38,6 +38,7 @@
 
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
+from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage
 
 try:
 	from Plugins.Extensions.MediaPortal.resources import cfscrape
@@ -122,7 +123,7 @@ class tataMain(MPScreen):
 				s = requests.session()
 				url = urlparse.urlparse(BASE_URL)
 				headers = {'user-agent': tat_agent}
-				page = s.get(url.geturl(), cookies=tat_cookies, headers=headers)
+				page = s.get(url.geturl(), cookies=tat_cookies, headers=headers, allow_redirects=False)
 				if page.status_code == 503 and page.headers.get("Server") == "cloudflare-nginx":
 					tat_ck, tat_agent = cfscrape.get_tokens(BASE_URL)
 					requests.cookies.cookiejar_from_dict(tat_ck, cookiejar=tat_cookies)
@@ -136,8 +137,11 @@ class tataMain(MPScreen):
 		self.keyCancel()
 
 	def getPage(self):
-		data = tat_grabpage(BASE_URL)
-		self.loadPage(data)
+		if not mp_globals.requests:
+			twAgentGetPage(BASE_URL, agent=tat_agent, cookieJar=tat_cookies).addCallback(self.loadPage).addErrback(self.dataError)
+		else:
+			data = tat_grabpage(BASE_URL)
+			self.loadPage(data)
 
 	def loadPage(self, data):
 		self.keyLocked = True
@@ -146,7 +150,7 @@ class tataMain(MPScreen):
 			cats = re.findall('href="(.*?)">(.*?)</a>', parse.group(1), re.S)
 			if cats:
 				for url, name in cats:
-					url = url.replace('https://','http://') + '/'
+					url = url + '/'
 					self.streamList.append((name, url))
 		self.streamList.sort(key=lambda t : t[0].lower())
 		self.streamList.insert(0, ("Serien","%s/tv/" % BASE_URL))
@@ -220,16 +224,17 @@ class tataParsing(MPScreen):
 			url = BASE_URL + '/filme/%s?suche=%s&type=alle' % (str(self.page), self.url)
 		else:
 			url = self.url + str(self.page)
-		data = tat_grabpage(url)
-		self.parseData(data)
+		if not mp_globals.requests:
+			twAgentGetPage(url, agent=tat_agent, cookieJar=tat_cookies).addCallback(self.parseData).addErrback(self.dataError)
+		else:
+			data = tat_grabpage(url)
+			self.parseData(data)
 
 	def parseData(self, data):
 		self.getLastPage(data, 'class="page-nav">(.*?)</ul>', '.*(?:>|")(\d+)(?:<|")')
 		movies = re.findall('<div class="ml-item-content">.*?<a href="(.*?)" class="ml-image">.*?<img src="(.*?)".*?<h6>(.*?)</h6>', data, re.S)
 		if movies:
 			for url,image,title in movies:
-				url = url.replace('https://','http://')
-				image = image.replace('https://','http://')
 				title = title.strip().replace('<span class="mark-wc">','').replace('</span>','')
 				self.streamList.append((decodeHtml(title), url, image))
 		if len(self.streamList) == 0:
@@ -253,12 +258,24 @@ class tataParsing(MPScreen):
 		exist = self['liste'].getCurrent()
 		if self.keyLocked or exist == None:
 			return
-		title = self['liste'].getCurrent()[0][0]
 		url = self['liste'].getCurrent()[0][1]
-		cover = self['liste'].getCurrent()[0][2]
-		data = tat_grabpage(url)
+		if not mp_globals.requests:
+			twAgentGetPage(url, agent=tat_agent, cookieJar=tat_cookies).addCallback(self.getAjax).addErrback(self.dataError)
+		else:
+			data = tat_grabpage(url)
+			self.getAjax(data)
+
+	def getAjax(self, data):
 		ajax = re.findall('class="video-blk".*?data-url=["|\'](.*?)["|\']', data, re.S)
-		data = tat_grabpage(ajax[0].replace('https://','http://'))
+		if not mp_globals.requests:
+			twAgentGetPage(ajax[0], agent=tat_agent, cookieJar=tat_cookies).addCallback(self.getStream).addErrback(self.dataError)
+		else:
+			data = tat_grabpage(ajax[0])
+			self.getStream(data)
+
+	def getStream(self, data):
+		title = self['liste'].getCurrent()[0][0]
+		cover = self['liste'].getCurrent()[0][2]
 		stream = re.findall('link_mp4":"(.*?)"', data, re.S)
 		if stream:
 			url = stream[0].replace('\/','/')

@@ -3,7 +3,7 @@
 #
 #    MediaPortal for Dreambox OS
 #
-#    Coded by MediaPortal Team (c) 2013-2016
+#    Coded by MediaPortal Team (c) 2013-2017
 #
 #  This plugin is open source but it is NOT free software.
 #
@@ -41,6 +41,7 @@ from imports import *
 import mp_globals
 from messageboxext import MessageBoxExt
 from twagenthelper import twAgentGetPage
+import random
 gLogFile = None
 
 class checkupdate:
@@ -64,12 +65,24 @@ class checkupdate:
 		tmp_infolines = html.splitlines()
 		remoteversion_ipk = re.sub('\D', '', tmp_infolines[0])
 		remoteversion_deb = re.sub('\D', '', tmp_infolines[2])
+		try:
+			mirrors = self.updateurl = tmp_infolines[5].split(';')
+			mirror_rand = random.choice(mirrors)
+			printl('Random update mirror selected: %s' % mirror_rand,self,'A')
+		except:
+			mirror_rand = None
 		if mp_globals.isDreamOS:
 			self.updateurl = tmp_infolines[3]
 			remoteversion = remoteversion_deb
 		else:
 			self.updateurl = tmp_infolines[1]
 			remoteversion = remoteversion_ipk
+		printl('Found update url: %s' % self.updateurl,self,'A')
+		if mirror_rand:
+			mirror_replace = re.search('(sourceforge.net.*)', self.updateurl)
+			if mirror_replace:
+				self.updateurl = 'http://' + mirror_rand + '.dl.' + mirror_replace.group(1)
+				printl('Generated update url: %s' % self.updateurl,self,'A')
 		if config.mediaportal.version.value < remoteversion:
 			self.session.openWithCallback(self.startUpdate,MessageBoxExt,_("An update is available for the MediaPortal Plugin!\nDo you want to download and install it now?"), MessageBoxExt.TYPE_YESNO)
 			return
@@ -132,7 +145,7 @@ class MPUpdateScreen(Screen):
 			configfile.save()
 			self.session.openWithCallback(self.restartGUI, MessageBoxExt, _("MediaPortal successfully updated!\nDo you want to restart the Enigma2 GUI now?"), MessageBoxExt.TYPE_YESNO)
 		elif retval == 2:
-			self.session.openWithCallback(self.returnGUI, MessageBoxExt, _("MediaPortal update failed! Please check free space on your root filesystem, at least 12MB are required for installation.\nCheck the update log carefully!"), MessageBoxExt.TYPE_ERROR)
+			self.session.openWithCallback(self.returnGUI, MessageBoxExt, _("MediaPortal update failed! Please check free space on your root filesystem, at least 16MB are required for installation.\nCheck the update log carefully!"), MessageBoxExt.TYPE_ERROR)
 		else:
 			self.session.openWithCallback(self.returnGUI, MessageBoxExt, _("MediaPortal update failed! Check the update log carefully!"), MessageBoxExt.TYPE_ERROR)
 

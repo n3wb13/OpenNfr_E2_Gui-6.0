@@ -1,6 +1,52 @@
 ﻿# -*- coding: utf-8 -*-
+###############################################################################################
+#
+#    MediaPortal for Dreambox OS
+#
+#    Coded by MediaPortal Team (c) 2013-2017
+#
+#  This plugin is open source but it is NOT free software.
+#
+#  This plugin may only be distributed to and executed on hardware which
+#  is licensed by Dream Property GmbH. This includes commercial distribution.
+#  In other words:
+#  It's NOT allowed to distribute any parts of this plugin or its source code in ANY way
+#  to hardware which is NOT licensed by Dream Property GmbH.
+#  It's NOT allowed to execute this plugin and its source code or even parts of it in ANY way
+#  on hardware which is NOT licensed by Dream Property GmbH.
+#
+#  This applies to the source code as a whole as well as to parts of it, unless
+#  explicitely stated otherwise.
+#
+#  If you want to use or modify the code or parts of it,
+#  you have to keep OUR license and inform us about the modifications, but it may NOT be
+#  commercially distributed other than under the conditions noted above.
+#
+#  As an exception regarding execution on hardware, you are permitted to execute this plugin on VU+ hardware
+#  which is licensed by satco europe GmbH, if the VTi image is used on that hardware.
+#
+#  As an exception regarding modifcations, you are NOT permitted to remove
+#  any copy protections implemented in this plugin or change them for means of disabling
+#  or working around the copy protections, unless the change has been explicitly permitted
+#  by the original authors. Also decompiling and modification of the closed source
+#  parts is NOT permitted.
+#
+#  Advertising with this plugin is NOT allowed.
+#  For other uses, permission from the authors is necessary.
+#
+###############################################################################################
+
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
+from Plugins.Extensions.MediaPortal.resources.keyboardext import VirtualKeyBoardExt
+
+agent='Mozilla/5.0 (Windows NT 6.1; rv:44.0) Gecko/20100101 Firefox/44.0'
+json_headers = {
+	'Accept':'application/json',
+	'Accept-Language':'de,en-US;q=0.7,en;q=0.3',
+	'X-Requested-With':'XMLHttpRequest',
+	'Content-Type':'application/x-www-form-urlencoded',
+	}
 
 class redtubeGenreScreen(MPScreen):
 
@@ -40,14 +86,16 @@ class redtubeGenreScreen(MPScreen):
 
 	def layoutFinished(self):
 		self.keyLocked = True
-		url = "http://www.redtube.com/channels"
+		url = "http://www.redtube.com/categories"
 		getPage(url).addCallback(self.genreData).addErrback(self.dataError)
 
 	def genreData(self, data):
-		Cats = re.findall('class="video">.*?<a\shref="(.*?)"\stitle="(.*?)">.*?data-src="(.*?)"', data, re.S)
+		Cats = re.findall('class="video">.*?<a\shref="(.*?)"\stitle="(.*?)">.*?data-src="(.*?\.jpg).*?"', data, re.S)
 		if Cats:
 			for (Url, Title, Image) in Cats:
 				Url = "http://www.redtube.com" + Url + '?page='
+				if Image.startswith('//'):
+					Image = 'http:' + Image
 				self.genreliste.append((Title, Url, Image))
 			self.genreliste.sort()
 			self.genreliste.insert(0, ("Most Favored", "http://www.redtube.com/mostfavored?period=alltime&page=", None))
@@ -69,18 +117,38 @@ class redtubeGenreScreen(MPScreen):
 			return
 		Name = self['liste'].getCurrent()[0][0]
 		if Name == "--- Search ---":
-			self.suchen()
-
+			self.session.openWithCallback(self.SuchenCallback, VirtualKeyBoardExt, title = (_("Enter search criteria")), text = self.suchString, is_dialog=True, auto_text_init=False, suggest_func=self.getSuggestions)
 		else:
 			Link = self['liste'].getCurrent()[0][1]
 			self.session.open(redtubeFilmScreen, Link, Name)
 
 	def SuchenCallback(self, callback = None, entry = None):
 		if callback is not None and len(callback):
-			self.suchString = callback.replace(' ', '+')
 			Name = "--- Search ---"
-			Link = 'http://www.redtube.com/?search=%s&page=' % (self.suchString)
+			self.suchString = callback
+			Link = 'http://www.redtube.com/?search=%s&page=' % self.suchString.replace(' ', '+')
 			self.session.open(redtubeFilmScreen, Link, Name)
+
+	def getSuggestions(self, text, max_res):
+		url = "http://www.redtube.com/searchsuggest?class=0&limit=10"
+		postdata = {'term': text}
+		d = twAgentGetPage(url, method='POST', postdata=urlencode(postdata), agent=agent, headers=json_headers, timeout=5)
+		d.addCallback(self.gotSuggestions, max_res)
+		d.addErrback(self.gotSuggestions, max_res, err=True)
+		return d
+
+	def gotSuggestions(self, suggestions, max_res, err=False):
+		list = []
+		if not err and type(suggestions) in (str, buffer):
+			suggestions = json.loads(suggestions)
+			for item in suggestions['data']['suggestions']:
+				li = item['label']
+				list.append(str(li))
+				max_res -= 1
+				if not max_res: break
+		elif err:
+			printl(str(suggestions),self,'E')
+		return list
 
 class redtubeFilmScreen(MPScreen, ThumbsHelper):
 
@@ -139,18 +207,14 @@ class redtubeFilmScreen(MPScreen, ThumbsHelper):
 		if lastp:
 			lastp = lastp.group(1).replace(',','')
 			cat = self.Link
-			search = re.search('/?search=(.*)', cat, re.S)
-			if search:
-				lastp = round((float(lastp) / 20) + 0.5)
-			else:
-				lastp = round((float(lastp) / 24) + 0.5)
+			lastp = round((float(lastp) / 24) + 0.5)
 			self.lastpage = int(lastp)
 		else:
 			self.lastpage = 1230
 		self['page'].setText(str(self.page) + ' / ' + str(self.lastpage))
-		Movies = re.findall('"video-duration"\sonclick="window.location.href\s=\'(.*?)\'">(.*?)<.*?data-src="(.*?)".*?alt="(.*?)"\s/>.*?views">(.*?)</span>', data, re.S)
+		Movies = re.findall('<a\shref="(\/\d+)"\stitle="(.*?)"\sclass="video-thumb.*?"\s{0,1}>\n\t{0,5}<span\sclass="video-duration.*?window.location.href.*?>(.*?)<.*?data-src="(.*?)".*?views">(.*?)</span>', data, re.S)
 		if Movies:
-			for (Url, Runtime, Image, Title, Views) in Movies:
+			for (Url, Title, Runtime, Image, Views) in Movies:
 				if Image.startswith('//'):
 					Image = 'http:' + Image
 				Views = Views.replace(',','').replace(' views','')
@@ -184,6 +248,8 @@ class redtubeFilmScreen(MPScreen, ThumbsHelper):
 		if videoPage:
 			url = videoPage[-1]
 			url = url.replace('\/','/')
+			if url.startswith('//'):
+				url = 'http:' + url
 			self.keyLocked = False
 			Title = self['liste'].getCurrent()[0][0]
 			self.session.open(SimplePlayer, [(Title, url)], showPlaylist=False, ltype='redtube')

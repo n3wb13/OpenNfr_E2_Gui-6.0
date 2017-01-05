@@ -44,4 +44,10 @@
 		<key id="KEY_TEXT" mapto="specText" flags="l" />
 		<key id="KEY_INFO" mapto="specTmdb" flags="m" />
 	</map>
+	<map context="MP_SP_Move">
+		<key id="KEY_CHANNELUP" mapto="SPMoveUp" flags="mr" />
+		<key id="KEY_CHANNELDOWN" mapto="SPMoveDown" flags="mr" />
+		<key id="KEY_PAGEUP" mapto="SPMoveUp" flags="mr" />
+		<key id="KEY_PAGEDOWN" mapto="SPMoveDown" flags="mr" />
+	</map>
 </keymap>

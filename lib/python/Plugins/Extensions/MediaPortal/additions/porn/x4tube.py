@@ -3,7 +3,7 @@
 #
 #    MediaPortal for Dreambox OS
 #
-#    Coded by MediaPortal Team (c) 2013-2016
+#    Coded by MediaPortal Team (c) 2013-2017
 #
 #  This plugin is open source but it is NOT free software.
 #
@@ -38,6 +38,13 @@
 
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
+from Plugins.Extensions.MediaPortal.resources.keyboardext import VirtualKeyBoardExt
+
+agent='Mozilla/5.0 (Windows NT 6.1; rv:44.0) Gecko/20100101 Firefox/44.0'
+headers = {
+	'Accept-Language':'de,en-US;q=0.7,en;q=0.3',
+	'X-Requested-With':'XMLHttpRequest',
+	}
 
 class fourtubeGenreScreen(MPScreen):
 
@@ -127,7 +134,7 @@ class fourtubeGenreScreen(MPScreen):
 			return
 		Name = self['liste'].getCurrent()[0][0]
 		if Name == "--- Search ---":
-			self.suchen()
+			self.session.openWithCallback(self.SuchenCallback, VirtualKeyBoardExt, title = (_("Enter search criteria")), text = self.suchString, is_dialog=True, auto_text_init=False, suggest_func=self.getSuggestions)
 		elif Name == "Websites" or Name == "Pornstars":
 			Link = self['liste'].getCurrent()[0][1]
 			self.session.open(fourtubeSitesScreen, Link, Name, self.portal, self.baseurl)
@@ -137,10 +144,30 @@ class fourtubeGenreScreen(MPScreen):
 
 	def SuchenCallback(self, callback = None, entry = None):
 		if callback is not None and len(callback):
-			self.suchString = callback.replace(' ', '+')
 			Name = "--- Search ---"
-			Link = self.suchString
+			self.suchString = callback
+			Link = self.suchString.replace(' ', '+')
 			self.session.open(fourtubeFilmScreen, Link, Name, self.portal, self.baseurl)
+
+	def getSuggestions(self, text, max_res):
+		url = "http://%s/search_suggestions_remote?q=%s&type=related" % (self.baseurl, urllib.quote_plus(text))
+		d = twAgentGetPage(url, agent=agent, headers=headers, timeout=5)
+		d.addCallback(self.gotSuggestions, max_res)
+		d.addErrback(self.gotSuggestions, max_res, err=True)
+		return d
+
+	def gotSuggestions(self, suggestions, max_res, err=False):
+		list = []
+		if not err and type(suggestions) in (str, buffer):
+			suggestions = json.loads(suggestions)
+			for item in suggestions:
+				li = item['value']
+				list.append(str(li))
+				max_res -= 1
+				if not max_res: break
+		elif err:
+			printl(str(suggestions),self,'E')
+		return list
 
 class fourtubeSitesScreen(MPScreen, ThumbsHelper):
 

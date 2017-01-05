@@ -42,7 +42,6 @@ class sTVGenreScreen(MPScreen):
 		self.genreliste.append(("Die Frühstückerinnen", "/de/Videos/Alle-Videos-zu-Sendungen/Die-Fruehstueckerinnen"))
 		self.genreliste.append(("Dokumentationen", "/de/Videos/Dokumentationen"))
 		self.genreliste.append(("Kultur", "/de/Themen/Kultur"))
-		self.genreliste.append(("Letzte Chance", "/de/Videos/Letzte-Chance"))
 		self.genreliste.append(("Mei Tracht mei Gwand", "/de/Videos/Alle-Videos-zu-Sendungen/Mei-Tracht-mei-Gwand"))
 		self.genreliste.append(("Natur", "/de/Themen/Natur"))
 		self.genreliste.append(("Neueste", "/de/Videos/Neueste-Videos"))
@@ -113,7 +112,7 @@ class sTVids(MPScreen):
 
 	def loadPageData(self, data):
 		self.getLastPage(data, 'class="org paging(.*?)</ul>', '.*page=(\d+)')
-		raw = re.findall('dotted-line ornament"(.*?)class="org\sFooter">', data, re.S)
+		raw = re.findall('block-(.*?)class="org\sFooter">', data, re.S)
 		shows = re.findall('href="(/de/Medien/.*?)".*?src="(.*?)".*?videoleange">(.*?)<.*?<h4.*?">(.*?)</.*?subtitel">(.*?)<', raw[0], re.S)
 		if shows:
 			self.filmliste = []

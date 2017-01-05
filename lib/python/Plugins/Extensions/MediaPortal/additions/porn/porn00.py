@@ -3,7 +3,7 @@
 #
 #    MediaPortal for Dreambox OS
 #
-#    Coded by MediaPortal Team (c) 2013-2016
+#    Coded by MediaPortal Team (c) 2013-2017
 #
 #  This plugin is open source but it is NOT free software.
 #
@@ -257,7 +257,8 @@ class porn00FilmAuswahlScreen(MPScreen):
 					elif 'http://www.porn00.org/video_ext.php' in stream:
 						hostername = 'porn00 pornaq'
 					elif 'http://www.porn00.org/play/?v=' in stream:
-						hostername = 'porn00 API'
+						#hostername = 'porn00 API'
+						hostername = 'porn00 direct'
 					elif hostername == 'www.wankz.com':
 						hostername = 'porn00 wankz'
 					elif re.search('http://www.porn00.org/(player|video|server|watch)/\?.=.*?', stream):

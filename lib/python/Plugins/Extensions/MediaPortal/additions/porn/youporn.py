@@ -3,7 +3,7 @@
 #
 #    MediaPortal for Dreambox OS
 #
-#    Coded by MediaPortal Team (c) 2013-2016
+#    Coded by MediaPortal Team (c) 2013-2017
 #
 #  This plugin is open source but it is NOT free software.
 #
@@ -39,6 +39,7 @@
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.configlistext import ConfigListScreenExt
+from Plugins.Extensions.MediaPortal.resources.keyboardext import VirtualKeyBoardExt
 from Plugins.Extensions.MediaPortal.resources.choiceboxext import ChoiceBoxExt
 from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage
 
@@ -48,6 +49,11 @@ config.mediaportal.youporn_password = ConfigPassword(default="youpornPassword", 
 ck = CookieJar()
 ypLoggedIn = False
 ypAgent = getUserAgent()
+
+headers = {
+	'Accept-Language':'de,en-US;q=0.7,en;q=0.3',
+	'X-Requested-With':'XMLHttpRequest',
+	}
 
 class youpornGenreScreen(MPScreen):
 
@@ -162,7 +168,7 @@ class youpornGenreScreen(MPScreen):
 			return
 		Name = self['liste'].getCurrent()[0][0]
 		if Name == "--- Search ---":
-			self.suchen()
+			self.session.openWithCallback(self.SuchenCallback, VirtualKeyBoardExt, title = (_("Enter search criteria")), text = self.suchString, is_dialog=True, auto_text_init=False, suggest_func=self.getSuggestions)
 		elif Name == "Channels":
 			Link = self['liste'].getCurrent()[0][1]
 			self.session.open(youpornChannelScreen, Link, Name)
@@ -175,9 +181,9 @@ class youpornGenreScreen(MPScreen):
 
 	def SuchenCallback(self, callback = None, entry = None):
 		if callback is not None and len(callback):
-			self.suchString = callback.replace(' ', '+')
 			Name = "--- Search ---"
-			Link = 'http://www.youporn.com/search/?query=%s&page=' % (self.suchString)
+			self.suchString = callback
+			Link = 'http://www.youporn.com/search/?query=%s&page=' % self.suchString.replace(' ', '+')
 			self.session.open(youpornFilmScreen, Link, Name)
 
 	def keySetup(self):
@@ -194,6 +200,26 @@ class youpornGenreScreen(MPScreen):
 			self.username = str(config.mediaportal.youporn_username.value)
 			self.password = str(config.mediaportal.youporn_password.value)
 			self.Login()
+
+	def getSuggestions(self, text, max_res):
+		url = "http://www.youporn.com/search/autocomplete/%s/" % urllib.quote_plus(text)
+		d = twAgentGetPage(url, agent=ypAgent, headers=headers, timeout=5)
+		d.addCallback(self.gotSuggestions, max_res)
+		d.addErrback(self.gotSuggestions, max_res, err=True)
+		return d
+
+	def gotSuggestions(self, suggestions, max_res, err=False):
+		list = []
+		if not err and type(suggestions) in (str, buffer):
+			suggestions = json.loads(suggestions)
+			for item in suggestions['queries']:
+				li = item
+				list.append(str(li))
+				max_res -= 1
+				if not max_res: break
+		elif err:
+			printl(str(suggestions),self,'E')
+		return list
 
 class youpornSetupScreen(Screen, ConfigListScreenExt):
 

@@ -159,16 +159,7 @@ class ShowThumbscreen(MPScreen):
 		self.pagefix = kwargs.get('pagefix', 0)
 		#varliablen groessen der Thumbs definieren
 		if mode == 1:
-			if mp_globals.videomode == 3:
-				self.picX = 350
-				self.picY = 200
-				self.spaceX = 55
-				self.spaceY = 65
-				xoffset = 120
-				yoffset = 155
-				fontsize = 25
-				textsize = 30
-			elif mp_globals.videomode == 2:
+			if mp_globals.videomode == 2:
 				self.picX = 350
 				self.picY = 200
 				self.spaceX = 55
@@ -189,21 +180,12 @@ class ShowThumbscreen(MPScreen):
 			self.coverframe = 'pic_frame_mode1_%s.png' % config.mediaportal.selektor.value
 
 		else:
-			if mp_globals.videomode == 3:
-				self.picX = 350
-				self.picY = 200
-				self.spaceX = 55
+			if mp_globals.videomode == 2:
+				self.picX = 240
+				self.picY = 330
+				self.spaceX = 40
 				self.spaceY = 65
-				xoffset = 120
-				yoffset = 155
-				fontsize = 25
-				textsize = 30
-			elif mp_globals.videomode == 2:
-				self.picX = 350
-				self.picY = 200
-				self.spaceX = 55
-				self.spaceY = 65
-				xoffset = 120
+				xoffset = 105
 				yoffset = 155
 				fontsize = 25
 				textsize = 30
@@ -219,10 +201,7 @@ class ShowThumbscreen(MPScreen):
 			self.coverframe = 'pic_frame_%s.png' % config.mediaportal.selektor.value
 
 		# Thumbs Geometrie, groesse und Anzahl berechnen
-		if mp_globals.videomode == 3:
-			size_w = 1700
-			size_h = 850
-		elif mp_globals.videomode == 2:
+		if mp_globals.videomode == 2:
 			size_w = 1700
 			size_h = 850
 		else:

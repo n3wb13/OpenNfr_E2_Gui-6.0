@@ -132,7 +132,6 @@ class VirtualKeyBoardExt(Screen, NumericalTextInput, HelpableScreen):
 					"prevBouquet": (self.selectSuggestionsList, _("Select suggestions list"))
 				},-2)
 
-		#self.set_GUI_Text()
 		self.setLang()
 		self.buildVirtualKeyBoard()
 		self.onExecBegin.append(self.setKeyboardModeAscii)

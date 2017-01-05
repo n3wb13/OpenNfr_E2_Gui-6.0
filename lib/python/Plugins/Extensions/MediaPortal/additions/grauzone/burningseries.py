@@ -3,7 +3,7 @@
 #
 #    MediaPortal for Dreambox OS
 #
-#    Coded by MediaPortal Team (c) 2013-2016
+#    Coded by MediaPortal Team (c) 2013-2017
 #
 #  This plugin is open source but it is NOT free software.
 #
@@ -65,7 +65,7 @@ class bsMain(MPScreen):
 			"left" : self.keyLeft
 		}, -1)
 
-		self['title'] = Label("Burning-seri.es")
+		self['title'] = Label("Burning-Series")
 		self['ContentTitle'] = Label(_("Selection"))
 
 		self.streamList = []
@@ -127,7 +127,7 @@ class bsSerien(MPScreen, SearchHelper):
 			"left" : self.keyLeft
 		}, -1)
 
-		self['title'] = Label("Burning-seri.es")
+		self['title'] = Label("Burning-Series")
 		self['ContentTitle'] = Label("Serien A-Z")
 		self['F2'] = Label(_("Add to Watchlist"))
 
@@ -216,7 +216,7 @@ class bsWatchlist(MPScreen):
 			"left" : self.keyLeft
 		}, -1)
 
-		self['title'] = Label("Burning-seri.es")
+		self['title'] = Label("Burning-Series")
 		self['ContentTitle'] = Label("Watchlist")
 		self['F1'] = Label(_("Delete"))
 
@@ -345,7 +345,7 @@ class bsStaffeln(MPScreen):
 			"red" :  self.keyTxtPageUp
 		}, -1)
 
-		self['title'] = Label("Burning-seri.es")
+		self['title'] = Label("Burning-Series")
 		self['ContentTitle'] = Label(_("Season Selection"))
 		self['name'] = Label(self.Title)
 		self['F1'] = Label(_("Text-"))
@@ -436,7 +436,7 @@ class bsEpisoden(MPScreen):
 			"red" :  self.keyTxtPageUp
 		}, -1)
 
-		self['title'] = Label("Burning-seri.es")
+		self['title'] = Label("Burning-Series")
 		self['ContentTitle'] = Label(_("Episode Selection"))
 		self['name'] = Label(self.Title)
 		self['F1'] = Label(_("Text-"))
@@ -563,7 +563,7 @@ class bsStreams(MPScreen):
 			"red" :  self.keyTxtPageUp
 		}, -1)
 
-		self['title'] = Label("Burning-seri.es")
+		self['title'] = Label("Burning-Series")
 		self['leftContentTitle'] = Label(_("Stream Selection"))
 		self['ContentTitle'] = Label(_("Stream Selection"))
 		self['name'] = Label(self.Title)

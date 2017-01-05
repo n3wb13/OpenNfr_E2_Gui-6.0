@@ -3,7 +3,7 @@
 #
 #    MediaPortal for Dreambox OS
 #
-#    Coded by MediaPortal Team (c) 2013-2016
+#    Coded by MediaPortal Team (c) 2013-2017
 #
 #  This plugin is open source but it is NOT free software.
 #
@@ -63,12 +63,10 @@ from resources.twisted_hang import HangWatcher
 CONFIG = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/additions/additions.xml"
 
 desktopSize = getDesktop(0).size()
-if desktopSize.height() == 2160:
-	mp_globals.videomode = 3
-elif desktopSize.height() == 1080:
+if desktopSize.width() == 1920:
 	mp_globals.videomode = 2
-else:
-	mp_globals.videomode = 1
+	mp_globals.fontsize = 30
+	mp_globals.sizefactor = 3
 
 try:
 	from enigma import eMediaDatabase
@@ -155,8 +153,8 @@ config.mediaportal.epg_deepstandby = ConfigSelection(default = "skip", choices =
 		])
 
 # Allgemein
-config.mediaportal.version = NoSave(ConfigText(default="767"))
-config.mediaportal.versiontext = NoSave(ConfigText(default="7.6.7"))
+config.mediaportal.version = NoSave(ConfigText(default="772"))
+config.mediaportal.versiontext = NoSave(ConfigText(default="7.7.2"))
 config.mediaportal.autoupdate = ConfigYesNo(default = True)
 config.mediaportal.pincode = ConfigPIN(default = 0000)
 config.mediaportal.showporn = ConfigYesNo(default = False)
@@ -169,25 +167,7 @@ config.mediaportal.animation_label = ConfigSelection(default = "mp_crossfade_fas
 config.mediaportal.animation_simpleplayer = ConfigSelection(default = "mp_player_animation", choices = [("mp_player_animation", _("Slide from bottom")),("mp_crossfade_slow", _("Crossfade"))])
 
 skins = []
-if mp_globals.videomode == 3:
-	mp_globals.skinFallback = "/clean_uhd"
-	for skin in os.listdir("/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins_2160/"):
-		if os.path.isdir(os.path.join("/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins_2160/", skin)):
-			skins.append(skin)
-	mp_globals.skinsPath = "/skins_2160"
-	if mp_globals.isDreamOS:
-		config.mediaportal.skin = ConfigSelection(default = skins[0], choices = skins)
-	else:
-		config.mediaportal.skin = ConfigSelection(default = skins[0], choices = skins)
-	if len(skins) == 0:
-		mp_globals.videomode = 2
-		mp_globals.skinsPath = "/skins_1080"
-		for skin in os.listdir("/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins_1080/"):
-			if os.path.isdir(os.path.join("/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins_1080/", skin)):
-				skins.append(skin)
-		config.mediaportal.skin = ConfigSelection(default = "clean_fhd", choices = ["clean_fhd"])
-		mp_globals.skinFallback = "/clean_fhd"
-elif mp_globals.videomode == 2:
+if mp_globals.videomode == 2:
 	mp_globals.skinsPath = "/skins_1080"
 	for skin in os.listdir("/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins_1080/"):
 		if os.path.isdir(os.path.join("/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins_1080/", skin)):
@@ -207,9 +187,9 @@ else:
 
 if mp_globals.covercollection:
 	config.mediaportal.ansicht = ConfigSelection(default = "wall2", choices = [("liste", _("List")),("wall", _("Wall")),("wall2", _("Wall 2.0"))])
-elif mp_globals.videomode >= 2 and mp_globals.fakeScale:
+elif mp_globals.videomode == 2 and mp_globals.fakeScale:
 	config.mediaportal.ansicht = ConfigSelection(default = "wall", choices = [("liste", _("List")),("wall", _("Wall"))])
-elif mp_globals.videomode >= 2 and not mp_globals.isDreamOS:
+elif mp_globals.videomode == 2 and not mp_globals.isDreamOS:
 	config.mediaportal.ansicht = ConfigSelection(default = "liste", choices = [("liste", _("List"))])
 else:
 	config.mediaportal.ansicht = ConfigSelection(default = "wall", choices = [("liste", _("List")),("wall", _("Wall"))])
@@ -221,7 +201,7 @@ config.mediaportal.use_hls_proxy = ConfigYesNo(default = False)
 config.mediaportal.hls_proxy_ip = ConfigIP(default = [127,0,0,1], auto_jump = True)
 config.mediaportal.hls_proxy_port = ConfigInteger(default = 0, limits = (0,65535))
 config.mediaportal.hls_buffersize = ConfigInteger(default = 16, limits = (1,32))
-config.mediaportal.storagepath = ConfigText(default="/media/hdd/mediaportal/tmp/", fixed_size=False)
+config.mediaportal.storagepath = ConfigText(default="/tmp/mediaportal/tmp/", fixed_size=False)
 config.mediaportal.autoplayThreshold = ConfigInteger(default = 50, limits = (1,100))
 config.mediaportal.filter = ConfigSelection(default = "ALL", choices = ["ALL", "Mediathek", "Grauzone", "Fun", "Sport", "Music", "Porn"])
 config.mediaportal.youtubeprio = ConfigSelection(default = "1", choices = [("0", _("Low")),("1", _("Medium")),("2", _("High"))])
@@ -445,20 +425,7 @@ class MPSetup(Screen, CheckPremiumize, ConfigListScreenExt):
 		ConfigListScreenExt.__init__(self, self.configlist, on_change = self._onKeyChange)
 
 		skins = []
-		if mp_globals.videomode == 3:
-			mp_globals.skinsPath = "/skins_2160"
-			for skin in os.listdir("/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins_2160/"):
-				if os.path.isdir(os.path.join("/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins_2160/", skin)):
-					skins.append(skin)
-			if mp_globals.isDreamOS:
-				config.mediaportal.skin.setChoices(skins, skins[0])
-			else:
-				config.mediaportal.skin.setChoices(skins, skins[0])
-			if len(skins) == 0:
-				mp_globals.videomode = 2
-				mp_globals.skinsPath = "/skins_1080"
-				config.mediaportal.skin.setChoices(["clean_fhd"], "clean_fhd")
-		elif mp_globals.videomode == 2:
+		if mp_globals.videomode == 2:
 			mp_globals.skinsPath = "/skins_1080"
 			for skin in os.listdir("/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins_1080/"):
 				if os.path.isdir(os.path.join("/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins_1080/", skin)):
@@ -814,9 +781,7 @@ class MPList(Screen, HelpableScreen):
 
 		self.chooseMenuList1 = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
 		self.chooseMenuList1.l.setFont(0, gFont(mp_globals.font, mp_globals.fontsize))
-		if mp_globals.videomode == 3:
-			self.chooseMenuList1.l.setItemHeight(100)
-		elif mp_globals.videomode == 2:
+		if mp_globals.videomode == 2:
 			self.chooseMenuList1.l.setItemHeight(60)
 		else:
 			self.chooseMenuList1.l.setItemHeight(44)
@@ -825,10 +790,8 @@ class MPList(Screen, HelpableScreen):
 
 		self.chooseMenuList2 = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
 		self.chooseMenuList2.l.setFont(0, gFont(mp_globals.font, mp_globals.fontsize))
-		if mp_globals.videomode == 3:
-			self.chooseMenuList1.l.setItemHeight(100)
-		elif mp_globals.videomode == 2:
-			self.chooseMenuList1.l.setItemHeight(60)
+		if mp_globals.videomode == 2:
+			self.chooseMenuList2.l.setItemHeight(60)
 		else:
 			self.chooseMenuList2.l.setItemHeight(44)
 		self['grauzone'] = self.chooseMenuList2
@@ -836,10 +799,8 @@ class MPList(Screen, HelpableScreen):
 
 		self.chooseMenuList3 = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
 		self.chooseMenuList3.l.setFont(0, gFont(mp_globals.font, mp_globals.fontsize))
-		if mp_globals.videomode == 3:
-			self.chooseMenuList1.l.setItemHeight(100)
-		elif mp_globals.videomode == 2:
-			self.chooseMenuList1.l.setItemHeight(60)
+		if mp_globals.videomode == 2:
+			self.chooseMenuList3.l.setItemHeight(60)
 		else:
 			self.chooseMenuList3.l.setItemHeight(44)
 		self['funsport'] = self.chooseMenuList3
@@ -847,10 +808,8 @@ class MPList(Screen, HelpableScreen):
 
 		self.chooseMenuList4 = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
 		self.chooseMenuList4.l.setFont(0, gFont(mp_globals.font, mp_globals.fontsize))
-		if mp_globals.videomode == 3:
-			self.chooseMenuList1.l.setItemHeight(100)
-		elif mp_globals.videomode == 2:
-			self.chooseMenuList1.l.setItemHeight(60)
+		if mp_globals.videomode == 2:
+			self.chooseMenuList4.l.setItemHeight(60)
 		else:
 			self.chooseMenuList4.l.setItemHeight(44)
 		self['porn'] = self.chooseMenuList4
@@ -976,9 +935,7 @@ class MPList(Screen, HelpableScreen):
 		if not fileExists(icon):
 			icon = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/icons/no_icon.png"
 		scale = AVSwitch().getFramebufferScale()
-		if mp_globals.videomode == 3:
-			self.picload.setPara((105, 56, scale[0], scale[1], False, 1, "#FF000000"))
-		elif mp_globals.videomode == 2:
+		if mp_globals.videomode == 2:
 			self.picload.setPara((105, 56, scale[0], scale[1], False, 1, "#FF000000"))
 		else:
 			self.picload.setPara((75, 40, scale[0], scale[1], False, 1, "#FF000000"))
@@ -987,10 +944,7 @@ class MPList(Screen, HelpableScreen):
 		else:
 			self.picload.startDecode(icon, 0, 0, False)
 		pngthumb = self.picload.getData()
-		if mp_globals.videomode == 3:
-			res.append(MultiContentEntryPixmapAlphaBlend(pos=(0, 0), size=(105, 60), png=pngthumb))
-			res.append(MultiContentEntryText(pos=(110, 0), size=(400, 60), font=0, text=name, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
-		elif mp_globals.videomode == 2:
+		if mp_globals.videomode == 2:
 			res.append(MultiContentEntryPixmapAlphaBlend(pos=(0, 0), size=(105, 60), png=pngthumb))
 			res.append(MultiContentEntryText(pos=(110, 0), size=(400, 60), font=0, text=name, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
 		else:
@@ -1529,11 +1483,7 @@ class MPpluginSort(Screen):
 
 	def show_menu(self, name, pic, genre, hits, msort):
 		res = [(name, pic, genre, hits, msort)]
-		if mp_globals.videomode == 3:
-			res.append(MultiContentEntryText(pos=(80, 0), size=(500, 30), font=0, text=name, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
-			if self.selected and name == self.last_plugin_name:
-				res.append(MultiContentEntryPixmapAlphaBlend(pos=(45, 3), size=(24, 24), png=loadPNG("/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/select.png")))
-		elif mp_globals.videomode == 2:
+		if mp_globals.videomode == 2:
 			res.append(MultiContentEntryText(pos=(80, 0), size=(500, 30), font=0, text=name, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
 			if self.selected and name == self.last_plugin_name:
 				res.append(MultiContentEntryPixmapAlphaBlend(pos=(45, 3), size=(24, 24), png=loadPNG("/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/select.png")))
@@ -1678,17 +1628,7 @@ class MPWall(Screen, HelpableScreen):
 		elif config.mediaportal.wallmode.value == "color_zoom":
 			self.wallzoom = True
 
-		if mp_globals.videomode == 3:
-			screenwidth = 3840
-			posxstart = 85
-			posxplus = 220
-			posystart = 310
-			posyplus = 122
-			iconsize = "210,112"
-			iconsizezoom = "308,190"
-			zoomoffsetx = 49
-			zoomoffsety = 39
-		elif mp_globals.videomode == 2:
+		if mp_globals.videomode == 2:
 			screenwidth = 1920
 			posxstart = 85
 			posxplus = 220
@@ -1740,9 +1680,7 @@ class MPWall(Screen, HelpableScreen):
 				start_pagebar = int(screenwidth / 2 - pagebar_size / 2)
 
 				for x in range(1,self.counting_pages+1):
-					if mp_globals.videomode == 3:
-						normal = 960
-					elif mp_globals.videomode == 2:
+					if mp_globals.videomode == 2:
 						normal = 960
 					elif config.mediaportal.skin.value == "original":
 						normal = 650
@@ -1998,9 +1936,7 @@ class MPWall(Screen, HelpableScreen):
 		poster_path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/icons/Selektor_%s.png" % config.mediaportal.selektor.value
 
 		scale = AVSwitch().getFramebufferScale()
-		if mp_globals.videomode == 3:
-			self.picload.setPara((210, 112, scale[0], scale[1], True, 1, "#FF000000"))
-		elif mp_globals.videomode == 2:
+		if mp_globals.videomode == 2:
 			self.picload.setPara((210, 112, scale[0], scale[1], True, 1, "#FF000000"))
 		else:
 			self.picload.setPara((150, 80, scale[0], scale[1], True, 1, "#FF000000"))
@@ -2025,9 +1961,7 @@ class MPWall(Screen, HelpableScreen):
 				poster_path = "%s/icons/no_icon.png" % self.plugin_path
 
 			scale = AVSwitch().getFramebufferScale()
-			if mp_globals.videomode == 3:
-				self.picload.setPara((210, 112, scale[0], scale[1], True, 1, "#FF000000"))
-			elif mp_globals.videomode == 2:
+			if mp_globals.videomode == 2:
 				self.picload.setPara((210, 112, scale[0], scale[1], True, 1, "#FF000000"))
 			else:
 				self.picload.setPara((150, 80, scale[0], scale[1], True, 1, "#FF000000"))
@@ -2050,9 +1984,7 @@ class MPWall(Screen, HelpableScreen):
 					poster_path = "%s/icons_zoom/no_icon.png" % self.plugin_path
 
 				scale = AVSwitch().getFramebufferScale()
-				if mp_globals.videomode == 3:
-					self.picload.setPara((308, 190, scale[0], scale[1], True, 1, "#FF000000"))
-				elif mp_globals.videomode == 2:
+				if mp_globals.videomode == 2:
 					self.picload.setPara((308, 190, scale[0], scale[1], True, 1, "#FF000000"))
 				else:
 					self.picload.setPara((220, 136, scale[0], scale[1], True, 1, "#FF000000"))
@@ -2075,9 +2007,7 @@ class MPWall(Screen, HelpableScreen):
 					poster_path = "%s/icons/no_icon.png" % self.plugin_path
 
 				scale = AVSwitch().getFramebufferScale()
-				if mp_globals.videomode == 3:
-					self.picload.setPara((210, 112, scale[0], scale[1], True, 1, "#FF000000"))
-				elif mp_globals.videomode == 2:
+				if mp_globals.videomode == 2:
 					self.picload.setPara((210, 112, scale[0], scale[1], True, 1, "#FF000000"))
 				else:
 					self.picload.setPara((150, 80, scale[0], scale[1], True, 1, "#FF000000"))
@@ -2628,13 +2558,7 @@ class MPWall2(Screen, HelpableScreen):
 		if config.mediaportal.wall2mode.value == "bw":
 			self.wallbw = True
 
-		if mp_globals.videomode == 3:
-			self.perpage = 48
-			pageiconwidth = 36
-			pageicondist = 8
-			screenwidth = 3840
-			screenheight = 2160
-		elif mp_globals.videomode == 2:
+		if mp_globals.videomode == 2:
 			self.perpage = 48
 			pageiconwidth = 36
 			pageicondist = 8
@@ -2675,9 +2599,7 @@ class MPWall2(Screen, HelpableScreen):
 					normal = screenheight - 2 * pageiconwidth
 					if config.mediaportal.skin.value == "original":
 						normal = normal - 20
-					if mp_globals.videomode == 3:
-						normal = normal - 30
-					elif mp_globals.videomode == 2:
+					if mp_globals.videomode == 2:
 						normal = normal - 30
 					skincontent += "<widget name=\"page_empty" + str(x) + "\" position=\"" + str(start_pagebar) + "," + str(normal) + "\" size=\"" + str(pageiconwidth) + "," + str(pageiconwidth) + "\" zPosition=\"2\" transparent=\"1\" alphatest=\"blend\" />"
 					skincontent += "<widget name=\"page_sel" + str(x) + "\" position=\"" + str(start_pagebar) + "," + str(normal) + "\" size=\"" + str(pageiconwidth) + "," + str(pageiconwidth) + "\" zPosition=\"2\" transparent=\"1\" alphatest=\"blend\" />"
@@ -3651,8 +3573,9 @@ def clearTmpBuffer():
 		mp_globals.yt_tmp_storage_dirty = False
 		BgFileEraser = eBackgroundFileEraser.getInstance()
 		path = config.mediaportal.storagepath.value
-		for fn in next(os.walk(path))[2]:
-			BgFileEraser.erase(os.path.join(path,fn))
+		if os.path.exists(path):
+			for fn in next(os.walk(path))[2]:
+				BgFileEraser.erase(os.path.join(path,fn))
 
 def MPmain(session, **kwargs):
 	mp_globals.start = True

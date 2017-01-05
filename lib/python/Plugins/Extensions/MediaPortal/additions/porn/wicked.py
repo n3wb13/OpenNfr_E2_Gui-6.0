@@ -38,10 +38,12 @@
 
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
+from Plugins.Extensions.MediaPortal.resources.choiceboxext import ChoiceBoxExt
 
 myagent = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:40.0) Gecko/20100101 Firefox/40.0'
+BASE_NAME = "WickedPictures.com"
 
-class cliphunterGenreScreen(MPScreen):
+class wickedGenreScreen(MPScreen):
 
 	def __init__(self, session):
 		self.plugin_path = mp_globals.pluginPath
@@ -58,17 +60,11 @@ class cliphunterGenreScreen(MPScreen):
 		self["actions"] = ActionMap(["MP_Actions"], {
 			"ok" : self.keyOK,
 			"0" : self.closeAll,
-			"cancel" : self.keyCancel,
-			"up" : self.keyUp,
-			"down" : self.keyDown,
-			"right" : self.keyRight,
-			"left" : self.keyLeft
+			"cancel" : self.keyCancel
 		}, -1)
 
-		self['title'] = Label("cliphunter.com")
+		self['title'] = Label(BASE_NAME)
 		self['ContentTitle'] = Label("Genre:")
-		self.keyLocked = True
-		self.suchString = ''
 
 		self.genreliste = []
 		self.ml = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
@@ -77,60 +73,39 @@ class cliphunterGenreScreen(MPScreen):
 		self.onLayoutFinish.append(self.layoutFinished)
 
 	def layoutFinished(self):
-		url = "http://www.cliphunter.com/categories/"
-		getPage(url, agent=myagent).addCallback(self.genreData).addErrback(self.dataError)
-
-	def genreData(self, data):
-		parse = re.search('id="submenu-categories">(.*?)</div>', data, re.S)
-		Cats = re.findall('href="(/categories/.*?)".*?>(.*?)<', parse.group(1), re.S)
-		if Cats:
-			for (Url, Title) in Cats:
-				Url = 'http://www.cliphunter.com%s/' % Url.replace(' ','%20')
-				if not Title == "All":
-					self.genreliste.append((Title, Url))
-			self.genreliste.sort()
-			self.genreliste.insert(0, ("Pornstars", 'http://www.cliphunter.com/pornstars/top/overview/'))
-			self.genreliste.insert(0, ("Top Year", 'http://www.cliphunter.com/popular/ratings/year/'))
-			self.genreliste.insert(0, ("Top Month", 'http://www.cliphunter.com/popular/ratings/month/'))
-			self.genreliste.insert(0, ("Top Week", 'http://www.cliphunter.com/popular/ratings/week/'))
-			self.genreliste.insert(0, ("Top Yesterday", 'http://www.cliphunter.com/popular/ratings/yesterday/'))
-			self.genreliste.insert(0, ("Top Today", 'http://www.cliphunter.com/popular/ratings/today/'))
-			self.genreliste.insert(0, ("Hall of Fame", 'http://www.cliphunter.com/popular/ratings/all/'))
-			self.genreliste.insert(0, ("Newest", 'http://www.cliphunter.com/categories/All/'))
-			self.genreliste.insert(0, ("--- Search ---", "callSuchen"))
-			self.ml.setList(map(self._defaultlistcenter, self.genreliste))
-			self.ml.moveToIndex(0)
-			self.keyLocked = False
+		self.genreliste.insert(0, ("Exclusive Girls", 'http://www.wicked.com/tour/pornstars/exclusive/', None))
+		self.genreliste.insert(0, ("Most Active Girls", 'http://www.wicked.com/tour/pornstars/mostactive/', None))
+		self.genreliste.insert(0, ("Most Liked Girls", 'http://www.wicked.com/tour/pornstars/mostliked/', None))
+		self.genreliste.insert(0, ("Most Recent Girls", 'http://www.wicked.com/tour/pornstars/mostrecent/', None))
+		self.genreliste.insert(0, ("Most Viewed Movies", 'http://www.wicked.com/tour/movies/mostviewed/', None))
+		self.genreliste.insert(0, ("Top Rated Movies", 'http://www.wicked.com/tour/movies/toprated/', None))
+		self.genreliste.insert(0, ("Latest Movies", 'http://www.wicked.com/tour/movies/latest/', None))
+		self.genreliste.insert(0, ("Most Viewed Scenes", 'http://www.wicked.com/tour/videos/mostviewed/', None))
+		self.genreliste.insert(0, ("Top Rated Scenes", 'http://www.wicked.com/tour/videos/toprated/', None))
+		self.genreliste.insert(0, ("Latest Scenes", 'http://www.wicked.com/tour/videos/latest/', None))
+		self.ml.setList(map(self._defaultlistcenter, self.genreliste))
 
 	def keyOK(self):
-		if self.keyLocked:
+		if not config.mediaportal.premiumize_use.value:
+			message = self.session.open(MessageBoxExt, _("%s only works with enabled MP premiumize.me option (MP Setup)!" % BASE_NAME), MessageBoxExt.TYPE_INFO, timeout=10)
 			return
 		Name = self['liste'].getCurrent()[0][0]
 		Link = self['liste'].getCurrent()[0][1]
-		if Name == "--- Search ---":
-			self.suchen()
-		elif Name == "Pornstars":
-			self.session.open(cliphunterPornstarScreen, Link, Name)
+		if re.match(".*?Girls", Name):
+			self.session.open(wickedGirlsScreen, Link, Name)
 		else:
-			self.session.open(cliphunterFilmScreen, Link, Name)
+			self.session.open(wickedFilmScreen, Link, Name)
 
-	def SuchenCallback(self, callback = None, entry = None):
-		if callback is not None and len(callback):
-			self.suchString = callback.replace(' ', '%20')
-			Link = '%s' % (self.suchString)
-			Name = "--- Search ---"
-			self.session.open(cliphunterFilmScreen, Link, Name)
-
-class cliphunterPornstarScreen(MPScreen, ThumbsHelper):
+class wickedGirlsScreen(MPScreen, ThumbsHelper):
 
 	def __init__(self, session, Link, Name):
 		self.Link = Link
 		self.Name = Name
 		self.plugin_path = mp_globals.pluginPath
 		self.skin_path = mp_globals.pluginPath + mp_globals.skinsPath
-		path = "%s/%s/defaultListWideScreen.xml" % (self.skin_path, config.mediaportal.skin.value)
+		path = "%s/%s/defaultGenreScreenCover.xml" % (self.skin_path, config.mediaportal.skin.value)
 		if not fileExists(path):
-			path = self.skin_path + mp_globals.skinFallback + "/defaultListWideScreen.xml"
+			path = self.skin_path + mp_globals.skinFallback + "/defaultGenreScreenCover.xml"
 		with open(path, "r") as f:
 			self.skin = f.read()
 			f.close()
@@ -152,86 +127,7 @@ class cliphunterPornstarScreen(MPScreen, ThumbsHelper):
 			"green" : self.keyPageNumber
 		}, -1)
 
-		self['title'] = Label("cliphunter.com")
-		self['ContentTitle'] = Label("Genre: %s" % self.Name)
-		self['F2'] = Label(_("Page"))
-
-		self['Page'] = Label(_("Page:"))
-		self.keyLocked = True
-		self.page = 1
-		self.lastpage = 1
-
-		self.genreliste = []
-		self.ml = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
-		self['liste'] = self.ml
-
-		self.onLayoutFinish.append(self.loadPage)
-
-	def loadPage(self):
-		self.keyLocked = True
-		self.genreliste = []
-		url = "%s%s" % (self.Link, str(self.page))
-		getPage(url, agent=myagent).addCallback(self.genreData).addErrback(self.dataError)
-
-	def genreData(self, data):
-		self.getLastPage(data, '', 'maxPages="(.*?)"')
-		Parse = re.search('photoGrid">(.*?)class="clearfix">', data, re.S)
-		Cats = re.findall('href="(.*?)">.*?src=\'(.*?)\'/>.*?<span>(.*?)</span>', Parse.group(1), re.S)
-		if Cats:
-			for (Url, Image, Title) in Cats:
-				Url = "http://www.cliphunter.com" + Url + "/movies/"
-				self.genreliste.append((Title.title(), Url, Image))
-			self.ml.setList(map(self._defaultlistleft, self.genreliste))
-			self.ml.moveToIndex(0)
-			self.keyLocked = False
-			self.th_ThumbsQuery(self.genreliste, 0, 1, 2, None, None, self.page, int(self.lastpage), mode=1)
-			self.showInfos()
-
-	def showInfos(self):
-		Title = self['liste'].getCurrent()[0][0]
-		Image = self['liste'].getCurrent()[0][2]
-		self['name'].setText(Title)
-		CoverHelper(self['coverArt']).getCover(Image)
-
-	def keyOK(self):
-		if self.keyLocked:
-			return
-		Name = self['liste'].getCurrent()[0][0]
-		Link = self['liste'].getCurrent()[0][1]
-		self.session.open(cliphunterFilmScreen, Link, Name)
-
-class cliphunterFilmScreen(MPScreen, ThumbsHelper):
-
-	def __init__(self, session, Link, Name):
-		self.Link = Link
-		self.Name = Name
-		self.plugin_path = mp_globals.pluginPath
-		self.skin_path = mp_globals.pluginPath + mp_globals.skinsPath
-		path = "%s/%s/defaultListWideScreen.xml" % (self.skin_path, config.mediaportal.skin.value)
-		if not fileExists(path):
-			path = self.skin_path + mp_globals.skinFallback + "/defaultListWideScreen.xml"
-		with open(path, "r") as f:
-			self.skin = f.read()
-			f.close()
-
-		MPScreen.__init__(self, session)
-		ThumbsHelper.__init__(self)
-
-		self["actions"] = ActionMap(["MP_Actions"], {
-			"ok" : self.keyOK,
-			"0" : self.closeAll,
-			"cancel" : self.keyCancel,
-			"5" : self.keyShowThumb,
-			"up" : self.keyUp,
-			"down" : self.keyDown,
-			"right" : self.keyRight,
-			"left" : self.keyLeft,
-			"nextBouquet" : self.keyPageUp,
-			"prevBouquet" : self.keyPageDown,
-			"green" : self.keyPageNumber
-		}, -1)
-
-		self['title'] = Label("cliphunter.com")
+		self['title'] = Label(BASE_NAME)
 		self['ContentTitle'] = Label("Genre: %s" % self.Name)
 		self['F2'] = Label(_("Page"))
 
@@ -250,19 +146,117 @@ class cliphunterFilmScreen(MPScreen, ThumbsHelper):
 		self.keyLocked = True
 		self['name'].setText(_('Please wait...'))
 		self.filmliste = []
-		if re.match(".*?Search", self.Name):
-			url = "http://www.cliphunter.com/search/%s/%s" % (self.Link, str(self.page))
-		else:
-			url = "%s%s" % (self.Link, str(self.page))
-		getPage(url).addCallback(self.loadData).addErrback(self.dataError)
+		url = "%s%s/" % (self.Link, str(self.page))
+		getPage(url, agent=myagent).addCallback(self.loadData).addErrback(self.dataError)
 
 	def loadData(self, data):
-		self.getLastPage(data, '', 'maxPages="(.*?)"')
-		Movies = re.findall('class="t"\shref="(.*?)".*?class="i"\ssrc="(.*?)".*?class="tr">(.*?)</div>.*?class="vttl.*?">(.*?)</a>.*?class="info.*?">(.*?)</div>', data, re.S)
+		self.getLastPage(data, 'class="paginationui-container(.*?)</ul>', '.*(?:\/|>)(\d+)')
+		parse = re.search('class="showcase-models(.*?)</section>', data, re.S)
+		Movies = re.findall('<a\shref="(.*?)"\sclass="showcase-models.*?img\ssrc="(.*?)"\stitle="(.*?)".*?scenes">(\d+)\sScenes', parse.group(1), re.S)
 		if Movies:
-			for (Url, Image, Runtime, Title, Info) in Movies:
-				Url = "http://www.cliphunter.com" + Url
-				self.filmliste.append((decodeHtml(Title).replace('   ',' '), Url, Image, Runtime, Info.strip().replace('  ',' ')))
+			for (Url, Image, Title, Scenes) in Movies:
+				Url = "http://www.wicked.com" + Url
+				Title = Title + " - %s Scenes" % Scenes
+				self.filmliste.append((decodeHtml(Title), Url, Image))
+		if len(self.filmliste) == 0:
+			self.filmliste.append((_('No pornstars found!'), None, None))
+		self.ml.setList(map(self._defaultlistleft, self.filmliste))
+		self.ml.moveToIndex(0)
+		self.keyLocked = False
+		self.th_ThumbsQuery(self.filmliste, 0, 1, 2, None, None, self.page, int(self.lastpage), mode=1)
+		self.showInfos()
+
+	def showInfos(self):
+		title = self['liste'].getCurrent()[0][0]
+		pic = self['liste'].getCurrent()[0][2]
+		self['name'].setText(title)
+		CoverHelper(self['coverArt']).getCover(pic)
+
+	def keyOK(self):
+		if self.keyLocked:
+			return
+		Link = self['liste'].getCurrent()[0][1]
+		if Link:
+			rangelist = [['Scenes', 'videos/'], ['Movies', 'movies/']]
+			self.session.openWithCallback(self.keyOK2, ChoiceBoxExt, title=_('Select Action'), list = rangelist)
+
+	def keyOK2(self, result):
+		if result:
+			Name = self['liste'].getCurrent()[0][0]
+			Link = self['liste'].getCurrent()[0][1]
+			Link = Link + result[1]
+			self.session.open(wickedFilmScreen, Link, Name)
+
+class wickedFilmScreen(MPScreen, ThumbsHelper):
+
+	def __init__(self, session, Link, Name):
+		self.Link = Link
+		self.Name = Name
+		self.plugin_path = mp_globals.pluginPath
+		self.skin_path = mp_globals.pluginPath + mp_globals.skinsPath
+		path = "%s/%s/defaultGenreScreenCover.xml" % (self.skin_path, config.mediaportal.skin.value)
+		if not fileExists(path):
+			path = self.skin_path + mp_globals.skinFallback + "/defaultGenreScreenCover.xml"
+		with open(path, "r") as f:
+			self.skin = f.read()
+			f.close()
+
+		MPScreen.__init__(self, session)
+		ThumbsHelper.__init__(self)
+
+		self["actions"] = ActionMap(["MP_Actions"], {
+			"ok" : self.keyOK,
+			"0" : self.closeAll,
+			"cancel" : self.keyCancel,
+			"5" : self.keyShowThumb,
+			"up" : self.keyUp,
+			"down" : self.keyDown,
+			"right" : self.keyRight,
+			"left" : self.keyLeft,
+			"nextBouquet" : self.keyPageUp,
+			"prevBouquet" : self.keyPageDown,
+			"green" : self.keyPageNumber
+		}, -1)
+
+		self['title'] = Label(BASE_NAME)
+		self['ContentTitle'] = Label("Genre: %s" % self.Name)
+		self['F2'] = Label(_("Page"))
+
+		self['Page'] = Label(_("Page:"))
+		self.keyLocked = True
+		self.page = 1
+		self.lastpage = 9
+
+		self.filmliste = []
+		self.ml = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
+		self['liste'] = self.ml
+
+		self.onLayoutFinish.append(self.loadPage)
+
+	def loadPage(self):
+		self.keyLocked = True
+		self['name'].setText(_('Please wait...'))
+		self.filmliste = []
+		url = "%s%s/" % (self.Link, str(self.page))
+		getPage(url, agent=myagent).addCallback(self.loadData).addErrback(self.dataError)
+
+	def loadData(self, data):
+		if re.match(".*?/tour/pornstar", self.Link):
+			self.getLastPage(data, 'class="paginationui-container(.*?)</ul>', '.*(?:\/|>)(\d+)')
+		else:
+			self['page'].setText(str(self.page) + ' / ' + str(self.lastpage))
+		parse = re.search('lass="showcase-movies">(.*?)</section>', data, re.S)
+		if parse:
+			Movies = re.findall('<a\shref="(.*?)"\sclass="showcase-movies.*?img\ssrc="(.*?)"\salt=".*?"\stitle="(.*?)"', parse.group(1), re.S)
+		else:
+			parse = re.search('class="showcase-scenes">(.*?)</section>', data, re.S)
+			if parse:
+				Movies = re.findall('<a\shref="(.*?)"\sclass="showcase-scenes.*?img\ssrc="(.*?)"\stitle=".*?"\salt="(.*?)"', parse.group(1), re.S)
+		if Movies:
+			for (Url, Image, Title) in Movies:
+				Image = Image.replace('_2.jpg','_1.jpg')
+				Url = "http://www.wicked.com" + Url
+				self.filmliste.append((decodeHtml(Title), Url, Image))
 		if len(self.filmliste) == 0:
 			self.filmliste.append((_('No videos found!'), '', None, ''))
 		self.ml.setList(map(self._defaultlistleft, self.filmliste))
@@ -273,11 +267,7 @@ class cliphunterFilmScreen(MPScreen, ThumbsHelper):
 
 	def showInfos(self):
 		title = self['liste'].getCurrent()[0][0]
-		url = self['liste'].getCurrent()[0][1]
 		pic = self['liste'].getCurrent()[0][2]
-		runtime = self['liste'].getCurrent()[0][3]
-		info = self['liste'].getCurrent()[0][4]
-		self['handlung'].setText("Runtime: %s \n%s" % (runtime, info))
 		self['name'].setText(title)
 		CoverHelper(self['coverArt']).getCover(pic)
 
@@ -286,20 +276,9 @@ class cliphunterFilmScreen(MPScreen, ThumbsHelper):
 			return
 		Link = self['liste'].getCurrent()[0][1]
 		self.keyLocked = True
-		getPage(Link).addCallback(self.getVideoPage).addErrback(self.dataError)
+		get_stream_link(self.session).check_link(Link, self.play)
 
-	def getVideoPage(self, data):
-		url = re.findall('"url":"(.*?)"}', data, re.S)
-		if url:
-			url = url[-1]
-			url = url.replace('\u0026', '.')
-			translation_table = {
-				'm': 'a', 'b': 'b', 'c': 'c', 'i': 'd', 'd': 'e', 'g': 'f', 'a': 'h',
-				'z': 'i', 'y': 'l', 'n': 'm', 'l': 'n', 'f': 'o', 'v': 'p', 'x': 'r',
-				'r': 's', 'q': 't', 'p': 'u', 'e': 'v',
-				'$': ':', '&': '.', '(': '=', '^': '&', '=': '/',
-			}
-			url = ''.join(translation_table.get(c, c) for c in url)
-			self.keyLocked = False
-			Title = self['liste'].getCurrent()[0][0]
-			self.session.open(SimplePlayer, [(Title, url)], showPlaylist=False, ltype='cliphunter')
+	def play(self, url):
+		self.keyLocked = False
+		title = self['liste'].getCurrent()[0][0]
+		self.session.open(SimplePlayer, [(title, url.replace('%2F','%252F').replace('%3D','%253D').replace('%2B','%252B'))], showPlaylist=False, ltype='wicked')

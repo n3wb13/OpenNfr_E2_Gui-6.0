@@ -3,7 +3,7 @@
 #
 #    MediaPortal for Dreambox OS
 #
-#    Coded by MediaPortal Team (c) 2013-2016
+#    Coded by MediaPortal Team (c) 2013-2017
 #
 #  This plugin is open source but it is NOT free software.
 #
@@ -38,8 +38,9 @@
 
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
+from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage
 
-myagent = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:40.0) Gecko/20100101 Firefox/40.0'
+myagent = 'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0'
 
 class PornStreamsGenreScreen(MPScreen):
 
@@ -74,7 +75,7 @@ class PornStreamsGenreScreen(MPScreen):
 
 	def layoutFinished(self):
 		url = "http://pornstreams.eu/studios/"
-		getPage(url, agent=myagent).addCallback(self.genreData).addErrback(self.dataError)
+		twAgentGetPage(url, agent=myagent, gzip_decoding=True).addCallback(self.genreData).addErrback(self.dataError)
 
 	def genreData(self, data):
 		Cats =  re.findall('<a\stitle="(.*?)"\shref="(.*?)">.*?</a>', data, re.S)
@@ -167,7 +168,7 @@ class PornStreamsFilmScreen(MPScreen, ThumbsHelper):
 		else:
 			url = self.Link + str(self.page)
 		if "/page/1" in url: url = url.replace('/page/1','')
-		getPage(url, agent=myagent).addCallback(self.loadData).addErrback(self.dataError)
+		twAgentGetPage(url, agent=myagent, gzip_decoding=True).addCallback(self.loadData).addErrback(self.dataError)
 
 	def loadData(self, data):
 		self.getLastPage(data, '', ">Page.*?of\s(.*?)</span")
@@ -234,7 +235,7 @@ class PornStreamsFilmAuswahlScreen(MPScreen):
 
 	def loadPage(self):
 		self.keyLocked = True
-		getPage(self.genreLink, agent=myagent).addCallback(self.loadPageData).addErrback(self.dataError)
+		twAgentGetPage(self.genreLink, agent=myagent, gzip_decoding=True).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
 		streams = re.findall('(?:src|href)=[\'|"](http[s]?://(?!(pornstreams.eu))(.*?)\/.*?)[\'|"|\&|<]', data, re.S|re.I)

@@ -58,7 +58,10 @@ class wrestlingnetworkGenreScreen(MPScreen):
 		if raw:
 			parse = re.findall('<li.*?href="(.*?)">(.*?)</a>', raw[0], re.S)
 			for (url, title) in parse:
-				self.genreliste.append((decodeHtml(title), url))
+				if not title.startswith('<i class'):
+					self.genreliste.append((decodeHtml(title), url))
+			# remove duplicates
+			self.genreliste = list(set(self.genreliste))
 			self.genreliste.sort()
 			self.ml.setList(map(self._defaultlistcenter, self.genreliste))
 			self.keyLocked = False

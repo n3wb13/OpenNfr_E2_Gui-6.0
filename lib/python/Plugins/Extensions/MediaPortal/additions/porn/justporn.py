@@ -131,6 +131,8 @@ class justPornListScreen(MPScreen, ThumbsHelper):
 				self.filmliste.append((decodeHtml(title), link, image, duration))
 			self.ml.setList(map(self._defaultlistleft, self.filmliste))
 			self.ml.moveToIndex(0)
+		if len(self.filmliste) == 0:
+			self.filmliste.append((_('No movies found!'), None, None, ""))
 		self.keyLocked = False
 		self.th_ThumbsQuery(self.filmliste, 0, 1, 2, None, None, self.page, self.lastpage)
 		self.showInfos()
@@ -147,9 +149,10 @@ class justPornListScreen(MPScreen, ThumbsHelper):
 		if self.keyLocked:
 			return
 		Link = self['liste'].getCurrent()[0][0]
-		Title = self['liste'].getCurrent()[0][1]
-		Cover = self['liste'].getCurrent()[0][2]
-		self.session.open(StreamAuswahl, Link, Title, Cover)
+		if Link:
+			Title = self['liste'].getCurrent()[0][1]
+			Cover = self['liste'].getCurrent()[0][2]
+			self.session.open(StreamAuswahl, Link, Title, Cover)
 
 class StreamAuswahl(MPScreen):
 

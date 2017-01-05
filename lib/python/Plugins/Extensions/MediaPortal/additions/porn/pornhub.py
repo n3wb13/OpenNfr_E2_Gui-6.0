@@ -3,7 +3,7 @@
 #
 #    MediaPortal for Dreambox OS
 #
-#    Coded by MediaPortal Team (c) 2013-2016
+#    Coded by MediaPortal Team (c) 2013-2017
 #
 #  This plugin is open source but it is NOT free software.
 #
@@ -39,16 +39,22 @@
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.configlistext import ConfigListScreenExt
+from Plugins.Extensions.MediaPortal.resources.keyboardext import VirtualKeyBoardExt
 from Plugins.Extensions.MediaPortal.resources.choiceboxext import ChoiceBoxExt
-from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage
 
 config.mediaportal.pornhub_username = ConfigText(default="pornhubUserName", fixed_size=False)
 config.mediaportal.pornhub_password = ConfigPassword(default="pornhubPassword", fixed_size=False)
 config.mediaportal.pornhub_cdnfix = ConfigYesNo(default=False)
 
-ck = CookieJar()
+ck = {}
 phLoggedIn = False
-phAgent = getUserAgent()
+phAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36"
+json_headers = {
+	'Accept':'application/json',
+	'Accept-Language':'de,en-US;q=0.7,en;q=0.3',
+	'X-Requested-With':'XMLHttpRequest',
+	'Content-Type':'application/x-www-form-urlencoded',
+	}
 
 class pornhubGenreScreen(MPScreen):
 
@@ -98,7 +104,7 @@ class pornhubGenreScreen(MPScreen):
 
 	def Login(self):
 		url = "http://www.pornhub.com"
-		getPage(url, agent=phAgent).addCallback(self.Login2).addErrback(self.dataError)
+		getPage(url, agent=phAgent, cookies=ck).addCallback(self.Login2).addErrback(self.dataError)
 
 	def Login2(self, data):
 		parse = re.findall('name="redirect"\svalue="(.*?)".*?id="token"\svalue="(.*?)"', data, re.S)
@@ -112,7 +118,7 @@ class pornhubGenreScreen(MPScreen):
 				'username' : self.username,
 				'password' : self.password
 				}
-			twAgentGetPage(loginUrl, agent=phAgent, method='POST', postdata=urlencode(loginData), cookieJar=ck, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.Login3).addErrback(self.dataError)
+			getPage(loginUrl, agent=phAgent, method='POST', postdata=urlencode(loginData), cookies=ck, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.Login3).addErrback(self.dataError)
 		else:
 			self.layoutFinished()
 
@@ -122,7 +128,7 @@ class pornhubGenreScreen(MPScreen):
 	def layoutFinished(self):
 		self.keyLocked = True
 		url = "http://www.pornhub.com/categories"
-		twAgentGetPage(url, agent=phAgent, cookieJar=ck).addCallback(self.genreData).addErrback(self.dataError)
+		getPage(url, agent=phAgent, cookies=ck).addCallback(self.genreData).addErrback(self.dataError)
 
 	def genreData(self, data):
 		self.filmliste = []
@@ -142,7 +148,7 @@ class pornhubGenreScreen(MPScreen):
 			self.filmliste.sort()
 		if phLoggedIn:
 			self.filmliste.insert(0, (400 * "—", None, None))
-			self.filmliste.insert(0, ("Previously Viewed", "http://www.pornhub.com/users/%s/videos/recent?page=" % self.username, None))
+			#self.filmliste.insert(0, ("Previously Viewed", "http://www.pornhub.com/users/%s/videos/recent?page=" % self.username, None))
 			self.filmliste.insert(0, ("My Feed", "http://www.pornhub.com/feeds?section=videos&page=", None))
 			self.filmliste.insert(0, ("Recommended", "http://www.pornhub.com/recommended?page=", None))
 			self.filmliste.insert(0, ("Member Subscriptions", "http://www.pornhub.com/users/%s/subscriptions?page=" % self.username, None))
@@ -178,7 +184,7 @@ class pornhubGenreScreen(MPScreen):
 			return
 		Name = self['liste'].getCurrent()[0][0]
 		if Name == "--- Search ---":
-			self.suchen()
+			self.session.openWithCallback(self.SuchenCallback, VirtualKeyBoardExt, title = (_("Enter search criteria")), text = self.suchString, is_dialog=True, auto_text_init=False, suggest_func=self.getSuggestions)
 		elif re.match(".*Subscriptions", Name):
 			Link = self['liste'].getCurrent()[0][1]
 			self.session.open(pornhubSubscriptionsScreen, Link, Name)
@@ -199,9 +205,29 @@ class pornhubGenreScreen(MPScreen):
 	def SuchenCallback(self, callback = None, entry = None):
 		if callback is not None and len(callback):
 			Name = "--- Search ---"
-			self.suchString = callback.replace(' ', '%2B')
-			Link = 'http://www.pornhub.com/video/search?search=%s&page=' % self.suchString
+			self.suchString = callback
+			Link = 'http://www.pornhub.com/video/search?search=%s&page=' % self.suchString.replace(' ', '+')
 			self.session.open(pornhubFilmScreen, Link, Name)
+
+	def getSuggestions(self, text, max_res):
+		url = "http://www.pornhub.com/video/search_autocomplete?pornstars=true&orientation=straight&q=%s" % urllib.quote_plus(text)
+		d = twAgentGetPage(url, agent=phAgent, headers=json_headers, timeout=5)
+		d.addCallback(self.gotSuggestions, max_res)
+		d.addErrback(self.gotSuggestions, max_res, err=True)
+		return d
+
+	def gotSuggestions(self, suggestions, max_res, err=False):
+		list = []
+		if not err and type(suggestions) in (str, buffer):
+			suggestions = json.loads(suggestions)
+			for item in suggestions['queries']:
+				li = item
+				list.append(str(li))
+				max_res -= 1
+				if not max_res: break
+		elif err:
+			printl(str(suggestions),self,'E')
+		return list
 
 	def keySetup(self):
 		if mp_globals.isDreamOS:
@@ -297,6 +323,7 @@ class pornhubPlayListScreen(MPScreen, ThumbsHelper):
 
 		self['Page'] = Label(_("Page:"))
 		self.keyLocked = True
+		self.lock = False
 		self.page = 1
 		self.lastpage = 1
 		self.sort = 'tr'
@@ -313,7 +340,7 @@ class pornhubPlayListScreen(MPScreen, ThumbsHelper):
 		self.filmliste = []
 		self.keyLocked = True
 		url = self.Link + str(self.page) + "&o=%s" % self.sort
-		twAgentGetPage(url, agent=phAgent, cookieJar=ck).addCallback(self.loadPageData).addErrback(self.dataError)
+		getPage(url, agent=phAgent, cookies=ck).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
 		countprofile = re.findall('class="showingInfo">Showing up to (\d+) playlists.</div>', data, re.S)
@@ -350,12 +377,14 @@ class pornhubPlayListScreen(MPScreen, ThumbsHelper):
 				submsg = ""
 				self['F4'].setText(_("Remove Favourite"))
 			else:
-				url = self['liste'].getCurrent()[0][4]
-				twAgentGetPage(url, agent=phAgent, cookieJar=ck).addCallback(self.showInfos2).addErrback(self.dataError)
+				url = self['liste'].getCurrent()[0][3]
+				self.lock = True
+				self['F4'].setText('')
+				getPage(url, agent=phAgent, cookies=ck).addCallback(self.showInfos2).addErrback(self.dataError)
 		self['handlung'].setText("%s: %s" % (_("Sort order"), self.sortname) + submsg)
 
 	def showInfos2(self, data):
-		fav = re.findall('data-already-favourite="(\d)"', data, re.S)
+		fav = re.findall('var\salreadyAddedToFav\s=\s(\d);', data, re.S)
 		isfav = str(fav[0])
 		if isfav == "1":
 			submsg = "\nFavourite"
@@ -363,6 +392,7 @@ class pornhubPlayListScreen(MPScreen, ThumbsHelper):
 		else:
 			submsg = ""
 			self['F4'].setText(_("Add Favourite"))
+		self.lock = False
 		self['handlung'].setText("%s: %s" % (_("Sort order"), self.sortname) + submsg)
 
 	def keyOK(self):
@@ -388,24 +418,24 @@ class pornhubPlayListScreen(MPScreen, ThumbsHelper):
 	def keyFavourite(self):
 		if self.keyLocked:
 			return
+		if self.lock:
+			return
 		if phLoggedIn:
-			self.playurl = self['liste'].getCurrent()[0][4]
+			self.playurl = self['liste'].getCurrent()[0][3]
 			if self.playurl:
-				twAgentGetPage(self.playurl, agent=phAgent, cookieJar=ck).addCallback(self.parseFavourite).addErrback(self.dataError)
+				getPage(self.playurl, agent=phAgent, cookies=ck).addCallback(self.parseFavourite).addErrback(self.dataError)
 
 	def parseFavourite(self, data):
-		fav = re.findall('data-already-favourite="(\d)"', data, re.S)
-		parse = re.findall('data-hash="(.*?)"\n\t{0,10}data-hash-key="(.*?)"\n\t{0,10}data-playlist-id="(.*?)"', data, re.S)
+		parse = re.findall('var\stoken\s=\s"(.*?)";.*?var\salreadyAddedToFav\s=\s(\d);.*?var\splaylistId\s=\s"(\d+)";', data, re.S)
 		if parse:
-			isfav = str(fav[0])
-			fav_key = str(parse[0][1])
-			fav_hash = str(parse[0][0])
+			isfav = str(parse[0][1])
+			favtoken = str(parse[0][0])
 			id = str(parse[0][2])
 			if isfav == "1":
-				FavUrl = "http://www.pornhub.com/playlist/remove_favourite?playlist_id=%s&fav_key=%s&fav_hash=%s" % (id, fav_key, fav_hash)
+				FavUrl = "http://www.pornhub.com/playlist/remove_favourite?playlist_id=%s&token=%s" % (id, favtoken)
 			else:
-				FavUrl = "http://www.pornhub.com/playlist_json/favourite?playlist_id=%s&fav_key=%s&fav_hash=%s" % (id, fav_key, fav_hash)
-			twAgentGetPage(FavUrl, agent=phAgent, cookieJar=ck, headers={'Content-Type':'application/x-www-form-urlencoded','Referer':self.playurl}).addCallback(self.ok).addErrback(self.dataError)
+				FavUrl = "http://www.pornhub.com/playlist_json/favourite?playlist_id=%s&token=%s" % (id, favtoken)
+			getPage(FavUrl, agent=phAgent, cookies=ck, headers={'Content-Type':'application/x-www-form-urlencoded','Referer':self.playurl}).addCallback(self.ok).addErrback(self.dataError)
 			self.reload = True
 			self.loadPage()
 
@@ -475,17 +505,35 @@ class pornhubSubscriptionsScreen(MPScreen, ThumbsHelper):
 	def loadPage(self):
 		self.filmliste = []
 		self.keyLocked = True
-		url = self.Link + str(self.page) + self.sort
-		twAgentGetPage(url, agent=phAgent, cookieJar=ck).addCallback(self.loadPageData).addErrback(self.dataError)
+		if self.page > 1 and self.Name == "Member Subscriptions":
+			url = self.Link.replace('/subscriptions','/subscriptions/ajax') + str(self.page) + self.sort
+			getPage(url, agent=phAgent, method='POST', cookies=ck, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadPageData).addErrback(self.dataError)
+		else:
+			url = self.Link + str(self.page) + self.sort
+			getPage(url, agent=phAgent, cookies=ck).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
-		self['page'].setText(str(self.page) + ' / ' + str(self.lastpage))
-		parse = re.search('(.*?)class="profileContentRight', data, re.S)
-		Cats = re.findall('class="pornStarLink"\shref="(.*?)".*?img\sclass="avatar.*?src="(.*?)".*?alt="(.*?)"', parse.group(1), re.S)
+		if self.page == 1 and self.Name == "Member Subscriptions":
+			countprofile = re.findall('class="showingInfo">Showing up to (\d+) subscriptions.</div>', data, re.S)
+			if countprofile:
+				self.lastpage = int(round((float(countprofile[0].replace(',','')) / 100) + 0.5))
+				self['page'].setText(str(self.page) + ' / ' + str(self.lastpage))
+			else:
+				self['page'].setText(str(self.page) + ' / ' + str(self.lastpage))
+			parse = re.search('(.*?)class="profileContentRight', data, re.S)
+			parsedata = parse.group(1)
+		else:
+			if self.Name == "Member Subscriptions":
+				parsedata = data
+			else:
+				self['page'].setText(str(self.page) + ' / ' + str(self.lastpage))
+				parse = re.search('(.*?)class="profileContentRight', data, re.S)
+				parsedata = parse.group(1)
+		Cats = re.findall('class="pornStarLink.*?href="(.*?)".*?img\sclass="avatar.*?src="(.*?)".*?alt="(.*?)"', parsedata, re.S)
 		if not Cats:
-			Cats = re.findall('class="userLink.*?\shref="(.*?)".*?img\sclass="avatar.*?src="(.*?)".*?alt="(.*?)"', parse.group(1), re.S)
+			Cats = re.findall('class="userLink.*?\shref="(.*?)".*?img\sclass="avatar.*?src="(.*?)".*?alt="(.*?)"', parsedata, re.S)
 			if not Cats:
-				Cats = re.findall('class="channelSubChannel.*?a\shref="(.*?)".*?img\ssrc="(.*?)".*?wtitle">.*?>(.*?)</a.', parse.group(1), re.S)
+				Cats = re.findall('class="channelSubChannel.*?a\shref="(.*?)".*?img\ssrc="(.*?)".*?wtitle">.*?>(.*?)</a.', parsedata, re.S)
 		if Cats:
 			for Url, Image, Title in Cats:
 				if self.Name == "Member Subscriptions":
@@ -544,13 +592,13 @@ class pornhubSubscriptionsScreen(MPScreen, ThumbsHelper):
 			url = self['liste'].getCurrent()[0][1]
 			if url:
 				url = url + "1"
-				twAgentGetPage(url, agent=phAgent, cookieJar=ck).addCallback(self.parseSubscribe).addErrback(self.dataError)
+				getPage(url, agent=phAgent, cookies=ck).addCallback(self.parseSubscribe).addErrback(self.dataError)
 
 	def parseSubscribe(self, data):
 		subs = re.findall('data-unsubscribe-url="(.*?)"', data, re.S)
 		if subs:
 			url = 'http://www.pornhub.com' + subs[0].replace('&amp;','&')
-			twAgentGetPage(url, agent=phAgent, cookieJar=ck).addCallback(self.parseSubscribe2).addErrback(self.dataError)
+			getPage(url, agent=phAgent, cookies=ck).addCallback(self.parseSubscribe2).addErrback(self.dataError)
 
 	def parseSubscribe2(self, data):
 		unsub = re.findall('(Subscription removed.*?PASS)', data, re.S)
@@ -616,12 +664,12 @@ class pornhubPornstarScreen(MPScreen, ThumbsHelper):
 		self.filmliste = []
 		self.keyLocked = True
 		url = self.Link + str(self.page) + "&o=%s" % self.sort
-		twAgentGetPage(url, agent=phAgent, cookieJar=ck).addCallback(self.loadPageData).addErrback(self.dataError)
+		getPage(url, agent=phAgent, cookies=ck).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
 		self.getLastPage(data, 'class="pagination3">(.*?)</div>')
 		parse = re.search('class="textFilter">.*?</span>(.*)', data, re.S)
-		Cats = re.findall('rank_number">(.*?)<.*?src="(.*?)".*?href="(.*?)".*?class="title".*?>(.*?)<.*?videosNumber">(.*?)\sVideos</span>', parse.group(1), re.S)
+		Cats = re.findall('rank_number">(.*?)<.*?src="(.*?)".*?href="(.*?)".*?class="title.*?>(.*?)<.*?videosNumber">(.*?)\sVideos', parse.group(1), re.S)
 		if Cats:
 			for Rank, Image, Url, Title, Videos in Cats:
 				Url = 'http://www.pornhub.com' + Url + "?page="
@@ -642,7 +690,7 @@ class pornhubPornstarScreen(MPScreen, ThumbsHelper):
 		CoverHelper(self['coverArt']).getCover(Image)
 		if phLoggedIn:
 			url = self['liste'].getCurrent()[0][1] + "1"
-			twAgentGetPage(url, agent=phAgent, cookieJar=ck).addCallback(self.showInfos2).addErrback(self.dataError)
+			getPage(url, agent=phAgent, cookies=ck).addCallback(self.showInfos2).addErrback(self.dataError)
 
 	def showInfos2(self, data):
 		subs = re.findall('data-subscribed="(\d)"', data, re.S)
@@ -678,7 +726,7 @@ class pornhubPornstarScreen(MPScreen, ThumbsHelper):
 			return
 		if phLoggedIn:
 			url = self['liste'].getCurrent()[0][1] + "1"
-			twAgentGetPage(url, agent=phAgent, cookieJar=ck).addCallback(self.parseSubscribe).addErrback(self.dataError)
+			getPage(url, agent=phAgent, cookies=ck).addCallback(self.parseSubscribe).addErrback(self.dataError)
 
 	def parseSubscribe(self, data):
 		subs = re.findall('data-subscribe-url="(.*?)"\sdata-unsubscribe-url="(.*?)"\sdata-subscribed="(.*?)"', data, re.S)
@@ -688,7 +736,7 @@ class pornhubPornstarScreen(MPScreen, ThumbsHelper):
 				url = 'http://www.pornhub.com' + subs[0][1].replace('&amp;','&')
 			else:
 				url = 'http://www.pornhub.com' + subs[0][0].replace('&amp;','&')
-			twAgentGetPage(url, agent=phAgent, cookieJar=ck).addCallback(self.parseSubscribe2).addErrback(self.dataError)
+			getPage(url, agent=phAgent, cookies=ck).addCallback(self.parseSubscribe2).addErrback(self.dataError)
 
 	def parseSubscribe2(self, data):
 		unsub = re.findall('(Subscription removed.*?PASS)', data, re.S)
@@ -759,7 +807,7 @@ class pornhubChannelScreen(MPScreen, ThumbsHelper):
 		self.filmliste = []
 		self.keyLocked = True
 		url = self.Link + str(self.page) + "&o=%s" % self.sort
-		twAgentGetPage(url, agent=phAgent, cookieJar=ck).addCallback(self.loadPageData).addErrback(self.dataError)
+		getPage(url, agent=phAgent, cookies=ck).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
 		self.getLastPage(data, 'class="pagination3">(.*?)</div>')
@@ -822,7 +870,7 @@ class pornhubChannelScreen(MPScreen, ThumbsHelper):
 				url = self['liste'].getCurrent()[0][6]
 			else:
 				url = self['liste'].getCurrent()[0][5]
-			twAgentGetPage(url, agent=phAgent, cookieJar=ck).addCallback(self.parseSubscribe).addErrback(self.dataError)
+			getPage(url, agent=phAgent, cookies=ck).addCallback(self.parseSubscribe).addErrback(self.dataError)
 
 	def parseSubscribe(self, data):
 		unsub = re.findall('(Subscription removed.*?PASS)', data, re.S)
@@ -909,12 +957,12 @@ class pornhubFilmScreen(MPScreen, ThumbsHelper):
 		else:
 			url = "%s%s" % (self.Link, str(self.page))
 		if re.match(".*Feed",self.Name):
-			twAgentGetPage(url, agent=phAgent, cookieJar=ck).addCallback(self.loadFeedData).addErrback(self.dataError)
+			getPage(url, agent=phAgent, cookies=ck).addCallback(self.loadFeedData).addErrback(self.dataError)
 		else:
-			twAgentGetPage(url, agent=phAgent, cookieJar=ck).addCallback(self.genreData).addErrback(self.dataError)
+			getPage(url, agent=phAgent, cookies=ck).addCallback(self.genreData).addErrback(self.dataError)
 
 	def genreData(self, data):
-		countprofile = re.findall('class="showingInfo">Showing up to (\d+) videos.</div>', data, re.S)
+		countprofile = re.findall('class="showingInfo">Showing up to (?:<span class="totalSpan">)(\d+)(?:</span>) videos.</div>', data, re.S)
 		if countprofile:
 			self.lastpage = int(round((float(countprofile[0].replace(',','')) / 48) + 0.5))
 			self['page'].setText(str(self.page) + ' / ' + str(self.lastpage))
@@ -999,7 +1047,7 @@ class pornhubFilmScreen(MPScreen, ThumbsHelper):
 				self['F1'].setText('')
 				self['F3'].setText('')
 				self['F4'].setText('')
-				twAgentGetPage(self.url, agent=phAgent, cookieJar=ck).addCallback(self.showInfos2).addErrback(self.dataError)
+				getPage(self.url, agent=phAgent, cookies=ck).addCallback(self.showInfos2).addErrback(self.dataError)
 
 	def showInfos2(self, data):
 		runtime = self['liste'].getCurrent()[0][3]
@@ -1009,12 +1057,11 @@ class pornhubFilmScreen(MPScreen, ThumbsHelper):
 		self.suburl = ""
 		self.unsuburl = ""
 		self.subscribed = ""
-		favparse = re.findall('favKey.*?(\d+),.*?favHash.*?:\s\'(.*?)\',.*?itemId.*?:\s\'(\d+)\',.*?isFavourite.*?:\s(\d),', data, re.S)
+		favparse = re.findall('favouriteUrl.*?token.*?:\s\'(.*?)\',.*?itemId.*?:\s\'(\d+)\',.*?isFavourite.*?:\s(\d),', data, re.S)
 		if favparse:
-			self.favkey = str(favparse[0][0])
-			self.favhash = str(favparse[0][1])
-			self.id = str(favparse[0][2])
-			self.favourited = str(favparse[0][3])
+			self.favtoken = str(favparse[0][0])
+			self.id = str(favparse[0][1])
+			self.favourited = str(favparse[0][2])
 		userinfo = re.findall('From:.*?data-type="(.*?)".*?bolded">(.*?)</', data, re.S)
 		if userinfo:
 			usertype = userinfo[0][0].title()
@@ -1061,7 +1108,7 @@ class pornhubFilmScreen(MPScreen, ThumbsHelper):
 			return
 		self.url = self['liste'].getCurrent()[0][1]
 		if self.url:
-			twAgentGetPage(self.url, agent=phAgent, cookieJar=ck).addCallback(self.parseData).addErrback(self.dataError)
+			getPage(self.url, agent=phAgent, cookies=ck).addCallback(self.parseData).addErrback(self.dataError)
 
 	def keyFavourite(self):
 		if self.keyLocked:
@@ -1077,11 +1124,10 @@ class pornhubFilmScreen(MPScreen, ThumbsHelper):
 				toggle = "0"
 			FavData = {
 				'id' : self.id,
-				'fav_key' : self.favkey,
-				'fav_hash' : self.favhash,
+				'token' : self.favtoken,
 				'toggle' : toggle
 				}
-			twAgentGetPage(FavUrl, agent=phAgent, method='POST', postdata=urlencode(FavData), cookieJar=ck, headers={'Content-Type':'application/x-www-form-urlencoded','Referer':self.url}).addCallback(self.ok).addErrback(self.dataError)
+			getPage(FavUrl, agent=phAgent, method='POST', postdata=urlencode(FavData), cookies=ck, headers={'Content-Type':'application/x-www-form-urlencoded','Referer':self.url}).addCallback(self.ok).addErrback(self.dataError)
 			if self.Name == "Favourite Videos":
 				self.reload = True
 				self.loadPage()
@@ -1110,7 +1156,7 @@ class pornhubFilmScreen(MPScreen, ThumbsHelper):
 			else:
 				url = self.suburl
 			if not self.suburl == "" and not self.unsuburl == "":
-				twAgentGetPage(url, agent=phAgent, cookieJar=ck).addCallback(self.parseSubscribe).addErrback(self.dataError)
+				getPage(url, agent=phAgent, cookies=ck).addCallback(self.parseSubscribe).addErrback(self.dataError)
 
 	def parseSubscribe(self, data):
 		unsub = re.findall('(Subscription removed.*?PASS)', data, re.S)
@@ -1148,7 +1194,7 @@ class pornhubFilmScreen(MPScreen, ThumbsHelper):
 			if phLoggedIn:
 				if vcserverurl.startswith('//'):
 					vcserverurl = 'http:' + vcserverurl
-					twAgentGetPage(vcserverurl, agent=phAgent, cookieJar=ck, headers={'Content-Type':'application/x-www-form-urlencoded','Referer':self.url}).addCallback(self.ok).addErrback(self.dataError)
+					getPage(vcserverurl, agent=phAgent, cookies=ck, headers={'Content-Type':'application/x-www-form-urlencoded','Referer':self.url}).addCallback(self.ok).addErrback(self.dataError)
 			if fetchurl.startswith('//'):
 				fetchurl = 'http:' + fetchurl
 			mp_globals.player_agent = phAgent

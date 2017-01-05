@@ -134,7 +134,7 @@ class chefvids(MPScreen):
 	def showInfos2(self,data):
 		self.desc = re.findall('itemprop="description" content="(.*?)"', data, re.S)
 		self.runtime = re.findall('L.*?nge: <strong>(.*?)</strong>,', data, re.S)
-		self.vid = re.findall('contentUrl" content="(.*?)">', data, re.S)
+		self.vid = re.findall('contentUrl" content="(.*?)"(?:\s/)>', data, re.S)
 		d = "Länge: %s\n\n%s" % (self.runtime[0],(decodeHtml(self.desc[0])))
 		self['handlung'].setText(d)
 

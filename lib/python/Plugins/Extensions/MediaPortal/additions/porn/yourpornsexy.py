@@ -3,7 +3,7 @@
 #
 #    MediaPortal for Dreambox OS
 #
-#    Coded by MediaPortal Team (c) 2013-2016
+#    Coded by MediaPortal Team (c) 2013-2017
 #
 #  This plugin is open source but it is NOT free software.
 #
@@ -38,8 +38,15 @@
 
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
+from Plugins.Extensions.MediaPortal.resources.keyboardext import VirtualKeyBoardExt
 
 myagent = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:40.0) Gecko/20100101 Firefox/40.0'
+json_headers = {
+	'Accept':'application/json',
+	'Accept-Language':'de,en-US;q=0.7,en;q=0.3',
+	'X-Requested-With':'XMLHttpRequest',
+	'Content-Type':'application/x-www-form-urlencoded',
+	}
 
 class YourPornSexyGenreScreen(MPScreen):
 
@@ -104,7 +111,7 @@ class YourPornSexyGenreScreen(MPScreen):
 		Name = self['liste'].getCurrent()[0][0]
 		Link = self['liste'].getCurrent()[0][1]
 		if Name == "--- Search ---":
-			self.suchen()
+			self.session.openWithCallback(self.SuchenCallback, VirtualKeyBoardExt, title = (_("Enter search criteria")), text = self.suchString, is_dialog=True, auto_text_init=False, suggest_func=self.getSuggestions)
 		elif Name == "Trends":
 			self.session.open(YourPornSexyTrendsScreen, Link, Name)
 		else:
@@ -112,10 +119,31 @@ class YourPornSexyGenreScreen(MPScreen):
 
 	def SuchenCallback(self, callback = None, entry = None):
 		if callback is not None and len(callback):
-			self.suchString = callback.replace(' ', '-')
 			Name = "--- Search ---"
-			Link = self.suchString
+			self.suchString = callback
+			Link = self.suchString.replace(' ', '-')
 			self.session.open(YourPornSexyFilmScreen, Link, Name)
+
+	def getSuggestions(self, text, max_res):
+		url = "http://yourporn.sexy/php/livesearch2.php"
+		postdata = {'key': text.replace(' ','-'), 'c':'livesearch'}
+		d = twAgentGetPage(url, method='POST', postdata=urlencode(postdata), agent=myagent, headers=json_headers, timeout=5)
+		d.addCallback(self.gotSuggestions, max_res)
+		d.addErrback(self.gotSuggestions, max_res, err=True)
+		return d
+
+	def gotSuggestions(self, suggestions, max_res, err=False):
+		list = []
+		if not err and type(suggestions) in (str, buffer):
+			suggestions = json.loads(suggestions)
+			for item in suggestions['searches']:
+				li = item['title']
+				list.append(str(li))
+				max_res -= 1
+				if not max_res: break
+		elif err:
+			printl(str(suggestions),self,'E')
+		return list
 
 class YourPornSexyTrendsScreen(MPScreen):
 
@@ -165,7 +193,6 @@ class YourPornSexyTrendsScreen(MPScreen):
 		self['name'].setText(_('Please wait...'))
 		self.genreliste = []
 		url = self.Link.replace('%s', str((self.page-1)*150))
-		print url
 		getPage(url, agent=myagent).addCallback(self.loadData).addErrback(self.dataError)
 
 	def loadData(self, data):
@@ -258,17 +285,23 @@ class YourPornSexyFilmScreen(MPScreen, ThumbsHelper):
 			preparse = re.search('</head>(.*?)<span>Other Results</span>', data, re.S)
 			if preparse:
 				prep = preparse.group(1)
-		Movies = re.findall('post_share_div.*?<a\shref=[\'|"](.*?)[\'|"]\stitle=[\'|"](.*?)[\'|"].*?vid_thumb.*?\ssrc=[\'|"](.*?)[\'|"].*?post_time.*?>(.*?)[<strong|</div>].*?(\d+)\sviews', data, re.S)
+		Movies = re.findall('post_share_div.*?<a\shref=[\'|"](.*?)[\'|"]\stitle=[\'|"](.*?)[\'|"].*?vid_thumb.*?\ssrc=[\'|"](.*?)[\'|"].*?post_time.*?>(.*?)(?:<strong|</div>).*?(\d+)\sviews', data, re.S)
 		if Movies:
 			for (Url, Title, Image, Added, Views) in Movies:
 				Url = "http://yourporn.sexy" + Url
 				self.filmliste.append((decodeHtml(Title), Url, Image, Views, "-", Added))
 		else:
-			Movies = re.findall("vid_container.*?<img.*?\ssrc='(.*?)'.*?a\shref='(.*?)'\stitle='(.*?)'.*?ptspan'>(.*?)<strong>.*?(\d+)\sviews", prep, re.S)
+			Movies = re.findall("vid_container.*?<img.*?\ssrc='(.*?)'.*?a\shref='(.*?\.html)'.*?title='(.*?)'.*?post_time.*?>(.*?)\s{0,1}<strong>.*?(\d+)\sviews", prep, re.S)
 			if Movies:
 				for (Image, Url, Title, Added, Views) in Movies:
 					Url = "http://yourporn.sexy" + Url
 					self.filmliste.append((decodeHtml(Title), Url, Image, Views, "-", Added.strip()))
+			else:
+				Movies = re.findall("vid_container.*?<img.*?\ssrc='(.*?)'.*?post_time.*?a\shref='(.*?\.html)'.*?title='(.*?)'.*?ptspan.*?>(.*?)\s{0,1}<strong>.*?(\d+)\sviews", prep, re.S)
+				if Movies:
+					for (Image, Url, Title, Added, Views) in Movies:
+						Url = "http://yourporn.sexy" + Url
+						self.filmliste.append((decodeHtml(Title), Url, Image, Views, "-", Added.strip()))
 		if len(self.filmliste) == 0:
 			self.filmliste.append((_('No videos found!'), '', None, '', '', ''))
 		self.ml.setList(map(self._defaultlistleft, self.filmliste))
@@ -297,7 +330,7 @@ class YourPornSexyFilmScreen(MPScreen, ThumbsHelper):
 	def getVideoUrl(self, data):
 		videoUrl = re.findall('<source\ssrc="(.*?)"\stype="video/mp4">', data, re.S)
 		if not videoUrl:
-			videoUrl = re.findall('<video.*?src=[\'|"](.*?.mp4)[\'|"]\s', data, re.S)
+			videoUrl = re.findall('<video.*?src=[\'|"](.*?.mp4)[\'|"]', data, re.S)
 		if videoUrl:
 			self.keyLocked = False
 			Title = self['liste'].getCurrent()[0][0]

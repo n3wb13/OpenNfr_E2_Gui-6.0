@@ -1,8 +1,54 @@
 ﻿# -*- coding: utf-8 -*-
+###############################################################################################
+#
+#    MediaPortal for Dreambox OS
+#
+#    Coded by MediaPortal Team (c) 2013-2017
+#
+#  This plugin is open source but it is NOT free software.
+#
+#  This plugin may only be distributed to and executed on hardware which
+#  is licensed by Dream Property GmbH. This includes commercial distribution.
+#  In other words:
+#  It's NOT allowed to distribute any parts of this plugin or its source code in ANY way
+#  to hardware which is NOT licensed by Dream Property GmbH.
+#  It's NOT allowed to execute this plugin and its source code or even parts of it in ANY way
+#  on hardware which is NOT licensed by Dream Property GmbH.
+#
+#  This applies to the source code as a whole as well as to parts of it, unless
+#  explicitely stated otherwise.
+#
+#  If you want to use or modify the code or parts of it,
+#  you have to keep OUR license and inform us about the modifications, but it may NOT be
+#  commercially distributed other than under the conditions noted above.
+#
+#  As an exception regarding execution on hardware, you are permitted to execute this plugin on VU+ hardware
+#  which is licensed by satco europe GmbH, if the VTi image is used on that hardware.
+#
+#  As an exception regarding modifcations, you are NOT permitted to remove
+#  any copy protections implemented in this plugin or change them for means of disabling
+#  or working around the copy protections, unless the change has been explicitly permitted
+#  by the original authors. Also decompiling and modification of the closed source
+#  parts is NOT permitted.
+#
+#  Advertising with this plugin is NOT allowed.
+#  For other uses, permission from the authors is necessary.
+#
+###############################################################################################
+
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.decrypt import *
+from Plugins.Extensions.MediaPortal.resources.keyboardext import VirtualKeyBoardExt
 from Plugins.Extensions.MediaPortal.resources.choiceboxext import ChoiceBoxExt
+
+agent='Mozilla/5.0 (Windows NT 6.1; rv:44.0) Gecko/20100101 Firefox/44.0'
+json_headers = {
+	'Accept':'application/json',
+	'Accept-Language':'de,en-US;q=0.7,en;q=0.3',
+	'X-Requested-With':'XMLHttpRequest',
+	'Content-Type':'application/json',
+	}
 
 class tube8GenreScreen(MPScreen):
 
@@ -82,17 +128,37 @@ class tube8GenreScreen(MPScreen):
 			return
 		Name = self['liste'].getCurrent()[0][0]
 		if Name == "--- Search ---":
-			self.suchen()
+			self.session.openWithCallback(self.SuchenCallback, VirtualKeyBoardExt, title = (_("Enter search criteria")), text = self.suchString, is_dialog=True, auto_text_init=False, suggest_func=self.getSuggestions)
 		else:
 			Link = self['liste'].getCurrent()[0][1]
 			self.session.open(tube8FilmScreen, Link, Name)
 
 	def SuchenCallback(self, callback = None, entry = None):
 		if callback is not None and len(callback):
-			self.suchString = callback.replace(' ', '+')
 			Name = "--- Search ---"
-			Link = 'http://www.tube8.com/searches.html?q=%s&page=' % (self.suchString)
+			self.suchString = callback
+			Link = self.suchString.replace(' ', '%20')
 			self.session.open(tube8FilmScreen, Link, Name)
+
+	def getSuggestions(self, text, max_res):
+		url = "http://www.tube8.com/ajax2/searchAutoComplete/?search_term=%s" % urllib.quote_plus(text)
+		d = twAgentGetPage(url, agent=agent, headers=json_headers, timeout=5)
+		d.addCallback(self.gotSuggestions, max_res)
+		d.addErrback(self.gotSuggestions, max_res, err=True)
+		return d
+
+	def gotSuggestions(self, suggestions, max_res, err=False):
+		list = []
+		if not err and type(suggestions) in (str, buffer):
+			suggestions = json.loads(suggestions)
+			for item in suggestions['queries']:
+				li = item
+				list.append(str(li))
+				max_res -= 1
+				if not max_res: break
+		elif err:
+			printl(str(suggestions),self,'E')
+		return list
 
 class tube8FilmScreen(MPScreen, ThumbsHelper):
 
@@ -137,8 +203,10 @@ class tube8FilmScreen(MPScreen, ThumbsHelper):
 		self.page = 1
 		self.lastpage = 999
 		self.sort = None
+		self.sortsearch = 'tube8_slave_featured'
 		self.filter = None
-		self.sortname = 'Futured'
+		self.filtersearch = ''
+		self.sortname = 'Featured'
 		self.filtername = 'Any Duration'
 
 		self.filmliste = []
@@ -152,45 +220,67 @@ class tube8FilmScreen(MPScreen, ThumbsHelper):
 		self['name'].setText(_('Please wait...'))
 		self.filmliste = []
 		self['page'].setText(str(self.page))
-		url = "%s%s/" % (self.Link, str(self.page))
-		if self.sort:
-			url = "%s?orderby=%s" % (url, self.sort)
-		if self.filter:
-			url = ("%s?filter_duration=%s" % (url, self.filter)).replace('?', '&').replace('&', '?', 1)
-		getPage(url).addCallback(self.genreData).addErrback(self.dataError)
+		if re.match(".*Search", self.Name):
+			url = "http://bnzmzkcxit-1.algolianet.com/1/indexes/*/queries?x-algolia-agent=Algolia%20for%20vanilla%20JavaScript%203.19.2&x-algolia-application-id=BNZMZKCXIT&x-algolia-api-key=9302a0e4a33f91355c89c58789d32e6b"
+			postdata = '{"requests":[{"indexName":"banned_words","params":"query=' + self.Link + '&optionalWords=%5B%22%22%5D&queryType=prefixNone&typoTolerance=false&optionalFacetFilters=%5B%22%22%5D&getRankingInfo=1&hitsPerPage=50"},{"indexName":"' + self.sortsearch + '","params":"query=' + self.Link + '&optionalWords=%5B%22%22%5D&facetFilters=%5B%22attributes.orientation%3Astraight%22' + self.filtersearch + '%5D&facets=*&page=' + str(self.page-1) +'"}]}'
+			getPage(url, method='POST', agent=agent, postdata=postdata, headers={'Content-Type': 'application/x-www-form-urlencoded'}).addCallback(self.genreData).addErrback(self.dataError)
+		else:
+			url = "%s%s/" % (self.Link, str(self.page))
+			if self.sort:
+				url = "%s?orderby=%s" % (url, self.sort)
+			if self.filter:
+				url = ("%s?filter_duration=%s" % (url, self.filter)).replace('?', '&').replace('&', '?', 1)
+			getPage(url).addCallback(self.genreData).addErrback(self.dataError)
 
 	def genreData(self, data):
-		Movies = re.findall('id="video_.*?a\shref="(.*?)".*?src="(http://.*?\.jpg)".*?title="(.*?)".*?video_duration">(.*?)</div>.*?video_views">(.*?)\sviews', data, re.S)
-		if Movies:
-			for (Url, Image, Title, Runtime, Views) in Movies:
-				self.filmliste.append((decodeHtml(Title), Url, Image, Runtime, Views.strip()))
-			self.ml.setList(map(self._defaultlistleft, self.filmliste))
-			self.ml.moveToIndex(0)
-			self.keyLocked = False
-			self.th_ThumbsQuery(self.filmliste, 0, 1, 2, None, None, self.page, 999, mode=1)
-			self.showInfos()
+		if re.match(".*Search", self.Name):
+			results = json.loads(data)
+			if results:
+				for node in results["results"][1]["hits"]:
+					Url = str(node["link"])
+					Image = str(node["thumbnails"][0]["urls"][0])
+					Title = str(node["title"])
+					Seconds = int(node["attributes"]["durationInSeconds"])
+					m, s = divmod(Seconds, 60)
+					Runtime = "%02d:%02d" % (m, s)
+					Views = str(node["attributes"]["stats"]["views"])
+					self.filmliste.append((Title, Url, Image, Runtime, Views))
+		else:
+			Movies = re.findall('id="video_.*?a\shref="(.*?)".*?src="(http://.*?\.jpg)".*?title="(.*?)".*?video_duration">(.*?)</div>.*?video_views">(.*?)\sviews', data, re.S)
+			if Movies:
+				for (Url, Image, Title, Runtime, Views) in Movies:
+					self.filmliste.append((decodeHtml(Title), Url, Image, Runtime, Views.strip()))
+		if len(self.filmliste) == 0:
+			self.filmliste.append((_('No movies found!'), "", None, None, None))
+		self.ml.setList(map(self._defaultlistleft, self.filmliste))
+		self.ml.moveToIndex(0)
+		self.keyLocked = False
+		self.th_ThumbsQuery(self.filmliste, 0, 1, 2, None, None, self.page, 999, mode=1)
+		self.showInfos()
 
 	def keySort(self):
 		if self.keyLocked:
 			return
-		rangelist = [ ['Futured', ''], ['Longest', 'ln'], ['Newest', 'nt'], ['Rating','tr'], ['Views','mv'], ['Votes','mt'], ['Comments','md'], ['Favorites','mf']]
+		rangelist = [ ['Featured', '', 'tube8_slave_featured'], ['Longest', 'ln', 'tube8_slave_longest'], ['Newest', 'nt', 'tube8_slave_newest'], ['Rating', 'tr', 'tube8_slave_rating'], ['Views', 'mv', 'tube8_slave_views'], ['Votes', 'mt', 'tube8_slave_votes'], ['Comments', 'md', 'tube8_slave_comments'], ['Favorites', 'mf', 'tube8_slave_favorites']]
 		self.session.openWithCallback(self.keySortAction, ChoiceBoxExt, title=_('Select Action'), list = rangelist)
 
 	def keySortAction(self, result):
 		if result:
 			self.sort = result[1]
+			self.sortsearch = result[2]
 			self.sortname = result[0]
 			self.loadPage()
 
 	def keyFilter(self):
 		if self.keyLocked:
 			return
-		rangelist = [['Any Duration', ''], ['Short 0-5 Min', 'short'], ['Medium 5-20 Min','medium'], ['Long 20+ Min','long']]
+		rangelist = [['Any Duration', '', ''], ['Short 0-5 Min', 'short', '%2C%22attributes.durationInSeconds_round%3A1%22'], ['Medium 5-20 Min', 'medium', '%2C%22attributes.durationInSeconds_round%3A2%22'], ['Long 20+ Min', 'long', '%2C%22attributes.durationInSeconds_round%3A3%22']]
 		self.session.openWithCallback(self.keyFilterAction, ChoiceBoxExt, title=_('Select Action'), list = rangelist)
 
 	def keyFilterAction(self, result):
 		if result:
 			self.filter = result[1]
+			self.filtersearch = result[2]
 			self.filtername = result[0]
 			self.loadPage()
 

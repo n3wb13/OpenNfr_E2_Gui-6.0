@@ -398,7 +398,7 @@ class MPScreen(Screen):
 				event = '%s - %s  %s' % (time.strftime('%H:%M',time.localtime(now[0])),time.strftime('%H:%M',time.localtime(now[1])),now[2])
 				r_tm = '%+d min' % int((now[1]-time.mktime(time.localtime())) / 60)
 
-		fhdoffset = 140 if mp_globals.videomode >= 2 else 0
+		fhdoffset = 140 if mp_globals.videomode == 2 else 0
 		width2 = 190+fhdoffset if event else width+fhdoffset
 		icon_name = entry[2]
 		iconwidth = self.DEFAULT_LM

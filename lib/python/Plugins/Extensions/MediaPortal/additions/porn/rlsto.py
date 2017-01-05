@@ -3,7 +3,7 @@
 #
 #    MediaPortal for Dreambox OS
 #
-#    Coded by MediaPortal Team (c) 2013-2016
+#    Coded by MediaPortal Team (c) 2013-2017
 #
 #  This plugin is open source but it is NOT free software.
 #
@@ -82,6 +82,7 @@ class rlstoGenreScreen(MPScreen):
 		raw = re.findall('class="menu-item.*?href="(.*?)">(.*?)</a>', parse.group(1), re.S)
 		if raw:
 			for (Url, Title) in raw:
+				if Title != "SiteRips":
 					self.filmliste.append((decodeHtml(Title), Url))
 		self.filmliste.insert(0, ("--- Search ---", None))
 		self.ml.setList(map(self._defaultlistcenter, self.filmliste))
@@ -235,12 +236,17 @@ class rlstoStreamListeScreen(MPScreen):
 		getPage(self.Url).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
-		streams = re.findall('href="http://rls.to/goto/(http://(.*?)\/.*?)"', data, re.S)
+		streams = re.findall('href="http://rls.to/goto/(.*?)"', data, re.S)
 		if streams:
-			for (stream, hostername) in streams:
-				if isSupportedHoster(hostername, True):
-					hostername = hostername.replace('www.','')
-					self.filmliste.append((hostername, stream))
+			import base64
+			for enc in streams:
+				dec = base64.b64decode(enc)
+				urls = re.findall('(http://(.*?)\/.*)', dec, re.S)
+				if urls:
+					for (stream, hostername) in urls:
+						if isSupportedHoster(hostername, True):
+							hostername = hostername.replace('www.','')
+							self.filmliste.append((hostername, stream))
 		# remove duplicates
 		self.filmliste = list(set(self.filmliste))
 		if len(self.filmliste) == 0:

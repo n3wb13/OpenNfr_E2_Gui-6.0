@@ -213,12 +213,12 @@ class JSInterpreter(object):
 			return opfunc(x, y)
 
 		m = re.match(
-			r'^(?P<func>%s)\((?P<args>[a-zA-Z0-9_$,]+)\)$' % _NAME_RE, expr)
+			r'^(?P<func>%s)\((?P<args>[a-zA-Z0-9_$,]*)\)$' % _NAME_RE, expr)
 		if m:
 			fname = m.group('func')
 			argvals = tuple([
 				int(v) if v.isdigit() else local_vars[v]
-				for v in m.group('args').split(',')])
+				for v in m.group('args').split(',')]) if len(m.group('args')) > 0 else tuple()
 			if fname not in self._functions:
 				self._functions[fname] = self.extract_function(fname)
 			return self._functions[fname](argvals)
@@ -247,7 +247,7 @@ class JSInterpreter(object):
 	def extract_function(self, funcname):
 		func_m = re.search(
 			r'''(?x)
-				(?:function\s+%s|[{;,]%s\s*=\s*function|var\s+%s\s*=\s*function)\s*
+				(?:function\s+%s|[{;,]\s*%s\s*=\s*function|var\s+%s\s*=\s*function)\s*
 				\((?P<args>[^)]*)\)\s*
 				\{(?P<code>[^}]+)\}''' % (
 				re.escape(funcname), re.escape(funcname), re.escape(funcname)),

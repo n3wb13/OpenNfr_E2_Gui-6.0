@@ -1,9 +1,0 @@
-<screen backgroundColor="#80ffffff" flags="wfNoBorder" name="ActionScreen" position="center,center" size="1504,628" title="">
-    <widget name="name" position="10,75" size="1480,45" backgroundColor="#20000000" transparent="1" zPosition="1" font="mediaportal_clean;35" valign="center" halign="center" />
-    <widget name="interspace" position="10,130" size="1480,30" backgroundColor="#20000000" transparent="1" zPosition="1" font="mediaportal_clean;35" valign="center" halign="center" />
-    <widget name="liste" position="10,185" size="1480,430" scrollbarMode="showOnDemand" zPosition="1" transparent="1" itemHeight="40" />
-    <eLabel name="bg up" position="2,64" size="1500,110" backgroundColor="#20000000" />
-    <eLabel name="bg up" position="2,2" size="1500,60" backgroundColor="#20000000" />
-    <eLabel name="bg down" position="2,176" size="1500,450" backgroundColor="#20000000" />
-    <widget name="title" position="2,2" size="1500,60" font="mediaportal_clean;40" backgroundColor="#20000000" foregroundColor="#00ffffff" zPosition="1" halign="center" valign="center" />
-</screen>

@@ -3,7 +3,7 @@
 #
 #    MediaPortal for Dreambox OS
 #
-#    Coded by MediaPortal Team (c) 2013-2016
+#    Coded by MediaPortal Team (c) 2013-2017
 #
 #  This plugin is open source but it is NOT free software.
 #
@@ -89,7 +89,6 @@ class get_stream_link:
 	from hosters.epornik import epornik
 	from hosters.exashare import exashare
 	from hosters.filehoot import filehoot
-	from hosters.flashx import flashx, flashxCheckUrl, flashxCalllater, flashxdata
 	from hosters.flyflv import flyflv, flyflvData
 	from hosters.google import google
 	from hosters.kodik import kodik, kodikData
@@ -114,6 +113,7 @@ class get_stream_link:
 	from hosters.videonest import videonest
 	from hosters.videowood import videowood
 	from hosters.vidbull import vidbull
+	from hosters.vidlox import vidlox
 	from hosters.vidspot import vidspot
 	from hosters.vidwoot import vidwoot
 	from hosters.vivo import vivo
@@ -387,6 +387,24 @@ class get_stream_link:
 				else:
 					self.only_premium()
 
+			elif re.search('naughtyamerica.com', data, re.S):
+				link = data
+				if config.mediaportal.premiumize_use.value and not self.fallback:
+					self.rdb = 0
+					self.prz = 1
+					self.callPremium(link)
+				else:
+					self.only_premium()
+
+			elif re.search('wicked.com', data, re.S):
+				link = data
+				if config.mediaportal.premiumize_use.value and not self.fallback:
+					self.rdb = 0
+					self.prz = 1
+					self.callPremium(link)
+				else:
+					self.only_premium()
+
 			elif re.search('1fichier.com', data, re.S):
 				link = data
 				if (config.mediaportal.premiumize_use.value or config.mediaportal.realdebrid_use.value) and not self.fallback:
@@ -507,7 +525,7 @@ class get_stream_link:
 					self.prz = 1
 					self.callPremium(link)
 				else:
-					twAgentGetPage(link, agent=None, headers=std_headers).addCallback(self.flashx, id.group(3)).addErrback(self.errorload)
+					self.only_premium()
 
 			elif re.search('userporn.com', data, re.S):
 				link = data
@@ -645,14 +663,13 @@ class get_stream_link:
 					if id:
 						link = "http://streamin.to/embed-%s-640x360.html" % id
 				if config.mediaportal.realdebrid_use.value and not self.fallback:
-					if id:
-						link = "http://streamin.to/%s" % id
+					link = data
 					self.rdb = 1
 					self.prz = 0
 					self.callPremium(link)
 				else:
 					spezialagent = 'Mozilla/5.0 (Linux; Android 4.4; Nexus 5 Build/BuildID) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36'
-					getPage(link, cookies=ck,  agent=spezialagent).addCallback(self.streamin).addErrback(self.errorload)
+					getPage(link, cookies=ck, agent=spezialagent).addCallback(self.streamin).addErrback(self.errorload)
 
 			elif re.search("vivo.sx", data, re.S):
 				link = data.replace('http:','https:')
@@ -862,6 +879,15 @@ class get_stream_link:
 			elif re.search('vidzi\.tv/', data, re.S):
 				link = data
 				getPage(link, cookies=ck).addCallback(self.vidzi).addErrback(self.errorload)
+
+			elif re.search('vidlox\.tv/', data, re.S):
+				if re.search('vidlox\.tv/embed-', data, re.S):
+					link = data
+				else:
+					id = re.search('vidlox\.tv/(\w+)', data)
+					if id:
+						link = "http://vidlox.tv/embed-%s.html" % id.group(1)
+				getPage(link).addCallback(self.vidlox).addErrback(self.errorload)
 
 			else:
 				message = self.session.open(MessageBoxExt, _("No supported Stream Hoster, try another one!"), MessageBoxExt.TYPE_INFO, timeout=5)

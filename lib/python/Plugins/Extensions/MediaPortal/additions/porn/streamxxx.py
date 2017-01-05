@@ -3,7 +3,7 @@
 #
 #    MediaPortal for Dreambox OS
 #
-#    Coded by MediaPortal Team (c) 2013-2016
+#    Coded by MediaPortal Team (c) 2013-2017
 #
 #  This plugin is open source but it is NOT free software.
 #
@@ -316,8 +316,8 @@ class streamxxxStreamListeScreen(MPScreen):
 		twAgentGetPage(self.streamFilmLink, cookieJar=glob_cookies, agent=myagent).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
-		parse = re.search('class="webwarezvideo">(.*?)</div>', data, re.S)
-		streams = re.findall('(http[s]?://(.*?)\/.*?)[\'|"|\&|<]', parse.group(1) , re.S)
+		parse = re.search('class="stream">(.*?)</div>', data, re.S)
+		streams = re.findall('(http[s]?://(.*?)\/.*?)[\'|"|\&|<]', parse.group(1), re.S)
 		if streams:
 			for (stream, hostername) in streams:
 				if isSupportedHoster(hostername, True):

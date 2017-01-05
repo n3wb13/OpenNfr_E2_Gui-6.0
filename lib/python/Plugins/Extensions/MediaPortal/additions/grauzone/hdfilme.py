@@ -3,7 +3,7 @@
 #
 #    MediaPortal for Dreambox OS
 #
-#    Coded by MediaPortal Team (c) 2013-2016
+#    Coded by MediaPortal Team (c) 2013-2017
 #
 #  This plugin is open source but it is NOT free software.
 #
@@ -379,7 +379,7 @@ class hdfilmeStreams(MPScreen):
 		else:
 			self.keyLocked = False
 		self.ml.setList(map(self._defaultlisthoster, self.streamList))
-		CoverHelper(self['coverArt']).getCover(self.cover, agent=hf_agent, cookieJar=hf_cookies)
+		CoverHelper(self['coverArt']).getCover(self.cover, agent=hf_agent, cookieJar=hf_cookies, req=True)
 
 	def keyOK(self):
 		exist = self['liste'].getCurrent()

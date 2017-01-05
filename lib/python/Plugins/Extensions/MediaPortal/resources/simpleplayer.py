@@ -80,8 +80,9 @@ def clearTmpBuffer():
 	from enigma import eBackgroundFileEraser
 	BgFileEraser = eBackgroundFileEraser.getInstance()
 	path = config.mediaportal.storagepath.value
-	for fn in next(os.walk(path))[2]:
-		BgFileEraser.erase(os.path.join(path,fn))
+	if os.path.exists(path):
+		for fn in next(os.walk(path))[2]:
+			BgFileEraser.erase(os.path.join(path,fn))
 
 class M3U8Player:
 
@@ -252,7 +253,6 @@ class SimpleSeekHelper:
 		self.onHide.append(self.__seekBarHide)
 		self.onShow.append(self.__seekBarShown)
 		self.resetMySpass()
-		self.skinYPos = 0
 
 	def initSeek(self):
 		global seekbuttonpos
@@ -314,7 +314,7 @@ class SimpleSeekHelper:
 
 	def __updateCursor(self):
 		if self.length:
-			if mp_globals.videomode >= 2:
+			if mp_globals.videomode == 2:
 				factor = 10.85
 			else:
 				factor = 6.86
@@ -366,20 +366,21 @@ class SimpleSeekHelper:
 			self.percent = 100.0
 
 	def numberKeySeek(self, val):
-		length = float(self.length[1])
-		if length > 0.0:
-			pts = int(length / 100.0 * self.percent) + val * 90000
-			self.percent = pts * 100 / length
-			if self.percent < 0.0:
-				self.percent = 0.0
-			elif self.percent > 100.0:
-				self.percent = 100.0
+		if self.length:
+			length = float(self.length[1])
+			if length > 0.0:
+				pts = int(length / 100.0 * self.percent) + val * 90000
+				self.percent = pts * 100 / length
+				if self.percent < 0.0:
+					self.percent = 0.0
+				elif self.percent > 100.0:
+					self.percent = 100.0
 
-			self.seekOK()
-			if config.usage.show_infobar_on_skip.value:
-				self.doShow()
-		else:
-			return
+				self.seekOK()
+				if config.usage.show_infobar_on_skip.value:
+					self.doShow()
+			else:
+				return
 
 	def doMySpassSeekTo(self, seekpos):
 		service = self.session.nav.getCurrentService()
@@ -449,17 +450,24 @@ class SimpleSeekHelper:
 		if self.seekBarShown and not self.seekBarLocked:
 			self.initSeek()
 		if self.seekBarLocked:
-			if self.skinYPos >= -450:
+			orgpos = self.instance.position()
+			orgheight = self.instance.size().height()
+			self.skinYPos = orgpos.y()
+			if self.skinYPos >= 0 - orgheight:
 				self.skinYPos -= 50
-				self.instance.move(ePoint(0, self.skinYPos))
+				self.instance.move(ePoint(orgpos.x(), self.skinYPos))
 
 	def moveSkinDown(self):
 		if self.seekBarShown and not self.seekBarLocked:
 			self.initSeek()
 		if self.seekBarLocked:
-			if self.skinYPos <= 450:
+			orgpos = self.instance.position()
+			orgheight = self.instance.size().height()
+			desktopSize = getDesktop(0).size()
+			self.skinYPos = orgpos.y()
+			if self.skinYPos <= desktopSize.height():
 				self.skinYPos += 50
-				self.instance.move(ePoint(0, self.skinYPos))
+				self.instance.move(ePoint(orgpos.x(), self.skinYPos))
 
 class SimplePlayerResume:
 
@@ -752,7 +760,7 @@ class SimplePlayer(Screen, M3U8Player, CoverSearchHelper, SimpleSeekHelper, Simp
 	ALLOW_SUSPEND = True
 	ctr = 0
 
-	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None, plType='local', title_inr=0, cover=False, ltype='', autoScrSaver=False, showPlaylist=True, listEntryPar=None, playList2=[], playerMode='VIDEO', useResume=True, bufferingOpt='None', googleCoverSupp=False, embeddedCoverArt=False):
+	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None, plType='local', title_inr=0, cover=False, ltype='', autoScrSaver=False, showPlaylist=True, listEntryPar=None, playList2=[], playerMode='VIDEO', useResume=True, bufferingOpt='None', googleCoverSupp=False, embeddedCoverArt=False, forceGST=False):
 
 		if (self.__class__.ctr + 1) > 1:
 			printl('[SP]: only 1 instance allowed',self,"E")
@@ -782,7 +790,7 @@ class SimplePlayer(Screen, M3U8Player, CoverSearchHelper, SimpleSeekHelper, Simp
 			self.skin = re.sub(r'type="MPServicePosition">Gauge</convert>', r'type="MPServicePosition">Position</convert>', self.skin)
 
 		self.setActionPrio()
-		self["actions"] = ActionMap(["WizardActions",'MediaPlayerSeekActions','InfobarInstantRecord',"EPGSelectActions",'MoviePlayerActions','ColorActions','InfobarActions',"MenuActions","HelpActions"],
+		self["actions"] = ActionMap(["WizardActions",'MediaPlayerSeekActions','InfobarInstantRecord',"EPGSelectActions",'MoviePlayerActions','ColorActions','InfobarActions',"MenuActions","HelpActions","MP_SP_Move"],
 		{
 			"leavePlayer": self.leavePlayer,
 			config.mediaportal.sp_mi_key.value: self.openMediainfo,
@@ -799,8 +807,8 @@ class SimplePlayer(Screen, M3U8Player, CoverSearchHelper, SimpleSeekHelper, Simp
 			"seekdef:6": self.Key6,
 			"seekdef:7": self.Key7,
 			"seekdef:9": self.Key9,
-			"prevBouquet": self.moveSkinUp,
-			"nextBouquet": self.moveSkinDown
+			"SPMoveDown": self.moveSkinDown,
+			"SPMoveUp": self.moveSkinUp
 
 		}, self.action_prio)
 
@@ -878,6 +886,7 @@ class SimplePlayer(Screen, M3U8Player, CoverSearchHelper, SimpleSeekHelper, Simp
 		self.coverBGisHidden = False
 		self.cover2 = False
 		self.searchTitle = None
+		self.forceGST = forceGST
 		self.embeddedCoverArt = embeddedCoverArt
 		self.hasEmbeddedCoverArt = False
 		self.lru_key = None
@@ -1031,7 +1040,7 @@ class SimplePlayer(Screen, M3U8Player, CoverSearchHelper, SimpleSeekHelper, Simp
 				print "SP FILMON extension is missing"
 			else:
 				FilmOnLink(self.session).getStream(url.split('#filmon-stream#')[0]).addCallback(lambda url: self._initStream(title, url, **kwargs)).addErrback(self.dataError)
-		elif config.mediaportal.use_hls_proxy.value and not self.ltype in ('myvideo2.de',) and '.m3u8' in url:
+		elif config.mediaportal.use_hls_proxy.value and not self.forceGST and '.m3u8' in url:
 			self._getM3U8Video(title, url, **kwargs)
 		else:
 			self._initStream(title, url, **kwargs)
@@ -1930,9 +1939,7 @@ try:
 
 except:
 	class SimpleScreenSaver(Screen):
-		if mp_globals.videomode == 3:
-			skin = '<screen position="0,0" size="3840,2160" flags="wfNoBorder" zPosition="15" transparent="0" backgroundColor="#00000000"></screen>'
-		elif mp_globals.videomode == 2:
+		if mp_globals.videomode == 2:
 			skin = '<screen position="0,0" size="1920,1080" flags="wfNoBorder" zPosition="15" transparent="0" backgroundColor="#00000000"></screen>'
 		else:
 			skin = '<screen position="0,0" size="1280,720" flags="wfNoBorder" zPosition="15" transparent="0" backgroundColor="#00000000"></screen>'

@@ -136,11 +136,11 @@ class showevonicGenre(MPScreen):
 		self.genreListe.append(("HD-Collection", "http://crynet.to/forum/content.php?r=3501-hd-collection&page="))
 		self.genreListe.append(("Serien Charts", "http://crynet.to/forum/content.php?r=1997-serien-charts&page="))
 		self.genreListe.append(("HD-Serien", "http://crynet.to/forum/content.php?r=5993-hd-serien&page="))
-		self.genreListe.append(("Century", "dump"))
-		self.genreListe.append(("Imdb", "dump"))
-		self.genreListe.append(("Imdb Top 1000", "dump"))
-		self.genreListe.append(("3D", "http://crynet.to/forum/content.php?r=4225-3d-filme&page="))
-		self.genreListe.append(("Alle HD Premium Streams", "http://crynet.to/forum/content.php?r=1669-hd-filme&page="))
+		#self.genreListe.append(("Century", "dump"))
+		#self.genreListe.append(("Imdb", "dump"))
+		#self.genreListe.append(("Imdb Top 1000", "dump"))
+		#self.genreListe.append(("3D", "http://crynet.to/forum/content.php?r=4225-3d-filme&page="))
+		#self.genreListe.append(("Alle HD Premium Streams", "http://crynet.to/forum/content.php?r=1669-hd-filme&page="))
 		self.genreListe.append(("Abenteuer", "http://crynet.to/forum/list.php?r=category/65-HD-Abenteuer&page="))
 		self.genreListe.append(("Action", "http://crynet.to/forum/list.php?r=category/35-HD-Action&page="))
 		self.genreListe.append(("Biografie", "http://crynet.to/forum/list.php?r=category/70-HD-Biografie&page="))
@@ -669,12 +669,13 @@ class meMovieScreen(MPScreen, ThumbsHelper):
 	def getStream(self, data):
 		self.genreListe2 = []
 		##testi##
-		findStream = re.findall('"(http://crynet.to/server/Premium.*?)".*?target="Videoframe.*?"><b>(.*?)</b>', data)
-                if findStream:
+		findStream = re.findall('<a href="(/server/Filme.php\?mov=.*?)" target="Videoframe">.*?<img src="http://crynet.to/images/(.*?).png"', data, re.S)
+		if findStream:
 			print "Premium", findStream
 			for stream, name in findStream:
+				stream = 'http://crynet.to'+stream
 				name2 = "Premium"
-                                name = re.sub('<.*?>', '', name2)
+				#name = re.sub('<.*?>', '', name2)
 				self.genreListe2.append((name, stream.replace('"','')))
 
 		m = re.search('//www.youtube.*?com/(embed|v|p)/(.*?)(\?|" |&amp)', data)
@@ -809,9 +810,10 @@ class meSerienScreen(MPScreen):
 			staffelcount = 0
 			for each in staffeln:
 				staffelcount += 1
-				eps = re.findall('<a href="(.*?)" target="Videoframe.*?"><b><span style="color: black;">(.*?)</span>', each, re.S|re.I)
+				eps = re.findall('<a href="(/server/.*?)" target="Videoframe.*?"><b><span style="color: black;">(.*?)</span>', each, re.S|re.I)
 				if eps:
 					for link,epTitle in eps:
+						link = 'http://crynet.to'+link
 						if int(staffelcount) < 10:
 							setStaffel = "S0%s" % str(staffelcount)
 						else:
@@ -1151,7 +1153,7 @@ class meCollectionScreen(MPScreen):
 	def getStream(self, data):
 		streams = []
 		searchSTRING = self.streamName.replace('(','\(').replace(')','\)')
-		streams = re.findall(searchSTRING+'.*?<a href="(http://crynet.to/server/Premium-Membe.*?.php.*?)"', data, re.S)
+		streams = re.findall(searchSTRING+'.*?<a href="(/server/Filme.php\?mov=.*?)" target="Videofram.*?">', data, re.S)
 		if streams:
 			print self.streamName, streams[0]
 		self.session.open(meServerScreen, self.streamName, streams, self.streamPic)
@@ -1415,11 +1417,11 @@ class meWatchlistScreen(MPScreen):
 		#print data
 		print "get streams.."
 		self.genreListe2 = []
-		findStream = re.findall('"(http://crynet.to/server/Premium.*?)" target="Videoframe"><b>(.*?)</b>', data)
+		findStream = re.findall('<a href="(/server/Filme.php\?mov=.*?)" target="Videoframe">.*?<img src="http://crynet.to/images/(.*?).png"', data, re.S)
 		if findStream:
 			print "Premium", findStream
 			for stream, name in findStream:
-				name = re.sub('<.*?>', '', name)
+				stream = 'http://crynet.to'+stream
 				self.genreListe2.append((name, stream.replace('"','')))
 
 		findStream2 = re.findall('"http://crynet.to/server/Free-Member.php.mov=.*?"  target="Videoframe"><b>(.*?)</b>', data)
@@ -1480,6 +1482,8 @@ class meServerScreen(MPScreen):
 			print self.eLink
 			for server in self.eLink:
 				print server
+				if 'http://crynet.to' not in server:
+					server = 'http://crynet.to'+server
 				self.eListe.append(("Premium", server))
 			self.ml.setList(map(self._defaultlistcenter, self.eListe))
 			self.keyLocked = False

@@ -3,7 +3,7 @@
 #
 #    MediaPortal for Dreambox OS
 #
-#    Coded by MediaPortal Team (c) 2013-2016
+#    Coded by MediaPortal Team (c) 2013-2017
 #
 #  This plugin is open source but it is NOT free software.
 #
@@ -83,8 +83,6 @@ class brazzersGenreScreen(MPScreen):
 		getPage(url, agent=myagent).addCallback(self.genreData).addErrback(self.dataError)
 
 	def genreData(self, data):
-		#parse = re.search('class="select-category"(.*?)</select>', data, re.S)
-		#Cats = re.findall('option\svalue="(/categories.*?)".*?>\s+(.*?)\s{2}', parse.group(1), re.S|re.I)
 		parse = re.search('class="categories">(.*?)</section>', data, re.S)
 		Cats = re.findall('class="tag-card">.*?href="(.*?)".*?title="(.*?)".*?img.*?src="(.*?)".*?</li>', parse.group(1), re.S|re.I)
 		if Cats:
@@ -178,7 +176,7 @@ class brazzersFilmScreen(MPScreen, ThumbsHelper):
 			url = "http://www.brazzers.com/search/all/?q=%s" % (self.Link)
 		else:
 			url = "%s%s/" % (self.Link, str(self.page))
-		getPage(url).addCallback(self.loadData).addErrback(self.dataError)
+		getPage(url, agent=myagent).addCallback(self.loadData).addErrback(self.dataError)
 
 	def loadData(self, data):
 		self.getLastPage(data, 'class="pagination(.*?)</div>', '.*(?:\/|>)(\d+)')
@@ -199,7 +197,6 @@ class brazzersFilmScreen(MPScreen, ThumbsHelper):
 
 	def showInfos(self):
 		title = self['liste'].getCurrent()[0][0]
-		url = self['liste'].getCurrent()[0][1]
 		pic = self['liste'].getCurrent()[0][2]
 		date = self['liste'].getCurrent()[0][3]
 		coll = self['liste'].getCurrent()[0][4]

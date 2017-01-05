@@ -1,7 +1,43 @@
 ﻿# -*- coding: utf-8 -*-
+###############################################################################################
+#
+#    MediaPortal for Dreambox OS
+#
+#    Coded by MediaPortal Team (c) 2013-2017
+#
+#  This plugin is open source but it is NOT free software.
+#
+#  This plugin may only be distributed to and executed on hardware which
+#  is licensed by Dream Property GmbH. This includes commercial distribution.
+#  In other words:
+#  It's NOT allowed to distribute any parts of this plugin or its source code in ANY way
+#  to hardware which is NOT licensed by Dream Property GmbH.
+#  It's NOT allowed to execute this plugin and its source code or even parts of it in ANY way
+#  on hardware which is NOT licensed by Dream Property GmbH.
+#
+#  This applies to the source code as a whole as well as to parts of it, unless
+#  explicitely stated otherwise.
+#
+#  If you want to use or modify the code or parts of it,
+#  you have to keep OUR license and inform us about the modifications, but it may NOT be
+#  commercially distributed other than under the conditions noted above.
+#
+#  As an exception regarding execution on hardware, you are permitted to execute this plugin on VU+ hardware
+#  which is licensed by satco europe GmbH, if the VTi image is used on that hardware.
+#
+#  As an exception regarding modifcations, you are NOT permitted to remove
+#  any copy protections implemented in this plugin or change them for means of disabling
+#  or working around the copy protections, unless the change has been explicitly permitted
+#  by the original authors. Also decompiling and modification of the closed source
+#  parts is NOT permitted.
+#
+#  Advertising with this plugin is NOT allowed.
+#  For other uses, permission from the authors is necessary.
+#
+###############################################################################################
+
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
-import base64
 
 BASE_URL = "http://www.drtuber.com"
 
@@ -48,11 +84,10 @@ class drtuberGenreScreen(MPScreen):
 	def genreData(self, data):
 		parse = re.search('<h2>%s</h2>(.*?)</div></div>' % self.scopeText[self.scope], data, re.S)
 		if parse:
-			genre = re.findall('<a href="(.*?)"\sdata-catFilter_category>(.*?)</span>', parse.group(1), re.S)
+			genre = re.findall('<a\shref="(.*?)"\sdata-catFilter_category>(.*?)\s{0,1}<span>', parse.group(1), re.S)
 			if genre:
 				for genreurl, genrename in genre:
-					genrename = genrename.replace('<span>','')
-					genreurl = "%s%s" % (BASE_URL,genreurl)
+					genreurl = BASE_URL + genreurl
 					self.genreliste.append((genrename, genreurl))
 		self.genreliste.sort()
 		self.genreliste.insert(0, ("--- Search ---", "callSuchen"))
@@ -180,6 +215,7 @@ class drtuberFilmScreen(MPScreen, ThumbsHelper):
 		self.param1 = param1
 		self.param2 = param2
 		self.param3 = param3
+		import base64
 		hash = hashlib.md5(self.param3 + base64.b64decode('UFQ2bDEzdW1xVjhLODI3')).hexdigest()
 		url = '%s/player_config/?h=%s&t=%s&vkey=%s&pkey=%s&aid=' % (BASE_URL, self.param1, self.param2, self.param3, hash)
 		getPage(url).addCallback(self.getData, callback).addErrback(self.dataError, callback)

@@ -1,10 +1,48 @@
 # -*- coding: utf-8 -*-
+###############################################################################################
+#
+#    MediaPortal for Dreambox OS
+#
+#    Coded by MediaPortal Team (c) 2013-2017
+#
+#  This plugin is open source but it is NOT free software.
+#
+#  This plugin may only be distributed to and executed on hardware which
+#  is licensed by Dream Property GmbH. This includes commercial distribution.
+#  In other words:
+#  It's NOT allowed to distribute any parts of this plugin or its source code in ANY way
+#  to hardware which is NOT licensed by Dream Property GmbH.
+#  It's NOT allowed to execute this plugin and its source code or even parts of it in ANY way
+#  on hardware which is NOT licensed by Dream Property GmbH.
+#
+#  This applies to the source code as a whole as well as to parts of it, unless
+#  explicitely stated otherwise.
+#
+#  If you want to use or modify the code or parts of it,
+#  you have to keep OUR license and inform us about the modifications, but it may NOT be
+#  commercially distributed other than under the conditions noted above.
+#
+#  As an exception regarding execution on hardware, you are permitted to execute this plugin on VU+ hardware
+#  which is licensed by satco europe GmbH, if the VTi image is used on that hardware.
+#
+#  As an exception regarding modifcations, you are NOT permitted to remove
+#  any copy protections implemented in this plugin or change them for means of disabling
+#  or working around the copy protections, unless the change has been explicitly permitted
+#  by the original authors. Also decompiling and modification of the closed source
+#  parts is NOT permitted.
+#
+#  Advertising with this plugin is NOT allowed.
+#  For other uses, permission from the authors is necessary.
+#
+###############################################################################################
+
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.keyboardext import VirtualKeyBoardExt
+from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage
 
 config.mediaportal.movie4klang = ConfigText(default="all", fixed_size=False)
-config.mediaportal.movie4kdomain = ConfigText(default="movie4k.to", fixed_size=False)
+config.mediaportal.movie4kdomain2 = ConfigText(default="movie4k.tv", fixed_size=False)
 
 if fileExists('/usr/lib/enigma2/python/Plugins/Extensions/TMDb/plugin.pyo'):
 	from Plugins.Extensions.TMDb.plugin import *
@@ -17,10 +55,10 @@ else:
 	IMDbPresent = False
 	TMDbPresent = False
 
-m4k = config.mediaportal.movie4kdomain.value
-m4k_url = "http://www.%s/" % config.mediaportal.movie4kdomain.value
-g_url = "http://www.%s/movies-genre-" % config.mediaportal.movie4kdomain.value
-t_url = "http://movie4k.tv/thumbs"
+m4k = config.mediaportal.movie4kdomain2.value
+m4k_url = "https://www.%s/" % config.mediaportal.movie4kdomain2.value
+g_url = "https://www.%s/movies-genre-" % config.mediaportal.movie4kdomain2.value
+t_url = "https://movie4k.tv/thumbs"
 
 movie4kheader = {}
 ds = defer.DeferredSemaphore(tokens=1)
@@ -56,7 +94,7 @@ class m4kGenreScreen(MPScreen):
 		}, -1)
 
 		self.locale = config.mediaportal.movie4klang.value
-		self.domain = config.mediaportal.movie4kdomain.value
+		self.domain = config.mediaportal.movie4kdomain2.value
 		global movie4kheader
 		if self.locale == "de":
 			movie4kheader = {'User-Agent': std_headers['User-Agent'], 'Cookie':'lang=de'}
@@ -148,27 +186,21 @@ class m4kGenreScreen(MPScreen):
 			self.session.open(m4kKinoAlleFilmeListeScreen, self.url, name)
 
 	def keyDomain(self):
-		if self.domain == "movie4k.tv" or self.domain == "to":
-			self.domain = "movie4k.to"
-			config.mediaportal.movie4kdomain.value = "movie4k.to"
-		elif self.domain == "movie4k.to":
+		if self.domain == "movie4k.tv":
 			self.domain = "movie.to"
-			config.mediaportal.movie4kdomain.value = "movie.to"
+			config.mediaportal.movie4kdomain2.value = "movie.to"
 		elif self.domain == "movie.to":
-			self.domain = "movie4k.cc"
-			config.mediaportal.movie4kdomain.value = "movie4k.cc"
-		elif self.domain == "movie4k.cc":
-			self.domain = "movie4k.me"
-			config.mediaportal.movie4kdomain.value = "movie4k.me"
-		elif self.domain == "movie4k.me":
+			self.domain = "movie4k.to"
+			config.mediaportal.movie4kdomain2.value = "movie4k.to"
+		elif self.domain == "movie4k.to":
 			self.domain = "movie4k.tv"
-			config.mediaportal.movie4kdomain.value = "movie4k.tv"
-		config.mediaportal.movie4kdomain.save()
+			config.mediaportal.movie4kdomain2.value = "movie4k.tv"
+		config.mediaportal.movie4kdomain2.save()
 		configfile.save()
 		global m4k, m4k_url, g_url, t_url
 		m4k = "%s" % self.domain
-		m4k_url = "http://www.%s/" % self.domain
-		g_url = "http://www.%s/movies-genre-" % self.domain
+		m4k_url = "https://www.%s/" % self.domain
+		g_url = "https://www.%s/movies-genre-" % self.domain
 		self['title'].setText(m4k)
 		self['F4'].setText(self.domain)
 
@@ -386,7 +418,7 @@ class m4kSucheAlleFilmeListeScreen(MPScreen, ThumbsHelper):
 		self.ml.setList(map(self._defaultlistleft, self.list))
 		self.ml.moveToIndex(0)
 		self.keyLocked = False
-		self.th_ThumbsQuery(self.list, 0, 1, None, None, '<img\ssrc="(http.*?/thumbs/.*?movie4k-film.jpg)".*?class="moviedescription"', 1, 1)
+		self.th_ThumbsQuery(self.list, 0, 1, None, None, '<img\ssrc="(http[s]?.*?/thumbs/.*?movie4k-film.jpg)".*?class="moviedescription"', 1, 1)
 		self.showInfos()
 
 	def showInfos(self):
@@ -401,7 +433,7 @@ class m4kSucheAlleFilmeListeScreen(MPScreen, ThumbsHelper):
 		filmdaten = re.findall('<div style="float:left">.*?<img src="(.*?)".*?<div class="moviedescription">(.*?)</div>', data, re.S)
 		if filmdaten:
 			streamPic, handlung = filmdaten[0]
-			CoverHelper(self['coverArt']).getCover(streamPic.replace('https','http'))
+			CoverHelper(self['coverArt']).getCover(streamPic)
 			self['handlung'].setText(decodeHtml(handlung).strip())
 
 	def keyOK(self):
@@ -473,7 +505,7 @@ class m4kKinoAlleFilmeListeScreen(MPScreen, ThumbsHelper):
 		elif re.search('%sxxx' % m4k_url, self.streamGenreLink):
 			url = '%s%s%s' % (self.streamGenreLink, self.page, '.html')
 			twAgentGetPage(url, agent=None, timeout=15, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
-		elif re.search('http://(www.|)movie[^/]+/movies-(updates|all|genre)-', self.streamGenreLink):
+		elif re.search('http[s]?://(www.|)movie[^/]+/movies-(updates|all|genre)-', self.streamGenreLink):
 			url = '%s%s%s' % (self.streamGenreLink, self.page, '.html')
 			twAgentGetPage(url, agent=None, timeout=15, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
 		else:
@@ -511,7 +543,7 @@ class m4kKinoAlleFilmeListeScreen(MPScreen, ThumbsHelper):
 				if self.preview == True:
 					imagelink = re.findall('coverPreview%s"\).hover\(.*?<img src=\'(.*?)\' alt' % image, data, re.S)
 					if imagelink:
-						self.list.append((decodeHtml(title).strip(), url, imagelink[0].replace('https','http')))
+						self.list.append((decodeHtml(title).strip(), url, imagelink[0]))
 					else:
 						self.list.append((decodeHtml(title).strip(), url, None))
 				else:
@@ -546,7 +578,7 @@ class m4kKinoAlleFilmeListeScreen(MPScreen, ThumbsHelper):
 		filmdaten = re.findall('<div style="float:left">.*?<img src="(.*?)".*?<div class="moviedescription">(.*?)</div>', data, re.S)
 		if filmdaten:
 			streamPic, handlung = filmdaten[0]
-			CoverHelper(self['coverArt']).getCover(streamPic.replace('https','http'))
+			CoverHelper(self['coverArt']).getCover(streamPic)
 			self['handlung'].setText(decodeHtml(handlung).strip())
 
 	def keyOK(self):
@@ -623,7 +655,7 @@ class m4kupdateFilme(MPScreen, ThumbsHelper):
 		self.ml.setList(map(self._defaultlistleft, self.list))
 		self.ml.moveToIndex(0)
 		self.keyLocked = False
-		self.th_ThumbsQuery(self.list, 0, 1, None, None, '<img\ssrc="(http.*?/thumbs/.*?movie4k-film.jpg)".*?class="moviedescription"', 1, 1)
+		self.th_ThumbsQuery(self.list, 0, 1, None, None, '<img\ssrc="(http[s]?.*?/thumbs/.*?movie4k-film.jpg)".*?class="moviedescription"', 1, 1)
 		self.showInfos()
 
 	def showInfos(self):
@@ -635,9 +667,9 @@ class m4kupdateFilme(MPScreen, ThumbsHelper):
 		self.deferreds.append(downloads)
 
 	def showHandlung(self, data):
-		image = re.search('<img\ssrc="(http.*?/thumbs/.*?movie4k-film.jpg)"\sborder=0', data, re.S)
+		image = re.search('<img\ssrc="(http[s]?.*?/thumbs/.*?movie4k-film.jpg)"\sborder=0', data, re.S)
 		if image:
-			image = image.group(1).replace('https','http')
+			image = image.group(1)
 			CoverHelper(self['coverArt']).getCover(image)
 		handlung = re.findall('<div class="moviedescription">(.*?)<', data, re.S)
 		if handlung:
@@ -712,7 +744,7 @@ class m4kFilme(MPScreen, ThumbsHelper):
 		if kino:
 			for url,image,title in kino:
 				url = "%s%s" % (m4k_url, url)
-				self.list.append((decodeHtml(title), url, image.replace('https','http')))
+				self.list.append((decodeHtml(title), url, image))
 		if len(self.list) == 0:
 			self.list.append((_('No movies found!'), '', None))
 		self.ml.setList(map(self._defaultlistleft, self.list))
@@ -803,7 +835,7 @@ class m4kTopSerienFilme(MPScreen, ThumbsHelper):
 		if serien:
 			for url,image,title in serien:
 				url = "%s%s" % (m4k_url, url)
-				self.list.append((decodeHtml(title), url, image.replace('https','http')))
+				self.list.append((decodeHtml(title), url, image))
 		if len(self.list) == 0:
 			self.list.append((_('No movies found!'), '', None))
 		self.ml.setList(map(self._defaultlistleft, self.list))
@@ -909,7 +941,7 @@ class m4kSerienUpdateFilme(MPScreen, ThumbsHelper):
 		self.ml.setList(map(self._defaultlistleft, self.list))
 		self.ml.moveToIndex(0)
 		self.keyLocked = False
-		self.th_ThumbsQuery(self.list, 0, 1, None, None, '"og:image" content="(http.*?/thumbs/.*?movie4k-film.jpg)"', 1, 1, coverlink=t_url)
+		self.th_ThumbsQuery(self.list, 0, 1, None, None, '"og:image" content="(http[s]?.*?/thumbs/.*?movie4k-film.jpg)"', 1, 1, coverlink=t_url)
 		self.showInfos()
 
 	def showInfos(self):
@@ -921,9 +953,9 @@ class m4kSerienUpdateFilme(MPScreen, ThumbsHelper):
 		self.deferreds.append(downloads)
 
 	def showHandlung(self, data):
-		image = re.search('"og:image" content="(http.*?/thumbs/.*?movie4k-film.jpg)"', data, re.S)
+		image = re.search('"og:image" content="(http[s]?.*?/thumbs/.*?movie4k-film.jpg)"', data, re.S)
 		if image:
-			image = image.group(1).replace('https','http')
+			image = image.group(1)
 		else:
 			image = None
 		CoverHelper(self['coverArt']).getCover(image)
@@ -1055,9 +1087,9 @@ class m4kStreamListeScreen(MPScreen):
 		self.deferreds.append(downloads)
 
 	def showInfosData(self, data):
-		image = re.search('<img\ssrc="(http.*?/thumbs/.*?movie4k-film.jpg)".*?class="moviedescription"', data, re.S)
+		image = re.search('<img\ssrc="(http[s]?.*?/thumbs/.*?movie4k-film.jpg)".*?class="moviedescription"', data, re.S)
 		if image:
-			image = image.group(1).replace('https','http')
+			image = image.group(1)
 		else:
 			image = None
 		CoverHelper(self['coverArt']).getCover(image)
@@ -1348,9 +1380,9 @@ class m4kEpisodenListeScreen(MPScreen):
 
 	def showInfosData(self, data):
 		self['name'].setText(self.streamName)
-		image = re.search('<img\ssrc="(http.*?/thumbs/.*?movie4k-film.jpg)".*?class="moviedescription"', data, re.S)
+		image = re.search('<img\ssrc="(http[s]?.*?/thumbs/.*?movie4k-film.jpg)".*?class="moviedescription"', data, re.S)
 		if image:
-			image = image.group(1).replace('https','http')
+			image = image.group(1)
 		else:
 			image = None
 		CoverHelper(self['coverArt']).getCover(image)
@@ -1443,7 +1475,7 @@ class m4kXXXListeScreen(MPScreen, ThumbsHelper):
 				if self.preview == True:
 					imagelink = re.findall('%s"\).hover\(.*?<img src=\'(.*?)\' alt' % cover, data, re.S)
 					if imagelink:
-						self.list.append((decodeHtml(title), url, imagelink[0].replace('https','http')))
+						self.list.append((decodeHtml(title), url, imagelink[0]))
 					else:
 						self.list.append((decodeHtml(title), url, None))
 				else:
@@ -1454,7 +1486,7 @@ class m4kXXXListeScreen(MPScreen, ThumbsHelper):
 		self.ml.moveToIndex(0)
 		self.keyLocked = False
 		if self.preview == False:
-			self.th_ThumbsQuery(self.list, 0, 1, None, None, '<img\ssrc="(http.*?/thumbs/.*?-film.jpg)"\sborder=0', self.page,self.lastpage)
+			self.th_ThumbsQuery(self.list, 0, 1, None, None, '<img\ssrc="(http[s]?.*?/thumbs/.*?-film.jpg)"\sborder=0', self.page,self.lastpage)
 		else:
 			self.th_ThumbsQuery(self.list,0,1,2,None,None,self.page,self.lastpage)
 		self.showInfos()
@@ -1470,9 +1502,9 @@ class m4kXXXListeScreen(MPScreen, ThumbsHelper):
 	def showHandlung(self, data):
 		image = self['liste'].getCurrent()[0][2]
 		if not image:
-			image = re.search('<img\ssrc="(http.*?/thumbs/.*?-film.jpg)"\sborder=0', data, re.S)
+			image = re.search('<img\ssrc="(http[s]?.*?/thumbs/.*?-film.jpg)"\sborder=0', data, re.S)
 			if image:
-				image = image.group(1).replace('https','http')
+				image = image.group(1)
 			else:
 				image = None
 		CoverHelper(self['coverArt']).getCover(image)
