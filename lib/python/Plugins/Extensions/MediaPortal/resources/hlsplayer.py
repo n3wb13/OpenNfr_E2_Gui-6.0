@@ -34,7 +34,6 @@ import simpleplayer
 from simpleplayer import SimplePlayer
 from debuglog import printlog as printl
 from messageboxext import MessageBoxExt
-#from Screens.MessageBox import MessageBox as MessageBoxExt
 from utopialink import UtopiaLink
 from httpplayer import GSTPlayer
 

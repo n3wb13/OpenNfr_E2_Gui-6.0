@@ -519,7 +519,7 @@ class get_stream_link:
 				link = data
 				id = re.search('flashx.(tv|pw)/(embed-|dl\?|fxplay-|embed.php\?c=|)(\w+)', data)
 				if id:
-					link = "http://www.flashx.tv/%s.html" % id.group(3)
+					link = "https://www.flashx.tv/%s.html" % id.group(3)
 				if config.mediaportal.premiumize_use.value and not self.fallback:
 					self.rdb = 0
 					self.prz = 1

@@ -190,7 +190,7 @@ class naughtyamericaFilmScreen(MPScreen, ThumbsHelper):
 		self.getLastPage(data, 'class="pagination(.*?)</div>', '.*(?:\/|>)(\d+)')
 		parse = re.search('content-main(.*?)(id="fantasySideBar"|id="wrapper-footer)', data, re.S)
 		print "aaaaa"
-		Movies = re.findall('a\shref="(.*?)(?:\?nats.*?)"\stitle="(.*?)".*?img.*?src="(.*?)"(.*?)class="entry-date">(.*?)</p', parse.group(1), re.S)
+		Movies = re.findall('a\shref="(http://tour.naughtyamerica.com.*?)(?:\?nats.*?)"\stitle="(.*?)".*?img.*?src="(.*?)"(.*?)class="entry-date">(.*?)</p', parse.group(1), re.S)
 		if Movies:
 			for (Url, Title, Image, VrCheck, Date) in Movies:
 				if not "vr-icon" in VrCheck:

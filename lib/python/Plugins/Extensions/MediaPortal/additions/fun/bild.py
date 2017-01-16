@@ -151,10 +151,12 @@ class bildSecondScreen(MPScreen, ThumbsHelper):
 		getPage(self.link).addCallback(self.parseData).addErrback(self.dataError)
 
 	def parseData(self, data):
-		videos =  re.findall('itemprop="video".*?data-ajax-href="(.*?)".*?itemprop="name"\scontent="(.*?)"/>.*?itemprop="description"\scontent="(.*?)"/>.*?itemprop="thumbnailUrl"\scontent="(.*?)"/>', data, re.S)
-		for (Url, Title, handlung, Image) in videos:
+		videos =  re.findall('video-id.*?data-video-json="(.*?)".*?class="kicker">(.*?)</span>.*?class="headline">(.*?)</span>', data, re.S)
+		for (Url, Title1, Title2) in videos:
 			if not re.match('.*?bild-plus', Url):
-				self.filmliste.append((decodeHtml(Title), Url, Image, handlung))
+				Url = baseurl + Url
+				Title = Title1.strip() + " - " + Title2.strip()
+				self.filmliste.append((decodeHtml(Title), Url))
 		if len(self.filmliste) == 0:
 			self.filmliste.append((_("No videos found!"),"",""))
 		self.ml.setList(map(self._defaultlistleft, self.filmliste))
@@ -163,28 +165,30 @@ class bildSecondScreen(MPScreen, ThumbsHelper):
 		self.showInfos()
 
 	def showInfos(self):
+		self.videourl = None
 		title = self['liste'].getCurrent()[0][0]
-		coverUrl = self['liste'].getCurrent()[0][2]
-		Handlung = self['liste'].getCurrent()[0][3]
-		self['handlung'].setText(decodeHtml(Handlung))
 		self['name'].setText(title)
+		jsonurl = self['liste'].getCurrent()[0][1]
+		getPage(jsonurl).addCallback(self.showInfos2).addErrback(self.dataError)
+
+	def showInfos2(self, data):
+		parse = re.findall('description":\s"(.*?)",.*?poster":\s"(.*?)".*?src":"(.*?.mp4)"', data, re.S)
+		if parse:
+			coverUrl = parse[0][1]
+			Handlung = parse[0][0]
+			self.videourl = parse[0][2]
+		else:
+			coverUrl = None
+			Handlung = ""
+		self['handlung'].setText(decodeHtml(Handlung))
 		CoverHelper(self['coverArt']).getCover(coverUrl)
 
 	def keyOK(self):
 		if self.keyLocked:
 			return
-		url = baseurl + self['liste'].getCurrent()[0][1]
-		getPage(url).addCallback(self.parseVideoData).addErrback(self.dataError)
+		if self.videourl:
+			self.playVideo(self.videourl)
 
-	def parseVideoData(self, data):
-		medialink = re.findall('data-media="(.*?)"', data, re.S)
-		if medialink:
-			getxml = baseurl + medialink[0]
-			getPage(getxml).addCallback(self.playVideo).addErrback(self.dataError)
-
-	def playVideo(self, data):
-		streamlink = re.search('"src":"(http://videos-.*?\.mp4)","type":"video/mp4"', data, re.S)
-		if streamlink:
-			title = self['liste'].getCurrent()[0][0]
-			final = streamlink.group(1)
-			self.session.open(SimplePlayer, [(title, final)], showPlaylist=False, ltype='bild')
+	def playVideo(self, url):
+		title = self['liste'].getCurrent()[0][0]
+		self.session.open(SimplePlayer, [(title, url)], showPlaylist=False, ltype='bild')

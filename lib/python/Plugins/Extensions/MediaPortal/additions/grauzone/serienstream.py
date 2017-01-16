@@ -38,7 +38,7 @@
 
 from Plugins.Extensions.MediaPortal.plugin import _
 from Plugins.Extensions.MediaPortal.resources.imports import *
-from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage
+from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage, TwAgentHelper
 
 try:
 	from Plugins.Extensions.MediaPortal.resources import cfscrape
@@ -688,6 +688,7 @@ class ssStreams(MPScreen):
 		self['name'] = Label(self.Title)
 
 		self.streamList = []
+		self.tw_agent_hlp = TwAgentHelper()
 		self.ml = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
 		self['liste'] = self.ml
 		self.keyLocked = True
@@ -725,8 +726,15 @@ class ssStreams(MPScreen):
 			return
 		url = self['liste'].getCurrent()[0][1]
 		if url:
-			get_stream_link(self.session).check_link(url, self.playfile)
+			if url.startswith('/out/'):
+				url = BASE_URL + url
+				self.tw_agent_hlp.getRedirectedUrl(url).addCallback(self.getStream).addErrback(self.dataError)
+			else:
+				get_stream_link(self.session).check_link(url, self.playfile)
 
+	def getStream(self, url):
+		get_stream_link(self.session).check_link(url, self.playfile)
+				
 	def playfile(self, stream_url):
 		if not re.search('\S[0-9][0-9]E[0-9][0-9]', self.Title, re.I):
 			self.streamname = self.Title + " - " + self.episode

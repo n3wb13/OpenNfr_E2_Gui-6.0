@@ -121,6 +121,17 @@ except:
 	except:
 		MediaInfoPresent = False
 
+# eUriResolver Imports for DreamOS
+###############################################################################################
+try:
+	from enigma import eUriResolver
+	from resources.MPYoutubeUriResolver import MPYoutubeUriResolver
+	MPYoutubeUriResolver.instance = MPYoutubeUriResolver()
+	eUriResolver.addResolver(MPYoutubeUriResolver.instance)
+except ImportError:
+	pass
+###############################################################################################
+
 def lastMACbyte():
 	try:
 		return int(open('/sys/class/net/eth0/address').readline().strip()[-2:], 16)
@@ -153,8 +164,8 @@ config.mediaportal.epg_deepstandby = ConfigSelection(default = "skip", choices =
 		])
 
 # Allgemein
-config.mediaportal.version = NoSave(ConfigText(default="772"))
-config.mediaportal.versiontext = NoSave(ConfigText(default="7.7.2"))
+config.mediaportal.version = NoSave(ConfigText(default="774"))
+config.mediaportal.versiontext = NoSave(ConfigText(default="7.7.4"))
 config.mediaportal.autoupdate = ConfigYesNo(default = True)
 config.mediaportal.pincode = ConfigPIN(default = 0000)
 config.mediaportal.showporn = ConfigYesNo(default = False)

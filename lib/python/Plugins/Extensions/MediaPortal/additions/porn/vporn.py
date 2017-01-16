@@ -48,6 +48,7 @@ class vpornGenreScreen(MPScreen):
 		self['F3'] = Label(self.date)
 		self['F4'] = Label(_("Setup"))
 		self.keyLocked = True
+		self.loggedin = False
 		self.suchString = ''
 
 		self.genreliste = []
@@ -65,9 +66,13 @@ class vpornGenreScreen(MPScreen):
 		getPage(loginUrl, method='POST', postdata=urlencode(loginData), cookies=ck, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.Login2).addErrback(self.dataError)
 
 	def Login2(self, data):
+		if 'alt="Logout"' in data:
+			self.loggedin = True
 		self.layoutFinished()
 
 	def layoutFinished(self):
+		if not self.loggedin:
+			message = self.session.open(MessageBoxExt, _("Login data is required for HD video playback!"), MessageBoxExt.TYPE_INFO, timeout=5)
 		self.keyLocked = True
 		url = "http://www.vporn.com"
 		getPage(url, cookies=ck).addCallback(self.genreData).addErrback(self.dataError)
@@ -88,7 +93,6 @@ class vpornGenreScreen(MPScreen):
 			self.genreliste.insert(0, ("Most Viewed", "http://www.vporn.com/views/", None, True))
 			self.genreliste.insert(0, ("Top Rated", "http://www.vporn.com/rating/", None, True))
 			self.genreliste.insert(0, ("Newest", "http://www.vporn.com/newest/", None, True))
-
 		self.genreliste.insert(0, ("--- Search ---", "callSuchen", None, False))
 		self.ml.setList(map(self._defaultlistcenter, self.genreliste))
 		self.ml.moveToIndex(0)
@@ -321,7 +325,7 @@ class vpornFilmScreen(MPScreen, ThumbsHelper):
 			getPage(url, cookies=ck).addCallback(self.getVideoPage).addErrback(self.dataError)
 
 	def getVideoPage(self, data):
-		videoPage = re.findall('flashvars.videoUrl.*?\s=\s"(http.*?.mp4)"', data, re.S)
+		videoPage = re.findall('flashvars.videoUrl(?:Low|Low2|Medium|Medium2|HD|HD2)\s=\s"(http.*?.mp4)"', data, re.S)
 		if videoPage:
 			self.keyLocked = False
 			Title = self['liste'].getCurrent()[0][0]

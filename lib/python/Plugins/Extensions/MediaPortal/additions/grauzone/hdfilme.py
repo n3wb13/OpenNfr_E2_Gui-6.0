@@ -148,10 +148,10 @@ class hdfilmeMain(MPScreen):
 			cats = re.findall('<option value="(\d+)"\s+>\s+(.*?)\s\s', parse.group(1), re.S)
 			if cats:
 				for tagid, name in cats:
-					self.streamList.append(("%s" % name, "%s/movie-movies?cat=%s&country=&order_f=id&order_d=desc&per_page=" % (BASE_URL, str(tagid))))
+					self.streamList.append(("%s" % name, "%s/movie-movies?cat=%s&country=&order_f=last_update&order_d=desc&page=" % (BASE_URL, str(tagid))))
 		self.streamList.sort(key=lambda t : t[0].lower())
-		self.streamList.insert(0, ("Serien","%s/movie-series?&per_page=" % BASE_URL))
-		self.streamList.insert(0, ("Kinofilme","%s/movie-cinemas?&per_page=" % BASE_URL))
+		self.streamList.insert(0, ("Serien","%s/movie-series?page=" % BASE_URL))
+		self.streamList.insert(0, ("Kinofilme","%s/movie-movies?page=" % BASE_URL))
 		self.streamList.insert(0, ("--- Search ---", "search"))
 		self.ml.setList(map(self._defaultlistcenter, self.streamList))
 		self.keyLocked = False
@@ -171,7 +171,7 @@ class hdfilmeMain(MPScreen):
 	def SuchenCallback(self, callback = None, entry = None):
 		if callback is not None and len(callback):
 			self.suchString = callback.strip()
-			url = '%s/movie/search?key=%s' % (BASE_URL, urllib.quote_plus(self.suchString))
+			url = '%s/movie-search?key=%s&page_film=' % (BASE_URL, urllib.quote_plus(self.suchString))
 			genre = self['liste'].getCurrent()[0][0]
 			self.session.open(hdfilmeParsing, genre, url)
 
@@ -219,10 +219,7 @@ class hdfilmeParsing(MPScreen, ThumbsHelper):
 
 	def loadPage(self):
 		self.streamList = []
-		if self.page > 1:
-			url = self.url+str((self.page-1)*50)
-		else:
-			url = self.url
+		url = self.url+str(self.page)
 		data = hf_grabpage(url)
 		self.parseData(data)
 
@@ -363,16 +360,20 @@ class hdfilmeStreams(MPScreen):
 							if not folge[0] == 'F': epi_num = ''
 							self.streamList.append((folge+epi_num, link, epi_num))
 		if not len(self.streamList):
-			streams = re.findall('_episode="(\d+)" _link="" _sub=""\s+href="(.*?)"', data, re.S)
+			streams = re.findall('_episode=".*?" _link="" _sub=""\s+href="(.*?)">', data, re.S)
 			if streams:
-				for (epi_num, link) in streams:
-					if re.search('staffel ', self.movietitle, re.I):
-						folge = 'Folge '
-						_epi_num = epi_num
-					else:
-						folge = 'Stream '
-						_epi_num = ''
-					self.streamList.append((folge+epi_num, link, _epi_num))
+				for link in streams:
+					epi_num = re.findall('episode=(\d+)\&amp', link)
+					if epi_num:
+						epi_num = epi_num[0]
+						print link, epi_num
+						if re.search('staffel ', self.movietitle, re.I):
+							folge = 'Folge '
+							_epi_num = epi_num.strip(' \t\n\r')
+						else:
+							folge = 'Stream '
+							_epi_num = ''
+						self.streamList.append((folge+epi_num, link, _epi_num))
 
 		if len(self.streamList) == 0:
 			self.streamList.append((_('No supported streams found!'), None, None))

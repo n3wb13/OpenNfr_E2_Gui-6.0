@@ -14,7 +14,7 @@
 
 import logging
 import re
-import urllib2
+import requests
 import urlparse
 import os
 import math
@@ -159,12 +159,9 @@ class M3U8(object):
 						if a > 0:
 							self._iv = l[j+a+5:].strip().decode("hex")
 						url = urlparse.urljoin(self.url, self._key_url)
-						opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self._cookies))
-						if self._headers:
-							opener.addheaders = self._headers.items()
-						response = opener.open(url)
-						self._key = response.read()
-						response.close()
+						opener = requests.session()
+						response = opener.get(url, cookies=self._cookies, headers=self._headers)
+						self._key = response.content
 					else:
 						printl("No Encryption Key-URI found",self,'E')
 				else:

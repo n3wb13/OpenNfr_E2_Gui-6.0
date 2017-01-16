@@ -42,7 +42,7 @@ from Plugins.Extensions.MediaPortal.resources.keyboardext import VirtualKeyBoard
 from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage
 
 config.mediaportal.movie4klang = ConfigText(default="all", fixed_size=False)
-config.mediaportal.movie4kdomain2 = ConfigText(default="movie4k.tv", fixed_size=False)
+config.mediaportal.movie4kdomain2 = ConfigText(default="http://movie4k.me", fixed_size=False)
 
 if fileExists('/usr/lib/enigma2/python/Plugins/Extensions/TMDb/plugin.pyo'):
 	from Plugins.Extensions.TMDb.plugin import *
@@ -55,9 +55,9 @@ else:
 	IMDbPresent = False
 	TMDbPresent = False
 
-m4k = config.mediaportal.movie4kdomain2.value
-m4k_url = "https://www.%s/" % config.mediaportal.movie4kdomain2.value
-g_url = "https://www.%s/movies-genre-" % config.mediaportal.movie4kdomain2.value
+m4k = config.mediaportal.movie4kdomain2.value.replace('https://','').replace('http://','')
+m4k_url = "%s/" % config.mediaportal.movie4kdomain2.value
+g_url = "%s/movies-genre-" % config.mediaportal.movie4kdomain2.value
 t_url = "https://movie4k.tv/thumbs"
 
 movie4kheader = {}
@@ -123,7 +123,6 @@ class m4kGenreScreen(MPScreen):
 			self.list.append(('Genres', m4k_url+"genres-xxx.html"))
 			self.list.append(("Alle Filme A-Z (XXX)", "XXXAZ"))
 		else:
-# check if 3 index the same
 			self.list.append(("Kinofilme", m4k_url+"index.php"))
 			self.list.append(("Videofilme", m4k_url+"index.php"))
 			self.list.append(("Letzte Updates (Filme)", m4k_url+"index.php"))
@@ -186,21 +185,21 @@ class m4kGenreScreen(MPScreen):
 			self.session.open(m4kKinoAlleFilmeListeScreen, self.url, name)
 
 	def keyDomain(self):
-		if self.domain == "movie4k.tv":
-			self.domain = "movie.to"
-			config.mediaportal.movie4kdomain2.value = "movie.to"
-		elif self.domain == "movie.to":
-			self.domain = "movie4k.to"
-			config.mediaportal.movie4kdomain2.value = "movie4k.to"
-		elif self.domain == "movie4k.to":
-			self.domain = "movie4k.tv"
-			config.mediaportal.movie4kdomain2.value = "movie4k.tv"
+		if self.domain == "http://movie4k.me":
+			config.mediaportal.movie4kdomain2.value = "https://movie.to"
+		elif self.domain == "https://movie.to":
+			config.mediaportal.movie4kdomain2.value = "http://movie4k.to"
+		elif self.domain == "http://movie4k.to":
+			config.mediaportal.movie4kdomain2.value = "https://movie4k.tv"
+		elif self.domain == "https://movie4k.tv":
+			config.mediaportal.movie4kdomain2.value = "http://movie4k.me"
 		config.mediaportal.movie4kdomain2.save()
 		configfile.save()
-		global m4k, m4k_url, g_url, t_url
-		m4k = "%s" % self.domain
-		m4k_url = "https://www.%s/" % self.domain
-		g_url = "https://www.%s/movies-genre-" % self.domain
+		self.domain = config.mediaportal.movie4kdomain2.value
+		global m4k, m4k_url, g_url
+		m4k = "%s" % self.domain.replace('https://','').replace('http://','')
+		m4k_url = "%s/" % self.domain
+		g_url = "%s/movies-genre-" % self.domain
 		self['title'].setText(m4k)
 		self['F4'].setText(self.domain)
 
@@ -404,7 +403,7 @@ class m4kSucheAlleFilmeListeScreen(MPScreen, ThumbsHelper):
 	def loadPage(self):
 		self['name'].setText(_("Please wait..."))
 		url = "%s&search=%s" % (self.searchUrl, self.searchData)
-		twAgentGetPage(url, agent=None, timeout=15, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
+		twAgentGetPage(url, agent=None, timeout=30, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
 		kino = re.findall('<TR id="coverPreview(.*?)">.*?<a href="(.*?)">(.*?)<', data, re.S)
@@ -426,7 +425,7 @@ class m4kSucheAlleFilmeListeScreen(MPScreen, ThumbsHelper):
 		streamUrl = self['liste'].getCurrent()[0][1]
 		self['name'].setText(streamName)
 		m4kcancel_defer(self.deferreds)
-		downloads = ds.run(twAgentGetPage, streamUrl, agent=None, timeout=15, headers=movie4kheader).addCallback(self.showHandlung).addErrback(self.dataError)
+		downloads = ds.run(twAgentGetPage, streamUrl, agent=None, timeout=30, headers=movie4kheader).addCallback(self.showHandlung).addErrback(self.dataError)
 		self.deferreds.append(downloads)
 
 	def showHandlung(self, data):
@@ -501,15 +500,15 @@ class m4kKinoAlleFilmeListeScreen(MPScreen, ThumbsHelper):
 	def loadPage(self):
 		self['name'].setText(_('Please wait...'))
 		if self.streamGenreLink == '%sgenres-xxx.html' % m4k_url:
-			twAgentGetPage(self.streamGenreLink, agent=None, timeout=15, headers=movie4kheader).addCallback(self.loadXXXPageData).addErrback(self.dataError)
+			twAgentGetPage(self.streamGenreLink, agent=None, timeout=30, headers=movie4kheader).addCallback(self.loadXXXPageData).addErrback(self.dataError)
 		elif re.search('%sxxx' % m4k_url, self.streamGenreLink):
 			url = '%s%s%s' % (self.streamGenreLink, self.page, '.html')
-			twAgentGetPage(url, agent=None, timeout=15, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
+			twAgentGetPage(url, agent=None, timeout=30, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
 		elif re.search('http[s]?://(www.|)movie[^/]+/movies-(updates|all|genre)-', self.streamGenreLink):
 			url = '%s%s%s' % (self.streamGenreLink, self.page, '.html')
-			twAgentGetPage(url, agent=None, timeout=15, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
+			twAgentGetPage(url, agent=None, timeout=30, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
 		else:
-			twAgentGetPage(self.streamGenreLink, agent=None, timeout=15, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
+			twAgentGetPage(self.streamGenreLink, agent=None, timeout=30, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadXXXPageData(self, data):
 		self.XXX = True
@@ -571,7 +570,7 @@ class m4kKinoAlleFilmeListeScreen(MPScreen, ThumbsHelper):
 			streamUrl = self['liste'].getCurrent()[0][1]
 			self['name'].setText(streamName)
 			m4kcancel_defer(self.deferreds)
-			downloads = ds.run(twAgentGetPage, streamUrl, agent=None, timeout=15, headers=movie4kheader).addCallback(self.showHandlung).addErrback(self.dataError)
+			downloads = ds.run(twAgentGetPage, streamUrl, agent=None, timeout=30, headers=movie4kheader).addCallback(self.showHandlung).addErrback(self.dataError)
 			self.deferreds.append(downloads)
 
 	def showHandlung(self, data):
@@ -642,7 +641,7 @@ class m4kupdateFilme(MPScreen, ThumbsHelper):
 
 	def loadPage(self):
 		self['name'].setText(_("Please wait..."))
-		twAgentGetPage(self.streamGenreLink, agent=None, timeout=15, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
+		twAgentGetPage(self.streamGenreLink, agent=None, timeout=30, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
 		last = re.findall('<td valign="top" height="100.*?"><a href="(.*?)"><font color="#000000" size="-1"><strong>(.*?)</strong></font></a></td>', data, re.S)
@@ -663,7 +662,7 @@ class m4kupdateFilme(MPScreen, ThumbsHelper):
 		self['name'].setText(streamName)
 		streamUrl = self['liste'].getCurrent()[0][1]
 		m4kcancel_defer(self.deferreds)
-		downloads = ds.run(twAgentGetPage, streamUrl, agent=None, timeout=15, headers=movie4kheader).addCallback(self.showHandlung).addErrback(self.dataError)
+		downloads = ds.run(twAgentGetPage, streamUrl, agent=None, timeout=30, headers=movie4kheader).addCallback(self.showHandlung).addErrback(self.dataError)
 		self.deferreds.append(downloads)
 
 	def showHandlung(self, data):
@@ -734,7 +733,7 @@ class m4kFilme(MPScreen, ThumbsHelper):
 
 	def loadPage(self):
 		self['name'].setText(_('Please wait...'))
-		twAgentGetPage(self.streamGenreLink, agent=None, timeout=15, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
+		twAgentGetPage(self.streamGenreLink, agent=None, timeout=30, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
 		if self.streamGenreName == "Kinofilme":
@@ -758,7 +757,7 @@ class m4kFilme(MPScreen, ThumbsHelper):
 		self['name'].setText(streamName)
 		streamUrl = self['liste'].getCurrent()[0][1]
 		m4kcancel_defer(self.deferreds)
-		downloads = ds.run(twAgentGetPage, streamUrl, agent=None, timeout=15, headers=movie4kheader).addCallback(self.showHandlung).addErrback(self.dataError)
+		downloads = ds.run(twAgentGetPage, streamUrl, agent=None, timeout=30, headers=movie4kheader).addCallback(self.showHandlung).addErrback(self.dataError)
 		self.deferreds.append(downloads)
 		streamPic = self['liste'].getCurrent()[0][2]
 		CoverHelper(self['coverArt']).getCover(streamPic)
@@ -828,7 +827,7 @@ class m4kTopSerienFilme(MPScreen, ThumbsHelper):
 
 	def loadPage(self):
 		self['name'].setText(_('Please wait...'))
-		twAgentGetPage(self.streamGenreLink, agent=None, timeout=15, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
+		twAgentGetPage(self.streamGenreLink, agent=None, timeout=30, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
 		serien = re.findall('<div style="float:left"><a href="(.*?)"><img src="(.*?)" border=0 width=105 height=150 alt=".*?" title="(.*?)"></a>', data, re.S)
@@ -849,7 +848,7 @@ class m4kTopSerienFilme(MPScreen, ThumbsHelper):
 		self['name'].setText(streamName)
 		streamUrl = self['liste'].getCurrent()[0][1]
 		m4kcancel_defer(self.deferreds)
-		downloads = ds.run(twAgentGetPage, streamUrl, agent=None, timeout=15, headers=movie4kheader).addCallback(self.showHandlung).addErrback(self.dataError)
+		downloads = ds.run(twAgentGetPage, streamUrl, agent=None, timeout=30, headers=movie4kheader).addCallback(self.showHandlung).addErrback(self.dataError)
 		self.deferreds.append(downloads)
 		streamPic = self['liste'].getCurrent()[0][2]
 		CoverHelper(self['coverArt']).getCover(streamPic)
@@ -928,7 +927,7 @@ class m4kSerienUpdateFilme(MPScreen, ThumbsHelper):
 
 	def loadPage(self):
 		self['name'].setText(_('Please wait...'))
-		twAgentGetPage(self.streamGenreLink, agent=None, timeout=15, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
+		twAgentGetPage(self.streamGenreLink, agent=None, timeout=30, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
 		serien = re.findall('<TD id="tdmovies" width=.*?<a href="(.*?)">(.*?)</a>', data, re.S)
@@ -949,7 +948,7 @@ class m4kSerienUpdateFilme(MPScreen, ThumbsHelper):
 		self['name'].setText(streamName)
 		streamUrl = self['liste'].getCurrent()[0][1]
 		m4kcancel_defer(self.deferreds)
-		downloads = ds.run(twAgentGetPage, streamUrl, agent=None, timeout=15, headers=movie4kheader).addCallback(self.showHandlung).addErrback(self.dataError)
+		downloads = ds.run(twAgentGetPage, streamUrl, agent=None, timeout=30, headers=movie4kheader).addCallback(self.showHandlung).addErrback(self.dataError)
 		self.deferreds.append(downloads)
 
 	def showHandlung(self, data):
@@ -1034,7 +1033,7 @@ class m4kStreamListeScreen(MPScreen):
 
 	def loadPage(self):
 		self['name'].setText(_("Please wait..."))
-		twAgentGetPage(self.streamGenreLink, agent=None, timeout=15, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
+		twAgentGetPage(self.streamGenreLink, agent=None, timeout=30, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
 		if re.match('.*?(/img/parts/teil1_aktiv.png|/img/parts/teil1_inaktiv.png|/img/parts/part1_active.png|/img/parts/part1_inactive.png)', data, re.S):
@@ -1083,7 +1082,7 @@ class m4kStreamListeScreen(MPScreen):
 
 	def showInfos(self):
 		m4kcancel_defer(self.deferreds)
-		downloads = ds.run(twAgentGetPage, self.streamGenreLink, agent=None, timeout=15, headers=movie4kheader).addCallback(self.showInfosData).addErrback(self.dataError)
+		downloads = ds.run(twAgentGetPage, self.streamGenreLink, agent=None, timeout=30, headers=movie4kheader).addCallback(self.showInfosData).addErrback(self.dataError)
 		self.deferreds.append(downloads)
 
 	def showInfosData(self, data):
@@ -1102,7 +1101,7 @@ class m4kStreamListeScreen(MPScreen):
 		if isSupportedHoster(streamLink, True):
 			get_stream_link(self.session).check_link(streamLink, self.got_link)
 		else:
-			twAgentGetPage(streamLink, agent=None, timeout=15, headers=movie4kheader).addCallback(self.get_streamlink, streamLink).addErrback(self.dataError)
+			twAgentGetPage(streamLink, agent=None, timeout=30, headers=movie4kheader).addCallback(self.get_streamlink, streamLink).addErrback(self.dataError)
 
 	def get_streamlink(self, data, streamLink):
 		link = re.search('<a\starget="_blank"\shref="(.*?)"><img\sborder=0\ssrc="/img/click_link.jpg"', data, re.S|re.I)
@@ -1232,7 +1231,7 @@ class m4kPartListeScreen(MPScreen):
 		streamPart = self['liste'].getCurrent()[0][0]
 		streamLinkPart = self['liste'].getCurrent()[0][1]
 		self.sname = "%s - Teil %s" % (self.streamName, streamPart)
-		twAgentGetPage(streamLinkPart, agent=None, timeout=15, headers=movie4kheader).addCallback(self.get_streamlink).addErrback(self.dataError)
+		twAgentGetPage(streamLinkPart, agent=None, timeout=30, headers=movie4kheader).addCallback(self.get_streamlink).addErrback(self.dataError)
 
 	def get_streamlink(self, data):
 		link = re.search('<a\starget="_blank"\shref="(.*?)"><img\sborder=0\ssrc="/img/click_link.jpg"', data, re.S|re.I)
@@ -1314,7 +1313,7 @@ class m4kEpisodenListeScreen(MPScreen):
 
 	def loadPage(self):
 		self['name'].setText(_("Please wait..."))
-		twAgentGetPage(self.streamGenreLink, agent=None, timeout=15, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
+		twAgentGetPage(self.streamGenreLink, agent=None, timeout=30, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
 		self.watched_liste = []
@@ -1452,7 +1451,7 @@ class m4kXXXListeScreen(MPScreen, ThumbsHelper):
 			url = shortUrlC + '-' + str(self.page) + '.html'
 		else:
 			url = str(self.streamXXXLink)
-		twAgentGetPage(url, agent=None, timeout=15, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
+		twAgentGetPage(url, agent=None, timeout=30, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
 		self.getLastPage(data, 'id="boxwhite"(.*?)<br>', '.*>(\d+)\s<')
@@ -1496,7 +1495,7 @@ class m4kXXXListeScreen(MPScreen, ThumbsHelper):
 		self['name'].setText(streamName)
 		streamUrl = self['liste'].getCurrent()[0][1]
 		m4kcancel_defer(self.deferreds)
-		downloads = ds.run(twAgentGetPage, streamUrl, agent=None, timeout=15, headers=movie4kheader).addCallback(self.showHandlung).addErrback(self.dataError)
+		downloads = ds.run(twAgentGetPage, streamUrl, agent=None, timeout=30, headers=movie4kheader).addCallback(self.showHandlung).addErrback(self.dataError)
 		self.deferreds.append(downloads)
 
 	def showHandlung(self, data):
@@ -1621,7 +1620,7 @@ class m4kSerienABCListe(MPScreen):
 
 	def loadPage(self):
 		self['name'].setText(_('Please wait...'))
-		twAgentGetPage(self.streamGenreLink, agent=None, timeout=15, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
+		twAgentGetPage(self.streamGenreLink, agent=None, timeout=30, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
 		serien = re.findall('<TD id="tdmovies" width="538"><a href="(.*?)">(.*?)<.*?src="/img/(.*?)\.', data, re.S)
@@ -1661,7 +1660,7 @@ class m4kSerienABCListe(MPScreen):
 		self.mLang = self['liste'].getCurrent()[0][2]
 		self.flag_stored = self.mLang.replace('/img/','').replace('.png','')
 
-		twAgentGetPage(self.mUrl, agent=None, timeout=15, headers=movie4kheader).addCallback(self.get_final).addErrback(self.dataError)
+		twAgentGetPage(self.mUrl, agent=None, timeout=30, headers=movie4kheader).addCallback(self.get_final).addErrback(self.dataError)
 
 	def get_final(self, data):
 		season_link = False
@@ -1675,7 +1674,7 @@ class m4kSerienABCListe(MPScreen):
 			message = self.session.open(MessageBoxExt, _("No link found."), MessageBoxExt.TYPE_INFO, timeout=3)
 
 		if season_link:
-			twAgentGetPage(season_link, agent=None, timeout=15, headers=movie4kheader).addCallback(self.get_final2).addErrback(self.dataError)
+			twAgentGetPage(season_link, agent=None, timeout=30, headers=movie4kheader).addCallback(self.get_final2).addErrback(self.dataError)
 		else:
 			message = self.session.open(MessageBoxExt, _("No link found."), MessageBoxExt.TYPE_INFO, timeout=3)
 
@@ -1745,7 +1744,7 @@ class m4kSerienABCListeStaffeln(MPScreen):
 
 	def loadPage(self):
 		self['name'].setText(_("Please wait..."))
-		twAgentGetPage(self.streamGenreLink, agent=None, timeout=15, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
+		twAgentGetPage(self.streamGenreLink, agent=None, timeout=30, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
 		staffeln = re.findall('<TD id="tdmovies" width="538"><a href="(.*?)".*?Season:(.*?)<', data, re.S)
@@ -1805,7 +1804,7 @@ class m4kSerienABCListeStaffelnFilme(MPScreen):
 
 	def loadPage(self):
 		self['name'].setText(_("Please wait..."))
-		twAgentGetPage(self.streamGenreLink, agent=None, timeout=15, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
+		twAgentGetPage(self.streamGenreLink, agent=None, timeout=30, headers=movie4kheader).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def loadPageData(self, data):
 		staffeln = re.findall('<TD id="tdmovies" width="538"><a href="(.*?)">(.*?), Season:(.*?), Episode:(.*?)<', data, re.S)
