@@ -91,7 +91,10 @@ class M3U8Player:
 		self._bitrate = 0
 		self._check_cache = True
 		start_hls_proxy()
-		self.onClose.append(self._m3u8Exit)
+		try:
+			self.onClose.append(self._m3u8Exit)
+		except:
+			pass
 
 	def _setM3U8BufferSize(self):
 		if config.mediaportal.use_hls_proxy.value:

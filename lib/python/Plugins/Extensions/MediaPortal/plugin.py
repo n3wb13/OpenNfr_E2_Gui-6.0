@@ -121,17 +121,6 @@ except:
 	except:
 		MediaInfoPresent = False
 
-# eUriResolver Imports for DreamOS
-###############################################################################################
-try:
-	from enigma import eUriResolver
-	from resources.MPYoutubeUriResolver import MPYoutubeUriResolver
-	MPYoutubeUriResolver.instance = MPYoutubeUriResolver()
-	eUriResolver.addResolver(MPYoutubeUriResolver.instance)
-except ImportError:
-	pass
-###############################################################################################
-
 def lastMACbyte():
 	try:
 		return int(open('/sys/class/net/eth0/address').readline().strip()[-2:], 16)
@@ -164,8 +153,8 @@ config.mediaportal.epg_deepstandby = ConfigSelection(default = "skip", choices =
 		])
 
 # Allgemein
-config.mediaportal.version = NoSave(ConfigText(default="774"))
-config.mediaportal.versiontext = NoSave(ConfigText(default="7.7.4"))
+config.mediaportal.version = NoSave(ConfigText(default="775"))
+config.mediaportal.versiontext = NoSave(ConfigText(default="7.7.5"))
 config.mediaportal.autoupdate = ConfigYesNo(default = True)
 config.mediaportal.pincode = ConfigPIN(default = 0000)
 config.mediaportal.showporn = ConfigYesNo(default = False)
@@ -211,7 +200,7 @@ config.mediaportal.selektor = ConfigSelection(default = "white", choices = [("bl
 config.mediaportal.use_hls_proxy = ConfigYesNo(default = False)
 config.mediaportal.hls_proxy_ip = ConfigIP(default = [127,0,0,1], auto_jump = True)
 config.mediaportal.hls_proxy_port = ConfigInteger(default = 0, limits = (0,65535))
-config.mediaportal.hls_buffersize = ConfigInteger(default = 16, limits = (1,32))
+config.mediaportal.hls_buffersize = ConfigInteger(default = 32, limits = (1,64))
 config.mediaportal.storagepath = ConfigText(default="/tmp/mediaportal/tmp/", fixed_size=False)
 config.mediaportal.autoplayThreshold = ConfigInteger(default = 50, limits = (1,100))
 config.mediaportal.filter = ConfigSelection(default = "ALL", choices = ["ALL", "Mediathek", "Grauzone", "Fun", "Sport", "Music", "Porn"])
@@ -291,6 +280,23 @@ mp_globals.yt_s = bsdcd(bsdcd(bsdcd(decrypt('LUAyV6SkpKS3bO2Io81BlkONIwZfjHfCJgD
 # Global variable
 autoStartTimer = None
 _session = None
+
+# eUriResolver Imports for DreamOS
+###############################################################################################
+try:
+	from enigma import eUriResolver
+
+	from resources.MPYoutubeUriResolver import MPYoutubeUriResolver
+	MPYoutubeUriResolver.instance = MPYoutubeUriResolver()
+	eUriResolver.addResolver(MPYoutubeUriResolver.instance)
+
+	from resources.MPHLSPUriResolver import MPHLSPUriResolver
+	MPHLSPUriResolver.instance = MPHLSPUriResolver()
+	eUriResolver.addResolver(MPHLSPUriResolver.instance)
+except ImportError:
+	pass
+###############################################################################################
+
 
 conf = xml.etree.cElementTree.parse(CONFIG)
 for x in conf.getroot():
@@ -3701,13 +3707,14 @@ def onBootStartCheck():
 
 def autostart(reason, session=None, **kwargs):
 	"called with reason=1 to during shutdown, with reason=0 at startup?"
-	global autoStartTimer
-	global _session
+	global autoStartTimer, _session, watcher
 	import time
 	print>>log, "[MP EPGImport] autostart (%s) occured at" % reason, time.time()
 	if reason == 0:
 		if session is not None:
 			_session = session
+		if watcher == None:
+			watcher = HangWatcher()
 		if autoStartTimer is None:
 			autoStartTimer = AutoStartTimer(session)
 		if config.mediaportal.epg_runboot.value:
@@ -3735,16 +3742,7 @@ def Plugins(path, **kwargs):
 	mp_globals.pluginPath = path
 
 	result = [
-		PluginDescriptor(
-			name="MediaPortal",
-			description = "MediaPortal - EPG Importer",
-			where = [
-				PluginDescriptor.WHERE_AUTOSTART,
-				PluginDescriptor.WHERE_SESSIONSTART
-			],
-			fnc = autostart,
-			wakeupfnc = getNextWakeup
-		),
+		PluginDescriptor(name="MediaPortal", description="MediaPortal - EPG Importer", where = [PluginDescriptor.WHERE_AUTOSTART, PluginDescriptor.WHERE_SESSIONSTART], fnc = autostart, wakeupfnc = getNextWakeup),
 		PluginDescriptor(name="MediaPortal", description="MediaPortal", where = [PluginDescriptor.WHERE_PLUGINMENU, PluginDescriptor.WHERE_EXTENSIONSMENU], icon="plugin.png", fnc=MPmain)
 	]
 	return result

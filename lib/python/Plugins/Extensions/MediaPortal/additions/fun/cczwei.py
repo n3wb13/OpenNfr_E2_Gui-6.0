@@ -31,17 +31,17 @@ class cczwei(MPScreen):
 		self.onLayoutFinish.append(self.loadPage)
 
 	def loadPage(self):
-		url = "http://www.cczwei.de/index.php?id=tvissuearchive"
+		url = "http://cc2.tv/daten/20161213181538.php"
 		getPage(url).addCallback(self.parseData).addErrback(self.dataError)
 
 	def parseData(self, data):
-		parse = re.search('CLASS="header"><b>TV-SENDUNGEN(.*?)class="header">AKTUELLE', data, re.S)
-		videos = re.findall('<b>Folge (.*?)</b>.*?<a href="(index.php.*?)">(.*?)</a>', parse.group(1), re.S)
+		parse = re.search('class="block"><h4>Videosendungen(.*)', data, re.S)
+		videos = re.findall('Folge\s(\d+).*?<a href="(.*?.mp4)">.*?</a>(.*?)(?:<br></ul><br>|<br>\d+\.)', parse.group(1), re.S)
 		if videos:
 			for (folge, url, title) in videos:
-				title = "Folge %s - %s" % (folge, title)
-				url = "http://www.cczwei.de/" + url
-				self.streamList.append((decodeHtml2(title), folge))
+				title = title.replace('\r\n<br>',', ')
+				title = "Folge %s - %s" % (folge, stripAllTags(title.replace(', , ','')))
+				self.streamList.append((decodeHtml(title), folge))
 			self.ml.setList(map(self._defaultlistleft, self.streamList))
 			self.keyLocked = False
 

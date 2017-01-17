@@ -42,7 +42,7 @@ from Plugins.Extensions.MediaPortal.resources.keyboardext import VirtualKeyBoard
 from Plugins.Extensions.MediaPortal.resources.twagenthelper import twAgentGetPage
 
 config.mediaportal.movie4klang = ConfigText(default="all", fixed_size=False)
-config.mediaportal.movie4kdomain2 = ConfigText(default="http://movie4k.me", fixed_size=False)
+config.mediaportal.movie4kdomain3 = ConfigText(default="http://movie4k.me", fixed_size=False)
 
 if fileExists('/usr/lib/enigma2/python/Plugins/Extensions/TMDb/plugin.pyo'):
 	from Plugins.Extensions.TMDb.plugin import *
@@ -55,9 +55,9 @@ else:
 	IMDbPresent = False
 	TMDbPresent = False
 
-m4k = config.mediaportal.movie4kdomain2.value.replace('https://','').replace('http://','')
-m4k_url = "%s/" % config.mediaportal.movie4kdomain2.value
-g_url = "%s/movies-genre-" % config.mediaportal.movie4kdomain2.value
+m4k = config.mediaportal.movie4kdomain3.value.replace('https://','').replace('http://','')
+m4k_url = "%s/" % config.mediaportal.movie4kdomain3.value
+g_url = "%s/movies-genre-" % config.mediaportal.movie4kdomain3.value
 t_url = "https://movie4k.tv/thumbs"
 
 movie4kheader = {}
@@ -94,7 +94,7 @@ class m4kGenreScreen(MPScreen):
 		}, -1)
 
 		self.locale = config.mediaportal.movie4klang.value
-		self.domain = config.mediaportal.movie4kdomain2.value
+		self.domain = config.mediaportal.movie4kdomain3.value
 		global movie4kheader
 		if self.locale == "de":
 			movie4kheader = {'User-Agent': std_headers['User-Agent'], 'Cookie':'lang=de'}
@@ -186,16 +186,18 @@ class m4kGenreScreen(MPScreen):
 
 	def keyDomain(self):
 		if self.domain == "http://movie4k.me":
-			config.mediaportal.movie4kdomain2.value = "https://movie.to"
+			config.mediaportal.movie4kdomain3.value = "https://movie.to"
 		elif self.domain == "https://movie.to":
-			config.mediaportal.movie4kdomain2.value = "http://movie4k.to"
+			config.mediaportal.movie4kdomain3.value = "http://movie4k.to"
 		elif self.domain == "http://movie4k.to":
-			config.mediaportal.movie4kdomain2.value = "https://movie4k.tv"
+			config.mediaportal.movie4kdomain3.value = "https://movie4k.tv"
 		elif self.domain == "https://movie4k.tv":
-			config.mediaportal.movie4kdomain2.value = "http://movie4k.me"
-		config.mediaportal.movie4kdomain2.save()
+			config.mediaportal.movie4kdomain3.value = "http://movie4k.me"
+		else:
+			config.mediaportal.movie4kdomain3.value = "http://movie4k.me"
+		config.mediaportal.movie4kdomain3.save()
 		configfile.save()
-		self.domain = config.mediaportal.movie4kdomain2.value
+		self.domain = config.mediaportal.movie4kdomain3.value
 		global m4k, m4k_url, g_url
 		m4k = "%s" % self.domain.replace('https://','').replace('http://','')
 		m4k_url = "%s/" % self.domain

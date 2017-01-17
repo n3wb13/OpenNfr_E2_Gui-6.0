@@ -144,7 +144,7 @@ class M3U8(object):
 					yield l
 
 		def getKey(l):
-			print l
+			#print l
 			self._key = None
 			a = l[18:].find(',')
 			if a > 0:
@@ -231,6 +231,21 @@ class M3U8(object):
 			elif l.startswith('#EXT-X-BYTERANGE'):
 				#print l
 				pass
+			elif l.startswith('#EXT-X-DATERANGE'):
+				#print l
+				pass
+			elif l.startswith('#EXT-X-CUEPOINT'):
+				#print l
+				pass
+			elif l.startswith('#EXT-X-PROGRAM-DATE-TIME'):
+				#print l
+				pass
+			elif l.startswith('#EXT-X-INDEPENDENT-SEGMENTS'):
+				#print l
+				pass
+			elif l.startswith('#EXT-X-PLAYLIST-TYPE'):
+				#print l
+				pass
 			elif l.startswith('#EXT-X-ALLOW-CACHE'):
 				pass
 			elif l.startswith('#EXT-X-KEY'):
@@ -279,7 +294,7 @@ class M3U8(object):
 				elif l.startswith('#EXT-X-ENDLIST'):
 					self._endlist = True
 					extinf_list.append((i,None,None))
-					print l
+					#print l
 				elif len(l.strip()) != 0:
 					print l
 

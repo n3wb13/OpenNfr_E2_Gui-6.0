@@ -51,7 +51,7 @@ class HLSFetcher(object):
 		self.hls_headers = options.get('headers',{})
 		self.path = options.get('path',None)
 		self.bitrate = options.get('bitrate',200000)
-		self.nbuffer = options.get('buffer',3)
+		self.nbuffer = options.get('buffer',5)
 		self.n_segments_keep = options.get('keep',self.nbuffer+1)
 		url = urllib.unquote(url)
 		self.puser = options.get('puser')

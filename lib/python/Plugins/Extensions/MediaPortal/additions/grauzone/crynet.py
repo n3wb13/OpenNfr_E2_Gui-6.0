@@ -112,10 +112,8 @@ class showevonicGenre(MPScreen):
 		print "hole account infos.."
 		infos = re.findall('<dt>Startdatum</dt>.*?<dd>(.*?)</dd>.*?<dt>L.*?t aus am</dt>.*?<dd>(.*?)</dd>.*?<p class="description">(.*?)</p>', data, re.S)
 		if infos:
-			print infos
 			(reg, bis, was) = infos[0]
 			acci = "%s: -> %s" % (was, bis)
-			print acci
 			self['ContentTitle'].setText(str(acci))
 
 	def loginDone(self, data):
@@ -139,7 +137,7 @@ class showevonicGenre(MPScreen):
 		#self.genreListe.append(("Century", "dump"))
 		#self.genreListe.append(("Imdb", "dump"))
 		#self.genreListe.append(("Imdb Top 1000", "dump"))
-		#self.genreListe.append(("3D", "http://crynet.to/forum/content.php?r=4225-3d-filme&page="))
+		self.genreListe.append(("3D", "http://crynet.to/forum/content.php?r=4225-3d-filme&page="))
 		#self.genreListe.append(("Alle HD Premium Streams", "http://crynet.to/forum/content.php?r=1669-hd-filme&page="))
 		self.genreListe.append(("Abenteuer", "http://crynet.to/forum/list.php?r=category/65-HD-Abenteuer&page="))
 		self.genreListe.append(("Action", "http://crynet.to/forum/list.php?r=category/35-HD-Action&page="))
@@ -249,8 +247,6 @@ class meSearchScreen(MPScreen):
 
 	def loadPage(self):
 		url = "http://crynet.to/forum/ajaxlivesearch.php?do=search"
-		print self.search, self.stoken
-
 		postData = {'do': 'search',
 					 'keyword': self.search,
 					 'lsasort': 'lastpost',
@@ -271,7 +267,6 @@ class meSearchScreen(MPScreen):
 		if found:
 			self.searchList = []
 			for link,title in found:
-				print title, link
 				self.searchList.append((title,link))
 		self.ml.setList(map(self._defaultlistleft, self.searchList))
 
@@ -287,7 +282,6 @@ class meSearchScreen(MPScreen):
 			return
 		self.streamName = self['liste'].getCurrent()[0][0]
 		streamLink = self['liste'].getCurrent()[0][1]
-		print self.streamName, streamLink
 		getPage(streamLink, method="GET", cookies=ck,
 			headers={'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest', 'Referer': 'http://crynet.to/forum/content.php'},
 			followRedirect=True, timeout=30).addCallback(self.loadRefreshData).addErrback(self.dataError)
@@ -295,7 +289,6 @@ class meSearchScreen(MPScreen):
 	def loadRefreshData(self, data):
 		refreshUrl = re.findall('<meta http-equiv="refresh" content="0; URL=(.*?)">', data, re.S)
 		if refreshUrl:
-			print refreshUrl
 			if re.match('.*?Collection', self.streamName, re.S|re.I):
 				print "Collection"
 				self.session.open(meCollectionScreen, self.streamName, refreshUrl[0], "")
@@ -346,7 +339,6 @@ class meSearchScreen(MPScreen):
 	def loadRefresh(self, data, streamLink):
 		refreshUrl = re.findall('<meta http-equiv="refresh" content="0; URL=(.*?)">', data, re.S)
 		if refreshUrl:
-			print refreshUrl
 			getPage(refreshUrl[0], cookies=ck, headers={'Content-Type': 'application/x-www-form-urlencoded', 'Referer': 'http://crynet.to/forum/content.php'}, timeout=30).addCallback(self.getCat, refreshUrl[0]).addErrback(self.dataError)
 
 	def getCat(self, data, streamLink):
@@ -357,9 +349,6 @@ class meSearchScreen(MPScreen):
 			cat = "HD-Serien"
 		elif re.search('http://crynet.to/server/Serien', data, re.S|re.I):
 			cat = "HD-Serien"
-
-		print cat, self.streamName, streamLink
-
 		if not fileExists(config.mediaportal.watchlistpath.value+"mp_evonic_watchlist"):
 			print "erstelle watchlist"
 			open(config.mediaportal.watchlistpath.value+"mp_evonic_watchlist","w").close()
@@ -468,12 +457,11 @@ class meMovieScreen(MPScreen, ThumbsHelper):
 				self.keyLocked = False
 				self.th_ThumbsQuery(self.genreListe, 0, 1, 2, None, None, self.page, totalPages[0])
 				self.showInfos()
-				
+
 		elif self.enterAuswahlLabel == "3D":
 			print "parsing: 3D"
 			totalPages = re.findall('<span class="first_last"><a href=".*?page=(.*?)"', data, re.S)
 			if totalPages:
-				print totalPages
 				self['page'].setText("%s / %s" % (self.page, totalPages[0]))
 
 			movies3D = re.findall('<h3 class="article_preview">.*?<a href="(.*?)"><span>[AZ:]?(.*?)</span></a>.*?<div class="cms_article_section_location">.*?>IMDB(.*?)</a>.*?<img class="cms_article_preview_image" src="(.*?)" alt="Vorschau"', data,re.S)
@@ -490,12 +478,11 @@ class meMovieScreen(MPScreen, ThumbsHelper):
 				self.showInfos()
 			else:
 				self.lastPage = self.page
-		
+
                 elif self.enterAuswahlLabel == "Alle HD Premium Streams":
 			print "parsing: Alle Premium"
 			totalPages = re.findall('<span class="first_last"><a href=".*?page=(.*?)"', data, re.S)
 			if totalPages:
-				print totalPages
 				self['page'].setText("%s / %s" % (self.page, totalPages[0]))
 
 			movies3D = re.findall('<h3 class="article_preview">.*?<a href="(.*?)"><span>[AZ:]?(.*?)</span></a>.*?<div class="cms_article_section_location">.*?>IMDB(.*?)</a>.*?<img class="cms_article_preview_image" src="(.*?)" alt="Vorschau"', data,re.S)
@@ -517,7 +504,6 @@ class meMovieScreen(MPScreen, ThumbsHelper):
 			print "parsing: Serien"
 			totalPages = re.findall('<span class="first_last"><a href=".*?page=(.*?)"', data, re.S)
 			if totalPages:
-				print totalPages
 				self['page'].setText("%s / %s" % (self.page, totalPages[0]))
 
 			result = re.findall('<h3 class="article_preview">.*?<a href="(.*?)">.*?<span>[A-Z][A-Z][:](.*?)</span>.*?<img class="cms_article_preview_image" src="(.*?)" alt="Vorschau"/>', data, re.S)
@@ -535,12 +521,12 @@ class meMovieScreen(MPScreen, ThumbsHelper):
                                         self.th_ThumbsQuery(self.genreListe, 0, 1, 2, None, None, 1, 1)
 			else:
 				self['handlung'].setText("Nichts gefunden...")
-				
+
 		elif (self.enterAuswahlLabel == "Serie-Abenteuer" or self.enterAuswahlLabel == "Serie-Action" or self.enterAuswahlLabel == "Serie-Comedy" or self.enterAuswahlLabel == "Serie-Drama" or self.enterAuswahlLabel == "Serie-Fantasy" or self.enterAuswahlLabel == "Serie-Horror" or self.enterAuswahlLabel == "Serie-Krieg" or self.enterAuswahlLabel == "Serie-Krimi" or self.enterAuswahlLabel == "Serie-Mystery" or self.enterAuswahlLabel == "Serie-SciFi" or self.enterAuswahlLabel == "Serie-Sitcom" or self.enterAuswahlLabel == "Serie-Sport"):
 			print "parsing: Serien"
 			totalPages = re.findall('<span class="first_last"><a href=".*?page=(.*?)"', data, re.S)
 			if totalPages:
-				self['page'].setText("%s / %s" % (self.page, totalPages[0]))  
+				self['page'].setText("%s / %s" % (self.page, totalPages[0]))
 			result = re.findall('<h3 class="article_preview">.*?<a href="(.*?)">.*?<span>[A-Z][A-Z][:](.*?)</span>.*?<img class="cms_article_preview_image" src="(.*?)" alt="Vorschau"/>', data, re.S)
 			if result:
 				for enterLink, enterName, enterPic in result:
@@ -556,7 +542,7 @@ class meMovieScreen(MPScreen, ThumbsHelper):
                                         self.th_ThumbsQuery(self.genreListe, 0, 1, 2, None, None, 1, 1)
 			else:
 				self['handlung'].setText("Nichts gefunden...")
-				
+
                 elif self.enterAuswahlLabel == "Neueinsteiger":
 			print "parsing: Neueinsteiger"
 			totalPages = re.search('>Seite \d+ von (\d+)</a>', data, re.S)
@@ -576,12 +562,11 @@ class meMovieScreen(MPScreen, ThumbsHelper):
 				self.keyLocked = False
 				self.th_ThumbsQuery(self.genreListe, 0, 1, 2, None, None, self.page, totalPages.group(1))
 				self.showInfos()
-				
+
                 elif self.enterAuswahlLabel == "HD-Collection":
 			print "parsing: Collection"
 			totalPages = re.findall('<span class="first_last"><a href=".*?page=(.*?)"', data, re.S)
 			if totalPages:
-				print totalPages
 				self['page'].setText("%s / %s" % (self.page, totalPages[0]))
 
 			movies = re.findall('<h3 class="article_preview">.*?<a href="(.*?)"><span>[AZ:]?(.*?)</span></a>.*?<div class="cms_article_section_location">.*?>IMDB(.*?)</a>.*?<img class="cms_article_preview_image" src="(.*?)" alt="Vorschau"', data,re.S)
@@ -600,7 +585,6 @@ class meMovieScreen(MPScreen, ThumbsHelper):
 			print "parsing: Sonstige Genres"
 			totalPages = re.findall('<span class="first_last"><a href=".*?page=(.*?)"', data, re.S)
 			if totalPages:
-				print totalPages
 				self['page'].setText("%s / %s" % (self.page, totalPages[0]))
 
 			movies = re.findall('<h3 class="article_preview">.*?<a href="(.*?)"><span>[AZ:]?(.*?)</span></a>.*?<div class="cms_article_section_location">.*?>IMDB(.*?)</a>.*?<img class="cms_article_preview_image" src="(.*?)" alt="Vorschau"', data,re.S)
@@ -629,9 +613,6 @@ class meMovieScreen(MPScreen, ThumbsHelper):
 			return
 		self.streamName = self['liste'].getCurrent()[0][0]
 		streamLink = self['liste'].getCurrent()[0][1]
-
-		print self.enterAuswahlLabel, self.streamName, streamLink
-
 		if not fileExists(config.mediaportal.watchlistpath.value+"mp_evonic_watchlist"):
 			print "erstelle watchlist"
 			open(config.mediaportal.watchlistpath.value+"mp_evonic_watchlist","w").close()
@@ -651,14 +632,12 @@ class meMovieScreen(MPScreen, ThumbsHelper):
 			return
 		self.streamName = self['liste'].getCurrent()[0][0]
 		streamLink = self['liste'].getCurrent()[0][1]
-		print self.streamName, streamLink
 		if self.enterAuswahlLabel == "HD-Serien" or self.enterAuswahlLabel == "Serien Charts" or self.enterAuswahlLabel == "Serie-Abenteuer" or self.enterAuswahlLabel == "Serie-Action" or self.enterAuswahlLabel == "Serie-Comedy" or self.enterAuswahlLabel == "Serie-Drama" or self.enterAuswahlLabel == "Serie-Fantasy" or self.enterAuswahlLabel == "Serie-Horror" or self.enterAuswahlLabel == "Serie-Krieg" or self.enterAuswahlLabel == "Serie-Krimi" or self.enterAuswahlLabel == "Serie-Mystery" or self.enterAuswahlLabel == "Serie-SciFi" or self.enterAuswahlLabel == "Serie-Sitcom" or self.enterAuswahlLabel == "Serie-Sport":
 			self.session.open(meSerienScreen, self.streamName, streamLink, self.streamPic)
 		elif self.enterAuswahlLabel == "HD-Collection":
 			self.session.open(meCollectionScreen, self.streamName, streamLink, self.streamPic)
 		elif self.enterAuswahlLabel == "Neueinsteiger":
 			genre = self['liste'].getCurrent()[0][3]
-			print genre
 			if re.search('serie', genre, re.I):
 				self.session.open(meSerienScreen, self.streamName, streamLink, self.streamPic)
 			else:
@@ -697,11 +676,11 @@ class meMovieScreen(MPScreen, ThumbsHelper):
 		print "loadHandlung...", streamFilmLink
 		getPage(streamFilmLink, cookies=ck, agent=std_headers).addCallback(self.setHandlung).addErrback(self.dataError)
 
-	def setHandlung(self, data):    
+	def setHandlung(self, data):
                 infos = re.findall('border="0" alt=""/><br/>\n<br/>(.*?)<a href=', data, re.S)
 		handlung = re.findall('<div class="bbcode_quote_container"></div>(.*?)<', data, re.S)
 		if infos and handlung:
-			handlung = re.sub(r"\s+", " ", handlung[0])                 
+			handlung = re.sub(r"\s+", " ", handlung[0])
 			infos = re.sub('<br/>', '\t', infos[0])
 			infos = decodeHtml2(infos)
 			handlung = decodeHtml2(handlung)
@@ -712,11 +691,11 @@ class meMovieScreen(MPScreen, ThumbsHelper):
 			        file = open("/tmp/.mpevo", "w")
 			        file.write(infos.strip())
                                 file.close
-                                
+
                         file = open("/tmp/.mpevo", "w")
                         file.write(infos.strip())
                         file.close
-                        
+
                         if not fileExists('/tmp/.mpevoext'):
 			        action = ' > /tmp/.mpevoext'
 			        os.system(action)
@@ -774,7 +753,7 @@ class meSerienScreen(MPScreen):
 		CoverHelper(self['coverArt']).getCover(self.streamPic)
 		getPage(self.eLink, cookies=ck, agent=std_headers).addCallback(self.getEpisoden).addErrback(self.dataError)
                 self.setHandlung()
-		
+
 	def setHandlung(self):
 	        if fileExists('/tmp/.mpevo'):
                         self.infos = "/tmp/.mpevo"
@@ -783,7 +762,7 @@ class meSerienScreen(MPScreen):
 		        self['handlung'].setText(self.text)
 		else:
 			self['handlung'].setText(_("No information found."))
-			
+
 	def getEpisoden(self, data):
 		m = re.search('//www.youtube\.com/(embed|v|p)/(.*?)(\?|" |&amp)', data)
 		if m:
@@ -835,7 +814,7 @@ class meSerienScreen(MPScreen):
                         staffelcount = 0
 			if eps:
                                 for link,epTitle in eps:
-			                setStaffel = "S01" 
+			                setStaffel = "S01"
 			                print "Staffel "+setStaffel, epTitle, link
                                         dupe_streamname = "%s - %s" % (self.eName, setStaffel + "E" + epTitle)
 			                if dupe_streamname in self.watched_liste:
@@ -847,7 +826,7 @@ class meSerienScreen(MPScreen):
 			        self.keyLocked = False
 			else:
 				print "parsing fehler.."
-                        
+
 	def keyOK(self):
 		if self.keyLocked:
 			return
@@ -856,7 +835,6 @@ class meSerienScreen(MPScreen):
 			return
 		self.streamName = self['liste'].getCurrent()[0][0]
 		streamLink = self['liste'].getCurrent()[0][1]
-		print self.streamName, streamLink
 		getPage(streamLink, cookies=ck, agent=std_headers).addCallback(self.getStreamUrl).addErrback(self.dataError)
 
 	def getStreamUrl(self, data):
@@ -864,20 +842,16 @@ class meSerienScreen(MPScreen):
 		if self.streamName == "Premium":
 			stream_url = re.findall('src="(.*?)"', data, re.S)
 			if stream_url:
-				print stream_url
 				self.session.open(SimplePlayer, [(self.eName + " " + self.streamName, stream_url[0], self.streamPic)], showPlaylist=False, ltype='ME', cover=True)
 				self.markAsWatched()
 		else:
-			print data
 			stream_url = re.findall('src="(.*?)"', data, re.S)
 			if stream_url:
-				print stream_url
 				self.session.open(SimplePlayer, [(self.eName + " " + self.streamName, stream_url[0], self.streamPic)], showPlaylist=False, ltype='ME', cover=True)
 				self.markAsWatched()
 
 	def markAsWatched(self):
 		self.stream_name = "%s - %s" % (self.eName, self.streamName)
-		print self.stream_name
 		if not fileExists(config.mediaportal.watchlistpath.value+"mp_evonic_watched"):
 			open(config.mediaportal.watchlistpath.value+"mp_evonic_watched","w").close()
 
@@ -888,7 +862,6 @@ class meSerienScreen(MPScreen):
 			for lines in sorted(self.updates_read.readlines()):
 				line = re.findall('"(.*?)"', lines)
 				if line:
-					print line[0]
 					self.update_liste.append("%s" % (line[0]))
 			self.updates_read.close()
 
@@ -985,8 +958,6 @@ class meCenturyScreen(MPScreen):
 			return
 		self.streamName = self['liste'].getCurrent()[0][0]
 		streamLink = self['liste'].getCurrent()[0][1]
-		
-		print self.streamName, streamLink
 		self.session.open(meMovieScreen, streamLink, self.streamName)
 
 class meImdbScreen(MPScreen):
@@ -1043,8 +1014,6 @@ class meImdbScreen(MPScreen):
 			return
 		self.streamName = self['liste'].getCurrent()[0][0]
 		streamLink = self['liste'].getCurrent()[0][1]
-
-		print self.streamName, streamLink
 		self.session.open(meMovieScreen, streamLink, self.streamName)
 
 class meCollectionScreen(MPScreen):
@@ -1098,7 +1067,7 @@ class meCollectionScreen(MPScreen):
 		CoverHelper(self['coverArt']).getCover(self.streamPic)
 		getPage(self.eLink, cookies=ck, agent=std_headers).addCallback(self.getEpisoden).addErrback(self.dataError)
                 #self.setHandlung()
-		
+
 	def BAKsetHandlung(self):
 	        if fileExists('/tmp/.mpevoext'):
                         self.infos = "/tmp/.mpevoext"
@@ -1107,8 +1076,8 @@ class meCollectionScreen(MPScreen):
 		        self['handlung'].setText(self.text)
 		else:
 			self['handlung'].setText(_("No information found."))
-			
-	
+
+
         def getEpisoden(self, data):
 		self.coverdata = data
 		self.eListe = []
@@ -1147,7 +1116,6 @@ class meCollectionScreen(MPScreen):
 		if check == None:
 			return
 		self.streamName = self['liste'].getCurrent()[0][0]
-		print self.streamName
 		getPage(self.eLink, cookies=ck, agent=std_headers).addCallback(self.getStream).addErrback(self.dataError)
 
 	def getStream(self, data):
@@ -1155,8 +1123,7 @@ class meCollectionScreen(MPScreen):
 		searchSTRING = self.streamName.replace('(','\(').replace(')','\)')
 		streams = re.findall(searchSTRING+'.*?<a href="(/server/Filme.php\?mov=.*?)" target="Videofram.*?">', data, re.S)
 		if streams:
-			print self.streamName, streams[0]
-		self.session.open(meServerScreen, self.streamName, streams, self.streamPic)
+			self.session.open(meServerScreen, self.streamName, streams, self.streamPic)
 
 	def showInfos(self):
 		if self.keyLocked or not self['liste'].getCurrent(): return
@@ -1184,10 +1151,9 @@ class meCollectionScreen(MPScreen):
                         file = open("/tmp/.mpevoext", "w")
                         file.write(titlename.strip())
                         file.close
-                        
+
                         if img_raw:
 				self.streamPic = img_raw[0]
-				print streamName, self.streamPic
 				CoverHelper(self['coverArt']).getCover(self.streamPic)
 			else:
 			        self['coverArt'].hide()
@@ -1276,7 +1242,6 @@ class meTimdbGenreScreen(MPScreen):
 		self.start = (self.page * 50) - 49
 
 		url = "http://www.imdb.de/search/title?groups=top_1000&sort=user_rating,desc&start=%s" % str(self.start)
-		print url
 		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded', 'User-agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0', 'Accept-Language':'de-de,de;q=0.8,en-us;q=0.5,en;q=0.3'}).addCallback(self.parseData).addErrback(self.dataError)
 
 	def parseData(self, data):
@@ -1303,10 +1268,7 @@ class meTimdbGenreScreen(MPScreen):
 	def keyOK(self):
 		if self.keyLocked:
 			return
-
 		self.searchTitle = self['liste'].getCurrent()[0][1]
-		print self.searchTitle
-
 		self.session.openWithCallback(self.mySearch, VirtualKeyBoardExt, title = (_("Search:")), text = self.searchTitle, is_dialog=True, auto_text_init=True)
 
 	def mySearch(self, callback = None):
@@ -1358,7 +1320,6 @@ class meWatchlistScreen(MPScreen):
 				data = re.findall('"(.*?)" "(.*?)" "(.*?)"', rawData, re.S)
 				if data:
 					(which, title, link) = data[0]
-					print which, title, link
 					self.watchListe.append((which, title, link))
 			print "Load Watchlist.."
 			self.watchListe.sort()
@@ -1403,9 +1364,6 @@ class meWatchlistScreen(MPScreen):
 		streamWhich = self['liste'].getCurrent()[0][0]
 		self.streamName = self['liste'].getCurrent()[0][1]
 		streamLink = self['liste'].getCurrent()[0][2]
-
-		print streamWhich, self.streamName, streamLink
-
 		if re.match('.*?Serien', streamWhich, re.S|re.I):
 			self.session.open(meSerienScreen, self.streamName, streamLink, "")
 		elif re.match('.*?Collection', streamWhich, re.S|re.I):
@@ -1414,7 +1372,6 @@ class meWatchlistScreen(MPScreen):
 			getPage(streamLink, cookies=ck, agent=std_headers).addCallback(self.getStream).addErrback(self.dataError)
 
 	def getStream(self, data):
-		#print data
 		print "get streams.."
 		self.genreListe2 = []
 		findStream = re.findall('<a href="(/server/Filme.php\?mov=.*?)" target="Videoframe">.*?<img src="http://crynet.to/images/(.*?).png"', data, re.S)
@@ -1479,9 +1436,7 @@ class meServerScreen(MPScreen):
 		self.eListe = []
 		CoverHelper(self['coverArt']).getCover(self.streamPic)
 		if len(self.eLink) != 0:
-			print self.eLink
 			for server in self.eLink:
-				print server
 				if 'http://crynet.to' not in server:
 					server = 'http://crynet.to'+server
 				self.eListe.append(("Premium", server))
@@ -1492,7 +1447,7 @@ class meServerScreen(MPScreen):
 	def BAKshowInfos(self):
 		if self.keyLocked or not self['eListe'].getCurrent(): return
 		idx = self['eListe'].getSelectedIndex()
-		
+
         def showInfos(self):
 	        if fileExists('/tmp/.mpevoext'):
                         self.infos = "/tmp/.mpevoext"
@@ -1503,7 +1458,7 @@ class meServerScreen(MPScreen):
 		        self['name'].setText(self.text)
 		else:
 			self['name'].setText(_("No information found."))
-			
+
                 if fileExists('/tmp/.mpevo'):
                         self.infos = "/tmp/.mpevo"
 		        self.info = open(self.infos, "r")
@@ -1513,7 +1468,7 @@ class meServerScreen(MPScreen):
 		        self['handlung'].setText(self.text)
 		else:
 			self['handlung'].setText(_("No information found."))
-			
+
         def keyOK(self):
 		if self.keyLocked:
 			return
@@ -1522,8 +1477,6 @@ class meServerScreen(MPScreen):
 			return
 		self.streamName = self['liste'].getCurrent()[0][0]
 		streamLink = self['liste'].getCurrent()[0][1]
-
-		print self.streamName, streamLink
 		getPage(streamLink, cookies=ck, agent=std_headers).addCallback(self.getStreamUrl).addErrback(self.dataError)
 
 	def getStreamUrl(self, data):
@@ -1532,13 +1485,10 @@ class meServerScreen(MPScreen):
 		if self.streamName == "Premium":
 			stream_url = re.findall('src="(http://.*?)"', data, re.S)
 			if stream_url:
-				print stream_url
 				self.session.open(SimplePlayer, [(self.eName2, stream_url[0], self.streamPic)], showPlaylist=False, ltype='ME', cover=True)
 		else:
-			print data
 			stream_url = re.findall('src="(http://.*?)"', data, re.S)
 			if stream_url:
-				print stream_url				
 				self.session.open(SimplePlayer, [(self.eName2, stream_url[0], self.streamPic)], showPlaylist=False, ltype='ME', cover=True)
 
 class meHosterScreen(MPScreen):
@@ -1584,9 +1534,9 @@ class meHosterScreen(MPScreen):
 	def loadPage(self):
 		self.ml.setList(map(self._defaultlistcenter, self.eListe))
 		CoverHelper(self['coverArt']).getCover(self.streamPic)
-		self.keyLocked = False		
+		self.keyLocked = False
 		self.setHandlung()
-		
+
 	def setHandlung(self):
 	        if fileExists('/tmp/.mpevo'):
                         self.infos = "/tmp/.mpevo"
@@ -1595,7 +1545,7 @@ class meHosterScreen(MPScreen):
 		        self['handlung'].setText(self.text)
 		else:
 			self['handlung'].setText(_("No information found."))
-			
+
         def keyOK(self):
 		if self.keyLocked:
 			return
@@ -1604,7 +1554,6 @@ class meHosterScreen(MPScreen):
 			return
 		self.streamName = self['liste'].getCurrent()[0][0]
 		streamLink = self['liste'].getCurrent()[0][1]
-		print self.streamName, streamLink
 		getPage(streamLink, cookies=ck, agent=std_headers).addCallback(self.getStreamUrl).addErrback(self.dataError)
 
 	def getStreamUrl(self, data):
@@ -1612,7 +1561,6 @@ class meHosterScreen(MPScreen):
 		self.eName2 = decodeHtml2(self.eName)
 		stream_url = re.findall('src="(http://.*?)"', data, re.S)
 		if stream_url:
-			print stream_url
 			self.session.open(SimplePlayer, [(self.eName2, stream_url[0], self.streamPic)], showPlaylist=False, ltype='ME', cover=True)
 
 	def keyTrailer(self):

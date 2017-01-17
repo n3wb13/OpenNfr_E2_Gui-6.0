@@ -143,7 +143,7 @@ class GSTPlayer:
 					self._on_about_to_finish()
 				else:
 					s_cache_item = None
-				
+
 				if self._seeking and not endlist:
 					self.play()
 		if endlist:
