@@ -41,9 +41,13 @@ class IconCheckPoller:
 				LinkState = open('/sys/class/net/wlan0/operstate').read()
 		elif fileExists('/sys/class/net/eth0/operstate'):
 			LinkState = open('/sys/class/net/eth0/operstate').read()
-			#if LinkState != 'down':
-				#LinkState = open('/sys/class/net/eth0/carrier').read()
-		#LinkState = LinkState[:1]
+			if LinkState != 'down':
+				try:
+					LinkState = open('/sys/class/net/eth0/carrier').read()
+				except:
+          				print "only Wlan"  
+				
+			LinkState = LinkState[:1]
 		if fileExists("/proc/stb/lcd/symbol_network") and config.lcd.mode.value == '1':
 			f = open("/proc/stb/lcd/symbol_network", "w")
 			f.write(str(LinkState))
